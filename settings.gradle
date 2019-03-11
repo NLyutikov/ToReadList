@@ -1,1 +1,3 @@
-include ':app', ':ui-core'
+include ':app',
+        ':ui-core',
+        ':ui'
