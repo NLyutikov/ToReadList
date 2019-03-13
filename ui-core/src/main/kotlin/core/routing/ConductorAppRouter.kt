@@ -34,7 +34,7 @@ class ConductorAppRouter<RouteType : Route> constructor(
         @IdRes containerViewId: Int,
         savedInstanceState: Bundle?,
         initialRoute: RouteType? = null,
-        initialTransitionType: RouterTransitionType?
+        initialTransitionType: RouterTransitionType? = null
     ) {
         val container = host.findViewById<ViewGroup>(containerViewId)
         conductorRouter = Conductor.attachRouter(host, container, savedInstanceState)
