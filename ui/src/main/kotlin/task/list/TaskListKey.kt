@@ -7,6 +7,6 @@ import ru.appkode.base.ui.core.core.model.ScreenKey
 @Parcelize
 internal class TaskListKey: ScreenKey() {
     override fun createController(): Controller {
-        return TaskListController() as Controller
+        return TaskListController()
     }
 }

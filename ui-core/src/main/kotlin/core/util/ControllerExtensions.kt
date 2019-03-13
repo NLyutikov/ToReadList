@@ -6,8 +6,11 @@ import com.bluelinelabs.conductor.RouterTransaction
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
+import ru.appkode.base.ui.core.core.BaseActivity
 import ru.appkode.base.ui.core.core.model.SCREEN_KEY_ARG_NAME
 import ru.appkode.base.ui.core.core.model.ScreenKey
+import ru.appkode.base.ui.core.core.routing.Route
+import ru.appkode.base.ui.core.core.routing.Router
 import ru.appkode.base.ui.core.core.routing.transition.SharedElementTransition
 
 inline val Controller.requireResources get() = this.resources!!
@@ -62,4 +65,9 @@ fun Controller.obtainSharedTransaction(transition: SharedElementTransition): Rou
         .with(this)
         .pushChangeHandler(transition as ControllerChangeHandler)
         .popChangeHandler(transition as ControllerChangeHandler)
+}
+
+fun Controller.getAppRouter(): Router<Route> {
+    val mainActivity = requireActivity as BaseActivity
+    return mainActivity.router
 }
