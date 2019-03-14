@@ -66,8 +66,3 @@ fun Controller.obtainSharedTransaction(transition: SharedElementTransition): Rou
         .pushChangeHandler(transition as ControllerChangeHandler)
         .popChangeHandler(transition as ControllerChangeHandler)
 }
-
-fun Controller.getAppRouter(): Router<Route> {
-    val mainActivity = requireActivity as BaseActivity
-    return mainActivity.router
-}

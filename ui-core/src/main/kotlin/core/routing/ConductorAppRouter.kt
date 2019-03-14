@@ -9,6 +9,7 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.RouterTransaction
+import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.model.ScreenKey
 import ru.appkode.base.ui.core.core.routing.transition.RouterTransitionType
 import ru.appkode.base.ui.core.core.util.*
@@ -116,7 +117,9 @@ class ConductorAppRouter<RouteType : Route> constructor(
     }
 
     private fun createTransaction(route: RouteType, transitionType: RouterTransitionType?): RouterTransaction {
-        val controller = screenKeyFactory(route).newController()
+        val controller = screenKeyFactory(route).newController().also {controller ->
+            (controller as BaseMviController<*,*,*>).setRouter(this as Router<Route>)
+        }
         return transitionType.toControllerTransaction(controller)
             // have to use 'path' here rather than route,
             // because conductor will save/restore only 'String' based tags on rotation

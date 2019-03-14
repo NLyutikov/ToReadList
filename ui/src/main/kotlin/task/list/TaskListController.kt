@@ -6,6 +6,7 @@ import kotlinx.android.synthetic.main.task_list_controller.*
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.*
+import ru.appkode.base.ui.routing.AppRouter
 import ru.appkode.base.ui.task.list.TaskListScreen.View
 import ru.appkode.base.ui.task.list.TaskListScreen.ViewState
 
@@ -38,7 +39,7 @@ internal class TaskListController : BaseMviController<ViewState, View, TaskListP
     }
 
     override fun createPresenter(): TaskListPresenter {
-        return TaskListPresenter(DefaultAppSchedulers, this.getAppRouter())
+        return TaskListPresenter(DefaultAppSchedulers, this.appRouter!!)
     }
 }
 

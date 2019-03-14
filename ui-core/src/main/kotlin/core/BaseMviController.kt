@@ -9,6 +9,8 @@ import com.hannesdorfmann.mosby3.mvi.MviPresenter
 import com.jakewharton.rxrelay2.PublishRelay
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.*
+import ru.appkode.base.ui.core.core.routing.Route
+import ru.appkode.base.ui.core.core.routing.Router
 
 abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
     : MviController<V, P>, MviView<VS>,
@@ -32,6 +34,9 @@ abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
     protected val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create()
     protected var previousViewState: VS? = null
 
+    protected var appRouter: Router<Route>? = null
+    get() = field?: throw IllegalStateException("App router should be initialized in controller")
+
     private var bindPropsRootView: View? = null
 
     protected abstract fun createConfig(): Config
@@ -47,6 +52,10 @@ abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
         // this is required for BindView delegate to work
         initializeView(rootView)
         return rootView
+    }
+
+    fun setRouter(router: Router<Route>) {
+        appRouter = router
     }
 
     abstract fun initializeView(rootView: View)
