@@ -2,24 +2,26 @@ package ru.appkode.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import ru.appkode.base.ui.core.core.BaseActivity
-import ru.appkode.base.ui.core.core.routing.ConductorAppRouter
-import ru.appkode.base.ui.core.core.routing.Route
-import ru.appkode.base.ui.routing.AppRoute
-import ru.appkode.base.ui.routing.ScreenKeyFactory
+import com.bluelinelabs.conductor.Conductor
+import com.bluelinelabs.conductor.Router
+import kotlinx.android.synthetic.main.activity_main.*
+import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
+import ru.appkode.base.ui.task.list.TaskListController
 
-class MainActivity : BaseActivity() {
+class MainActivity : AppCompatActivity() {
 
-    override var router = ConductorAppRouter<Route> { ScreenKeyFactory().invoke(it as AppRoute) }
+  private lateinit var router: Router
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        router.attachTo(this, R.id.main_container, savedInstanceState, AppRoute.List)
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    router = Conductor.attachRouter(this, main_container, savedInstanceState)
+    if (!router.hasRootController())
+      router.setRoot(TaskListController().obtainHorizontalTransaction())
+  }
 
-    override fun onBackPressed() {
-        if (!router.handleBack())
-            super.onBackPressed()
-    }
+  override fun onBackPressed() {
+    if (!router.handleBack())
+      super.onBackPressed()
+  }
 }
