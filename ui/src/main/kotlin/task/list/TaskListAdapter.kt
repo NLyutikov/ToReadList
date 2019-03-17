@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
@@ -17,14 +18,22 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
   var data: List<TaskUM> = emptyList()
     set(value) {
-      field = value
-      notifyDataSetChanged()
-    }
+      DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+          return field[oldItemPosition].id == value[newItemPosition].id
+        }
 
-  var checkedList: List<String> = emptyList()
-    set(value) {
+        override fun getOldListSize() = field.size
+
+        override fun getNewListSize() = value.size
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+          return field[oldItemPosition] == value[newItemPosition]
+        }
+
+      }).dispatchUpdatesTo(this)
+
       field = value
-      notifyDataSetChanged()
     }
 
   private val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create<Pair<Int, Any>>()
@@ -39,7 +48,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     with(holder) {
-      checkBox.isChecked = checkedList.contains(data[position].id)
+      checkBox.isChecked = data[position].isChecked
       title.text = data[position].title
       description.text = data[position].description
     }

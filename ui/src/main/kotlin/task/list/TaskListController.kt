@@ -29,8 +29,6 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   override fun renderViewState(viewState: ViewState) {
     if (fieldChanged(viewState) { it.tasks })
       adapter.data = viewState.tasks
-    if (fieldChanged(viewState) { it.checkedTask })
-      adapter.checkedList = viewState.checkedTask
   }
 
   override fun switchTaskIntent(): Observable<String> {

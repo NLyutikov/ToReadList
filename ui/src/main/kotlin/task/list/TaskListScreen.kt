@@ -12,7 +12,6 @@ interface TaskListScreen {
   }
 
   data class ViewState(
-    val tasks: List<TaskUM>,
-    val checkedTask: LinkedList<String>
+    val tasks: List<TaskUM>
   )
 }

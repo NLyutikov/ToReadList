@@ -38,18 +38,22 @@ class TaskListPresenter(
     previousState: ViewState,
     action: SwitchTask
   ): Pair<ViewState, Command<ScreenAction>?> {
-    val list = (previousState.checkedTask.clone() as LinkedList<String>).apply {
-      if (this.contains(action.id)) {
-        this.remove(action.id)
-      } else this.add(action.id)
+//    val list = (previousState.checkedTask.clone() as LinkedList<String>).apply {
+//      if (this.contains(action.id)) {
+//        this.remove(action.id)
+//      } else this.add(action.id)
+//    }
+    val list = previousState.tasks.map { task ->
+      if (task.id == action.id) task.copy(isChecked = !task.isChecked)
+      else task
     }
-    return previousState.copy(checkedTask = list) to null
+
+    return previousState.copy(tasks = list) to null
   }
 
   override fun createInitialState(): ViewState {
     return ViewState(
-      tasks = createMockTasks(),
-      checkedTask = LinkedList()
+      tasks = createMockTasks()
     )
   }
 }
@@ -59,7 +63,8 @@ private fun createMockTasks(): List<TaskUM> {
     TaskUM(
       id = index.toString(),
       title = "Task $index",
-      description = "This is description of task $index"
+      description = "This is description of task $index",
+      isChecked = false
     )
   }
 }
