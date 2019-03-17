@@ -3,18 +3,9 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <TextView
-            android:id="@+id/task_list_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    <EditText
-            android:id="@+id/task_list_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    <Button
-            android:id="@+id/task_list_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="popRouter()"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/task_list_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

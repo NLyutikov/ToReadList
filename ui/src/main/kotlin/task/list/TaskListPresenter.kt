@@ -4,15 +4,15 @@ import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
-import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.task.list.TaskListScreen.View
 import ru.appkode.base.ui.task.list.TaskListScreen.ViewState
+import ru.appkode.base.ui.task.list.entities.TaskUM
+import java.util.*
 
 sealed class ScreenAction
 
-data class UpdateText(val text: String) : ScreenAction()
-object PopRouter : ScreenAction()
+data class SwitchTask(val id: String) : ScreenAction()
 
 class TaskListPresenter(
   schedulers: AppSchedulers,
@@ -20,10 +20,8 @@ class TaskListPresenter(
 ) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
   override fun createIntents(): List<Observable<out ScreenAction>> {
     return listOf(
-      intent(View::updateTextIntent)
-        .map { UpdateText(it) },
-      intent(View::popRouterIntent)
-        .map { PopRouter }
+      intent(View::switchTaskIntent)
+        .map { SwitchTask(it) }
     )
   }
 
@@ -32,27 +30,36 @@ class TaskListPresenter(
     action: ScreenAction
   ): Pair<ViewState, Command<ScreenAction>?> {
     return when (action) {
-      is UpdateText -> processUpdateText(previousState, action)
-      is PopRouter -> processPopRouter(previousState, action)
+      is SwitchTask -> processSwitchTask(previousState, action)
     }
   }
 
-  private fun processPopRouter(
+  private fun processSwitchTask(
     previousState: ViewState,
-    action: PopRouter
+    action: SwitchTask
   ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState to command { router.popCurrentController() }
-  }
-
-  private fun processUpdateText(
-    previousState: ViewState,
-    action: UpdateText
-  ): Pair<ViewState, Command<ScreenAction>?> {
-    val newText = if (action.text.isNotBlank()) action.text else "Enter text"
-    return previousState.copy(text = newText) to null
+    val list = (previousState.checkedTask.clone() as LinkedList<String>).apply {
+      if (this.contains(action.id)) {
+        this.remove(action.id)
+      } else this.add(action.id)
+    }
+    return previousState.copy(checkedTask = list) to null
   }
 
   override fun createInitialState(): ViewState {
-    return ViewState(text = "Enter text")
+    return ViewState(
+      tasks = createMockTasks(),
+      checkedTask = LinkedList()
+    )
+  }
+}
+
+private fun createMockTasks(): List<TaskUM> {
+  return List(30) { index ->
+    TaskUM(
+      id = index.toString(),
+      title = "Task $index",
+      description = "This is description of task $index"
+    )
   }
 }
