@@ -36,4 +36,5 @@ androidExtensions {
 dependencies {
   implementation project(':core')
   implementation project(':entities')
+  implementation project(':repository')
 }

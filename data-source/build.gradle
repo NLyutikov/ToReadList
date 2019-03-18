@@ -29,12 +29,11 @@ android {
   }
 
 }
-androidExtensions{
+androidExtensions {
   experimental true
 }
 
 dependencies {
-  implementation project(":core")
   implementation project(':entities')
-  implementation project(':data-source')
+  implementation project(':core')
 }

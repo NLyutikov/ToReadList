@@ -61,4 +61,4 @@ class CreateTaskPresenter(
   }
 }
 
-private const val NONE_ID_VALUE = ""
+private const val NONE_ID_VALUE = 0L

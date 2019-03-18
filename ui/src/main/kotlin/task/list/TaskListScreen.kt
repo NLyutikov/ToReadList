@@ -7,7 +7,7 @@ import ru.appkode.base.ui.task.list.entities.TaskUM
 interface TaskListScreen {
 
   interface View : MviView<ViewState> {
-    fun switchTaskIntent(): Observable<String>
+    fun switchTaskIntent(): Observable<Long>
     fun createTaskIntent(): Observable<Unit>
   }
 

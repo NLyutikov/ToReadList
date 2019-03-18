@@ -34,4 +34,5 @@ androidExtensions{
 }
 
 dependencies {
+  implementation project(":core")
 }

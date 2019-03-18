@@ -7,5 +7,7 @@ interface TaskRepository {
 
   fun addTask(task: TaskUM)
 
+  fun updateTask(task: TaskUM)
+
   fun tasks(): Observable<List<TaskUM>>
 }

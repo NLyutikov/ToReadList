@@ -2,6 +2,7 @@ package ru.appkode.base.ui.task.list
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
@@ -14,11 +15,13 @@ import ru.appkode.base.ui.task.list.entities.TaskUM
 
 sealed class ScreenAction
 
-data class SwitchTask(val id: String) : ScreenAction()
+data class SwitchTask(val id: Long) : ScreenAction()
 object CreateTask : ScreenAction()
+data class UpdateList(val list: List<TaskUM>): ScreenAction()
 
 class TaskListPresenter(
   schedulers: AppSchedulers,
+  val taskRepository: TaskRepository,
   private val router: Router
 ) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
   override fun createIntents(): List<Observable<out ScreenAction>> {
@@ -26,7 +29,9 @@ class TaskListPresenter(
       intent(View::switchTaskIntent)
         .map { SwitchTask(it) },
       intent(View::createTaskIntent)
-        .map { CreateTask }
+        .map { CreateTask },
+      intent{ taskRepository.tasks() }
+        .map { UpdateList(it) }
     )
   }
 
@@ -37,7 +42,15 @@ class TaskListPresenter(
     return when (action) {
       is SwitchTask -> processSwitchTask(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
+      is UpdateList -> processUpdateList(previousState, action)
     }
+  }
+
+  private fun processUpdateList(
+    previousState: ViewState,
+    action: UpdateList
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState.copy(tasks = action.list) to null
   }
 
   private fun processSwitchTask(
@@ -70,7 +83,7 @@ class TaskListPresenter(
 private fun createMockTasks(): List<TaskUM> {
   return List(30) { index ->
     TaskUM(
-      id = index.toString(),
+      id = index.toLong(),
       title = "Task $index",
       description = "This is description of task $index",
       isChecked = false

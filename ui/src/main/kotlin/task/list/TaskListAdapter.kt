@@ -38,7 +38,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
   private val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create<Pair<Int, Any>>()
 
-  val itemClicked: Observable<String> = eventsRelay.filterEvents(EVENT_ID_ITEM_CLICKED)
+  val itemClicked: Observable<Long> = eventsRelay.filterEvents(EVENT_ID_ITEM_CLICKED)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.task_list_item, parent, false))

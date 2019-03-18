@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.task_list_controller.*
+import ru.appkode.base.repository.task.TaskRepositoryImpl
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -30,7 +31,7 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
     if (fieldChanged(viewState) { it.tasks }) adapter.data = viewState.tasks
   }
 
-  override fun switchTaskIntent(): Observable<String> {
+  override fun switchTaskIntent(): Observable<Long> {
     return adapter.itemClicked
   }
 
@@ -39,6 +40,6 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun createPresenter(): TaskListPresenter {
-    return TaskListPresenter(DefaultAppSchedulers, this.router!!)
+    return TaskListPresenter(DefaultAppSchedulers, TaskRepositoryImpl(), this.router!!)
   }
 }
