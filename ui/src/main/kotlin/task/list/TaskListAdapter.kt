@@ -60,7 +60,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
     val description: TextView = view.task_list_item_description
 
     init {
-      view.setOnClickListener {
+      checkBox.setOnClickListener {
         eventsRelay.accept(EVENT_ID_ITEM_CLICKED to data[adapterPosition].id)
       }
     }

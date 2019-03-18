@@ -31,7 +31,6 @@ abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
   protected val config: Config by lazy(LazyThreadSafetyMode.NONE) { createConfig() }
   protected val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create()
   protected var previousViewState: VS? = null
-    //get() = field ?: throw IllegalStateException("App router should be initialized in controller")
 
   private var bindPropsRootView: View? = null
 
@@ -64,6 +63,11 @@ abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
   final override fun render(viewState: VS) {
     renderViewState(viewState)
     previousViewState = viewState
+  }
+
+  protected fun fieldChanged(newState: VS, field: (VS) -> Any): Boolean {
+    return if (previousViewState == null) true
+    else (field.invoke(previousViewState!!) != field.invoke(newState))
   }
 
   protected abstract fun renderViewState(viewState: VS)
