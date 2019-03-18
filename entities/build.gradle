@@ -1,13 +1,10 @@
-apply plugin: 'com.android.application'
-
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
 
 android {
   compileSdkVersion 28
   defaultConfig {
-    applicationId "ru.appkode.base"
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 1
@@ -18,33 +15,23 @@ android {
     buildConfigField 'boolean', 'DEV', 'Boolean.parseBoolean("false")'
     buildConfigField 'boolean', 'RELEASE', 'Boolean.parseBoolean("false")'
   }
+  // see app/build.gradle for description and other details
   buildTypes {
     debug {
-      versionNameSuffix '-dev'
-      applicationIdSuffix '.dev'
-      debuggable true
-
       buildConfigField 'boolean', 'DEV', 'Boolean.parseBoolean("true")'
     }
     release {
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      versionNameSuffix '-release'
-      debuggable false
-
-      minifyEnabled true
-
-      // not using parseBoolean, because in this mode we don't care about lint warnings
-      // and this way proguard is more likely to better optimize: strip out conditions
       buildConfigField 'boolean', 'RELEASE', 'true'
     }
   }
+  sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+  }
+
 }
-androidExtensions {
-  experimental = true
+androidExtensions{
+  experimental true
 }
 
 dependencies {
-  implementation project(':core')
-  implementation project(':ui')
-  implementation 'com.android.support:appcompat-v7:28.0.0'
 }

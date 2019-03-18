@@ -15,7 +15,7 @@ import ru.appkode.base.ui.task.list.entities.TaskUM
 sealed class ScreenAction
 
 data class SwitchTask(val id: String) : ScreenAction()
-object CreateTask: ScreenAction()
+object CreateTask : ScreenAction()
 
 class TaskListPresenter(
   schedulers: AppSchedulers,
