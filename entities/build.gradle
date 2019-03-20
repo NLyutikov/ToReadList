@@ -35,4 +35,5 @@ androidExtensions{
 
 dependencies {
   implementation project(":core")
+  implementation "androidx.room:room-common:2.1.0-alpha05"
 }

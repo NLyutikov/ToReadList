@@ -1,8 +1,10 @@
 package ru.appkode.base.ui.task.create
 
 import io.reactivex.Observable
+import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
+import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.task.create.CreateTaskScreen.View
 import ru.appkode.base.ui.task.create.CreateTaskScreen.ViewState
@@ -12,9 +14,11 @@ sealed class ScreenAction
 
 data class ChangeTaskTitle(val text: String) : ScreenAction()
 data class ChangeTaskDescription(val text: String) : ScreenAction()
+object CreateTask : ScreenAction()
 
 class CreateTaskPresenter(
-  schedulers: AppSchedulers
+  schedulers: AppSchedulers,
+  private val taskRepository: TaskRepository
 ) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
 
   override fun createIntents(): List<Observable<out ScreenAction>> {
@@ -22,7 +26,9 @@ class CreateTaskPresenter(
       intent(View::changeTaskTitleIntent)
         .map { ChangeTaskTitle(it) },
       intent(View::changeTaskDescription)
-        .map { ChangeTaskDescription(it) }
+        .map { ChangeTaskDescription(it) },
+      intent(View::createTaskIntent)
+        .map { CreateTask }
     )
   }
 
@@ -33,6 +39,16 @@ class CreateTaskPresenter(
     return when (action) {
       is ChangeTaskTitle -> processChangeTaskTitle(previousState, action)
       is ChangeTaskDescription -> processChangeTaskDescription(previousState, action)
+      is CreateTask -> processCreateTask(previousState, action)
+    }
+  }
+
+  private fun processCreateTask(
+    previousState: ViewState,
+    action: CreateTask
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState to command {
+      taskRepository.addTask(previousState.task)
     }
   }
 
@@ -56,7 +72,8 @@ class CreateTaskPresenter(
         id = NONE_ID_VALUE,
         title = "",
         description = "",
-        isChecked = false)
+        isChecked = false
+      )
     )
   }
 }

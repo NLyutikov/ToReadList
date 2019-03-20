@@ -57,11 +57,17 @@ class TaskListPresenter(
     previousState: ViewState,
     action: SwitchTask
   ): Pair<ViewState, Command<ScreenAction>?> {
+    var currentTask: TaskUM? = null
     val list = previousState.tasks.map { task ->
-      if (task.id == action.id) task.copy(isChecked = !task.isChecked)
+      if (task.id == action.id) {
+        currentTask = task.copy(isChecked = !task.isChecked)
+        currentTask!!
+      }
       else task
     }
-    return previousState.copy(tasks = list) to null
+    return previousState.copy(tasks = list) to command {
+      taskRepository.updateTask(currentTask!!)
+    }
   }
 
   private fun processCreateTask(
@@ -75,18 +81,7 @@ class TaskListPresenter(
 
   override fun createInitialState(): ViewState {
     return ViewState(
-      tasks = createMockTasks()
-    )
-  }
-}
-
-private fun createMockTasks(): List<TaskUM> {
-  return List(30) { index ->
-    TaskUM(
-      id = index.toLong(),
-      title = "Task $index",
-      description = "This is description of task $index",
-      isChecked = false
+      tasks = emptyList()
     )
   }
 }

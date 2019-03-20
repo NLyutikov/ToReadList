@@ -8,6 +8,7 @@ interface CreateTaskScreen {
   interface View : MviView<ViewState>{
     fun changeTaskTitleIntent(): Observable<String>
     fun changeTaskDescription(): Observable<String>
+    fun createTaskIntent(): Observable<Unit>
   }
 
   data class ViewState(

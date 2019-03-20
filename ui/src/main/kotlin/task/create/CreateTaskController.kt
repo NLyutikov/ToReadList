@@ -1,8 +1,10 @@
 package ru.appkode.base.ui.task.create
 
 import androidx.core.widget.doOnTextChanged
+import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.create_task_controller.*
+import ru.appkode.base.repository.task.TaskRepositoryImpl
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -45,8 +47,12 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
     return eventsRelay.filterEvents(EVENT_ID_DESCRIPTION_CHANGED)
   }
 
+  override fun createTaskIntent(): Observable<Unit> {
+    return create_task_button_create.clicks()
+  }
+
   override fun createPresenter(): CreateTaskPresenter {
-    return CreateTaskPresenter(DefaultAppSchedulers)
+    return CreateTaskPresenter(DefaultAppSchedulers, TaskRepositoryImpl())
   }
 }
 
