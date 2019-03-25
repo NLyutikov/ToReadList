@@ -55,4 +55,9 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent" />
+
+  <ProgressBar
+    android:id="@+id/create_task_loading"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

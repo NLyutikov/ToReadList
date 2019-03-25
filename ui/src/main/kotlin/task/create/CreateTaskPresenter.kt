@@ -1,9 +1,10 @@
 package ru.appkode.base.ui.task.create
 
+import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.repository.task.TaskRepository
-import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
+import ru.appkode.base.ui.core.core.NewBasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.task.create.CreateTaskScreen.View
@@ -15,11 +16,13 @@ sealed class ScreenAction
 data class ChangeTaskTitle(val text: String) : ScreenAction()
 data class ChangeTaskDescription(val text: String) : ScreenAction()
 object CreateTask : ScreenAction()
+data class ScreenState(val isLoading: Boolean = false, val error: Throwable? = null) : ScreenAction()
 
 class CreateTaskPresenter(
   schedulers: AppSchedulers,
-  private val taskRepository: TaskRepository
-) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
+  private val taskRepository: TaskRepository,
+  private val router: Router
+) : NewBasePresenter<View, ViewState, ScreenAction>(schedulers) {
 
   override fun createIntents(): List<Observable<out ScreenAction>> {
     return listOf(
@@ -40,7 +43,15 @@ class CreateTaskPresenter(
       is ChangeTaskTitle -> processChangeTaskTitle(previousState, action)
       is ChangeTaskDescription -> processChangeTaskDescription(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
+      is ScreenState -> processScreenState(previousState, action)
     }
+  }
+
+  private fun processScreenState(
+    previousState: ViewState,
+    action: ScreenState
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState.copy(isLoading = action.isLoading) to null
   }
 
   private fun processCreateTask(
@@ -49,6 +60,9 @@ class CreateTaskPresenter(
   ): Pair<ViewState, Command<ScreenAction>?> {
     return previousState to command {
       taskRepository.addTask(previousState.task)
+        .observeOn(schedulers.ui)
+        .doOnComplete { router.popCurrentController() }
+        .safeSubscribe()
     }
   }
 
@@ -56,7 +70,9 @@ class CreateTaskPresenter(
     previousState: ViewState,
     action: ChangeTaskTitle
   ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState.copy(task = previousState.task.copy(title = action.text)) to null
+    return previousState.copy(
+      task = previousState.task.copy(title = action.text)
+    ) to null
   }
 
   private fun processChangeTaskDescription(
@@ -73,7 +89,8 @@ class CreateTaskPresenter(
         title = "",
         description = "",
         isChecked = false
-      )
+      ),
+      isLoading = false
     )
   }
 }

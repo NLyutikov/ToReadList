@@ -3,10 +3,12 @@ package ru.appkode.base.ui.task.list
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.repository.task.TaskRepository
-import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
+import ru.appkode.base.ui.core.core.LceState
+import ru.appkode.base.ui.core.core.NewBasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
+import ru.appkode.base.ui.core.core.util.hotSwapWithSuccess
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import ru.appkode.base.ui.task.create.CreateTaskController
 import ru.appkode.base.ui.task.list.TaskListScreen.View
@@ -17,13 +19,14 @@ sealed class ScreenAction
 
 data class SwitchTask(val id: Long) : ScreenAction()
 object CreateTask : ScreenAction()
-data class UpdateList(val list: List<TaskUM>): ScreenAction()
+data class UpdateList(val state: LceState<List<TaskUM>>): ScreenAction()
+data class UpdateTask(val state: LceState<Unit>): ScreenAction()
 
 class TaskListPresenter(
   schedulers: AppSchedulers,
-  val taskRepository: TaskRepository,
+  private val taskRepository: TaskRepository,
   private val router: Router
-) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
+) : NewBasePresenter<View, ViewState, ScreenAction>(schedulers) {
   override fun createIntents(): List<Observable<out ScreenAction>> {
     return listOf(
       intent(View::switchTaskIntent)
@@ -31,7 +34,7 @@ class TaskListPresenter(
       intent(View::createTaskIntent)
         .map { CreateTask },
       intent{ taskRepository.tasks() }
-        .map { UpdateList(it) }
+        .map { UpdateList(LceState.Content(it)) }
     )
   }
 
@@ -43,14 +46,23 @@ class TaskListPresenter(
       is SwitchTask -> processSwitchTask(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
       is UpdateList -> processUpdateList(previousState, action)
+      is UpdateTask -> processUpdateTask(previousState, action)
     }
+  }
+
+  private fun processUpdateTask(
+    previousState: ViewState,
+    action: UpdateTask
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    val state = LceState(action.state.isLoading, previousState.taskState.content, action.state.error)
+    return previousState.copy(taskState = state) to null
   }
 
   private fun processUpdateList(
     previousState: ViewState,
     action: UpdateList
   ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState.copy(tasks = action.list) to null
+    return previousState.copy(taskState = action.state) to null
   }
 
   private fun processSwitchTask(
@@ -58,15 +70,18 @@ class TaskListPresenter(
     action: SwitchTask
   ): Pair<ViewState, Command<ScreenAction>?> {
     var currentTask: TaskUM? = null
-    val list = previousState.tasks.map { task ->
+    val tasks = previousState.taskState.asContent()
+    val list = tasks.map { task ->
       if (task.id == action.id) {
         currentTask = task.copy(isChecked = !task.isChecked)
         currentTask!!
       }
       else task
     }
-    return previousState.copy(tasks = list) to command {
+    return previousState.copy(taskState = LceState.Content(list)) to command {
       taskRepository.updateTask(currentTask!!)
+        .doLceAction {UpdateTask(it)}
+        .safeSubscribe()
     }
   }
 
@@ -81,7 +96,7 @@ class TaskListPresenter(
 
   override fun createInitialState(): ViewState {
     return ViewState(
-      tasks = emptyList()
+      taskState = LceState.Loading()
     )
   }
 }

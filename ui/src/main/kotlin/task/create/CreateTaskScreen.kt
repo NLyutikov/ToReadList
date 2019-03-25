@@ -12,6 +12,7 @@ interface CreateTaskScreen {
   }
 
   data class ViewState(
-    val task: TaskUM
+    val task: TaskUM,
+    val isLoading: Boolean
   )
 }

@@ -11,7 +11,7 @@ object DatabaseHelper {
   private lateinit var database: AppDatabase
 
   fun createDatabase(context: Context){
-    database = Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).allowMainThreadQueries().build()
+    database = Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()
   }
 
   fun getTaskPersistence(): TaskPersistence = database.taskPersistence()

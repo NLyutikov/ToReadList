@@ -1,5 +1,6 @@
 package ru.appkode.base.ui.task.list
 
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
@@ -28,7 +29,11 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun renderViewState(viewState: ViewState) {
-    if (fieldChanged(viewState) { it.tasks }) adapter.data = viewState.tasks
+    if (fieldChanged(viewState) { it.taskState }) {
+      task_list_loading.isVisible = viewState.taskState.isLoading
+      task_list_recycler.isVisible = viewState.taskState.isContent
+      if (viewState.taskState.isContent) adapter.data = viewState.taskState.asContent()
+    }
   }
 
   override fun switchTaskIntent(): Observable<Long> {
@@ -40,6 +45,6 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun createPresenter(): TaskListPresenter {
-    return TaskListPresenter(DefaultAppSchedulers, TaskRepositoryImpl(), this.router!!)
+    return TaskListPresenter(DefaultAppSchedulers, TaskRepositoryImpl(DefaultAppSchedulers), this.router!!)
   }
 }

@@ -1,5 +1,6 @@
 package ru.appkode.base.ui.task.create
 
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
@@ -37,6 +38,8 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
 
     create_task_description.setText(viewState.task.description)
     create_task_description.setSelection(viewState.task.description.length)
+
+    create_task_loading.isVisible = viewState.isLoading
   }
 
   override fun changeTaskTitleIntent(): Observable<String> {
@@ -52,7 +55,7 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
   }
 
   override fun createPresenter(): CreateTaskPresenter {
-    return CreateTaskPresenter(DefaultAppSchedulers, TaskRepositoryImpl())
+    return CreateTaskPresenter(DefaultAppSchedulers, TaskRepositoryImpl(DefaultAppSchedulers), router)
   }
 }
 
