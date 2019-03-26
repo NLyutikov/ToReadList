@@ -8,7 +8,6 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.NewBasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import ru.appkode.base.ui.core.core.util.hotSwapWithSuccess
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import ru.appkode.base.ui.task.create.CreateTaskController
 import ru.appkode.base.ui.task.list.TaskListScreen.View
@@ -19,8 +18,7 @@ sealed class ScreenAction
 
 data class SwitchTask(val id: Long) : ScreenAction()
 object CreateTask : ScreenAction()
-data class UpdateList(val state: LceState<List<TaskUM>>): ScreenAction()
-data class UpdateTask(val state: LceState<Unit>): ScreenAction()
+data class UpdateList(val state: LceState<List<TaskUM>>) : ScreenAction()
 
 class TaskListPresenter(
   schedulers: AppSchedulers,
@@ -33,7 +31,7 @@ class TaskListPresenter(
         .map { SwitchTask(it) },
       intent(View::createTaskIntent)
         .map { CreateTask },
-      intent{ taskRepository.tasks() }
+      intent { taskRepository.tasks() }
         .map { UpdateList(LceState.Content(it)) }
     )
   }
@@ -46,16 +44,7 @@ class TaskListPresenter(
       is SwitchTask -> processSwitchTask(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
       is UpdateList -> processUpdateList(previousState, action)
-      is UpdateTask -> processUpdateTask(previousState, action)
     }
-  }
-
-  private fun processUpdateTask(
-    previousState: ViewState,
-    action: UpdateTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
-    val state = LceState(action.state.isLoading, previousState.taskState.content, action.state.error)
-    return previousState.copy(taskState = state) to null
   }
 
   private fun processUpdateList(
@@ -75,12 +64,10 @@ class TaskListPresenter(
       if (task.id == action.id) {
         currentTask = task.copy(isChecked = !task.isChecked)
         currentTask!!
-      }
-      else task
+      } else task
     }
     return previousState.copy(taskState = LceState.Content(list)) to command {
       taskRepository.updateTask(currentTask!!)
-        .doLceAction {UpdateTask(it)}
         .safeSubscribe()
     }
   }

@@ -29,7 +29,7 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun renderViewState(viewState: ViewState) {
-    if (fieldChanged(viewState) { it.taskState }) {
+    fieldChanged(viewState, { it.taskState }) {
       task_list_loading.isVisible = viewState.taskState.isLoading
       task_list_recycler.isVisible = viewState.taskState.isContent
       if (viewState.taskState.isContent) adapter.data = viewState.taskState.asContent()

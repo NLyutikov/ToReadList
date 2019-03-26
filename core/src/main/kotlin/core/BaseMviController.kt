@@ -65,9 +65,9 @@ abstract class BaseMviController<VS, V : MviView<VS>, P : MviPresenter<V, VS>>
     previousViewState = viewState
   }
 
-  protected fun fieldChanged(newState: VS, field: (VS) -> Any): Boolean {
-    return if (previousViewState == null) true
-    else (field.invoke(previousViewState!!) != field.invoke(newState))
+  protected fun fieldChanged(newState: VS, field: (VS) -> Any, action: () -> Unit) {
+    if (previousViewState == null) action.invoke()
+    else if (field.invoke(previousViewState!!) != field.invoke(newState)) action.invoke()
   }
 
   protected abstract fun renderViewState(viewState: VS)

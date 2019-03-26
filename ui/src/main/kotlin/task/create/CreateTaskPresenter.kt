@@ -4,6 +4,7 @@ import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.Command
+import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.NewBasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
@@ -16,7 +17,7 @@ sealed class ScreenAction
 data class ChangeTaskTitle(val text: String) : ScreenAction()
 data class ChangeTaskDescription(val text: String) : ScreenAction()
 object CreateTask : ScreenAction()
-data class ScreenState(val isLoading: Boolean = false, val error: Throwable? = null) : ScreenAction()
+data class UpdateState(val state: LceState<Unit>) : ScreenAction()
 
 class CreateTaskPresenter(
   schedulers: AppSchedulers,
@@ -43,15 +44,15 @@ class CreateTaskPresenter(
       is ChangeTaskTitle -> processChangeTaskTitle(previousState, action)
       is ChangeTaskDescription -> processChangeTaskDescription(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
-      is ScreenState -> processScreenState(previousState, action)
+      is UpdateState -> processUpdateState(previousState, action)
     }
   }
 
-  private fun processScreenState(
+  private fun processUpdateState(
     previousState: ViewState,
-    action: ScreenState
+    action: UpdateState
   ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState.copy(isLoading = action.isLoading) to null
+    return previousState.copy(state = action.state) to null
   }
 
   private fun processCreateTask(
@@ -60,7 +61,7 @@ class CreateTaskPresenter(
   ): Pair<ViewState, Command<ScreenAction>?> {
     return previousState to command {
       taskRepository.addTask(previousState.task)
-        .observeOn(schedulers.ui)
+        .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
         .safeSubscribe()
     }
@@ -90,7 +91,7 @@ class CreateTaskPresenter(
         description = "",
         isChecked = false
       ),
-      isLoading = false
+      state = LceState.Content(Unit)
     )
   }
 }

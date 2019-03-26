@@ -2,6 +2,7 @@ package ru.appkode.base.ui.task.create
 
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.create_task_controller.*
@@ -10,6 +11,7 @@ import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
+import ru.appkode.base.ui.core.core.util.setTextSafe
 import ru.appkode.base.ui.task.create.CreateTaskScreen.View
 import ru.appkode.base.ui.task.create.CreateTaskScreen.ViewState
 
@@ -31,15 +33,27 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
   }
 
   override fun renderViewState(viewState: ViewState) {
-    create_task_toolbar.title = viewState.task.title
+    fieldChanged(viewState, { it.task.title }) {
+      create_task_toolbar.title = viewState.task.title
+      create_task_title.setTextSafe(viewState.task.title)
+    }
 
-    create_task_title.setText(viewState.task.title)
-    create_task_title.setSelection(viewState.task.title.length)
+    fieldChanged(viewState, { it.task.description }){
+      create_task_description.setTextSafe(viewState.task.description)
+    }
 
-    create_task_description.setText(viewState.task.description)
-    create_task_description.setSelection(viewState.task.description.length)
-
-    create_task_loading.isVisible = viewState.isLoading
+    fieldChanged(viewState, { it.state }){
+      create_task_loading.isVisible = viewState.state.isLoading
+      if (viewState.state.isError) {
+        Snackbar
+          .make(
+            this.containerView!!,
+            viewState.state.asError(),
+            Snackbar.LENGTH_LONG
+          )
+          .show()
+      }
+    }
   }
 
   override fun changeTaskTitleIntent(): Observable<String> {

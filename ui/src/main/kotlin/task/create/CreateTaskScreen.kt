@@ -1,6 +1,7 @@
 package ru.appkode.base.ui.task.create
 
 import io.reactivex.Observable
+import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.MviView
 import ru.appkode.base.ui.task.list.entities.TaskUM
 
@@ -13,6 +14,6 @@ interface CreateTaskScreen {
 
   data class ViewState(
     val task: TaskUM,
-    val isLoading: Boolean
+    val state: LceState<Unit>
   )
 }
