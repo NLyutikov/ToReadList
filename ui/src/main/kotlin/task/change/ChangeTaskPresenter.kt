@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.task.create
+package ru.appkode.base.ui.task.change
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
@@ -9,20 +9,23 @@ import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import ru.appkode.base.ui.task.create.CreateTaskScreen.View
-import ru.appkode.base.ui.task.create.CreateTaskScreen.ViewState
+import ru.appkode.base.ui.task.change.ChangeTaskScreen.View
+import ru.appkode.base.ui.task.change.ChangeTaskScreen.ViewState
 
 sealed class ScreenAction
 
 data class ChangeTaskTitle(val text: String) : ScreenAction()
 data class ChangeTaskDescription(val text: String) : ScreenAction()
-object CreateTask : ScreenAction()
+object SaveTask : ScreenAction()
 data class UpdateState(val state: LceState<Unit>) : ScreenAction()
+data class SetTask(val task: TaskUM) : ScreenAction()
+object DeleteTask : ScreenAction()
 
-class CreateTaskPresenter(
+class ChangeTaskPresenter(
   schedulers: AppSchedulers,
   private val taskRepository: TaskRepository,
-  private val router: Router
+  private val router: Router,
+  private val taskId: Long
 ) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
 
   override fun createIntents(): List<Observable<out ScreenAction>> {
@@ -31,8 +34,12 @@ class CreateTaskPresenter(
         .map { ChangeTaskTitle(it) },
       intent(View::changeTaskDescription)
         .map { ChangeTaskDescription(it) },
-      intent(View::createTaskIntent)
-        .map { CreateTask }
+      intent(View::saveTaskIntent)
+        .map { SaveTask },
+      intent(View::deleteTask)
+        .map { DeleteTask },
+      intent { taskRepository.task(taskId) }
+        .map { SetTask(it) }
     )
   }
 
@@ -43,9 +50,33 @@ class CreateTaskPresenter(
     return when (action) {
       is ChangeTaskTitle -> processChangeTaskTitle(previousState, action)
       is ChangeTaskDescription -> processChangeTaskDescription(previousState, action)
-      is CreateTask -> processCreateTask(previousState, action)
+      is SaveTask -> processSaveTask(previousState, action)
       is UpdateState -> processUpdateState(previousState, action)
+      is SetTask -> processSetTask(previousState, action)
+      is DeleteTask -> processDeleteTask(previousState, action)
     }
+  }
+
+  private fun processDeleteTask(
+    previousState: ViewState,
+    action: DeleteTask
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState to command {
+      taskRepository.deleteTask(previousState.task)
+        .doLceAction { UpdateState(it) }
+        .doOnComplete { router.popCurrentController() }
+        .safeSubscribe()
+    }
+  }
+
+  private fun processSetTask(
+    previousState: ViewState,
+    action: SetTask
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState.copy(
+      task = action.task,
+      isButtonEnabled = true
+    ) to null
   }
 
   private fun processUpdateState(
@@ -55,12 +86,12 @@ class CreateTaskPresenter(
     return previousState.copy(state = action.state) to null
   }
 
-  private fun processCreateTask(
+  private fun processSaveTask(
     previousState: ViewState,
-    action: CreateTask
+    action: SaveTask
   ): Pair<ViewState, Command<ScreenAction>?> {
     return previousState to command {
-      taskRepository.addTask(previousState.task)
+      taskRepository.updateTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
         .safeSubscribe()

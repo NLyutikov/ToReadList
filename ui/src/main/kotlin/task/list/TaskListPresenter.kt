@@ -2,22 +2,25 @@ package ru.appkode.base.ui.task.list
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import ru.appkode.base.entities.core.ui.task.TaskUM
 import ru.appkode.base.repository.task.TaskRepository
+import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
-import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
+import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
+import ru.appkode.base.ui.task.change.ChangeTaskController
 import ru.appkode.base.ui.task.create.CreateTaskController
 import ru.appkode.base.ui.task.list.TaskListScreen.View
 import ru.appkode.base.ui.task.list.TaskListScreen.ViewState
-import ru.appkode.base.ui.task.list.entities.TaskUM
 
 sealed class ScreenAction
 
 data class SwitchTask(val id: Long) : ScreenAction()
 object CreateTask : ScreenAction()
+data class ChangeTask(val id: Long) : ScreenAction()
 data class UpdateList(val state: LceState<List<TaskUM>>) : ScreenAction()
 
 class TaskListPresenter(
@@ -31,6 +34,8 @@ class TaskListPresenter(
         .map { SwitchTask(it) },
       intent(View::createTaskIntent)
         .map { CreateTask },
+      intent(View::changeTaskIntent)
+        .map { ChangeTask(it) },
       intent { taskRepository.tasks() }
         .map { UpdateList(LceState.Content(it)) }
     )
@@ -44,6 +49,19 @@ class TaskListPresenter(
       is SwitchTask -> processSwitchTask(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
       is UpdateList -> processUpdateList(previousState, action)
+      is ChangeTask -> processChangeTask(previousState, action)
+    }
+  }
+
+  private fun processChangeTask(
+    previousState: ViewState,
+    action: ChangeTask
+  ): Pair<ViewState, Command<ScreenAction>?> {
+    return previousState to command {
+      router.pushController(
+        ChangeTaskController.createController(action.id)
+          .obtainVerticalTransaction()
+      )
     }
   }
 

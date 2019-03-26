@@ -37,6 +37,10 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun switchTaskIntent(): Observable<Long> {
+    return adapter.itemSwitched
+  }
+
+  override fun changeTaskIntent(): Observable<Long> {
     return adapter.itemClicked
   }
 

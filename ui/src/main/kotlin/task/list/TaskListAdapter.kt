@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.task_list_item.view.*
+import ru.appkode.base.entities.core.ui.task.TaskUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
-import ru.appkode.base.ui.task.list.entities.TaskUM
 
 class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
@@ -39,6 +39,7 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
   private val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create<Pair<Int, Any>>()
 
   val itemClicked: Observable<Long> = eventsRelay.filterEvents(EVENT_ID_ITEM_CLICKED)
+  val itemSwitched: Observable<Long> = eventsRelay.filterEvents(EVENT_ID_ITEM_SWITCHED)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.task_list_item, parent, false))
@@ -61,10 +62,14 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
     init {
       checkBox.setOnClickListener {
+        eventsRelay.accept(EVENT_ID_ITEM_SWITCHED to data[adapterPosition].id)
+      }
+      view.setOnClickListener {
         eventsRelay.accept(EVENT_ID_ITEM_CLICKED to data[adapterPosition].id)
       }
     }
   }
 }
 
-private const val EVENT_ID_ITEM_CLICKED = 0
+private const val EVENT_ID_ITEM_SWITCHED = 0
+private const val EVENT_ID_ITEM_CLICKED = 1

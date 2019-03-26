@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.task.list.entities
+package ru.appkode.base.entities.core.ui.task
 
 data class TaskUM(
     val id: Long,

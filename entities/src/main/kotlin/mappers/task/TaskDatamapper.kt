@@ -1,9 +1,9 @@
 package ru.appkode.base.entities.core.mappers.task
 
 import ru.appkode.base.entities.core.datasource.task.TaskSM
-import ru.appkode.base.ui.task.list.entities.TaskUM
+import ru.appkode.base.entities.core.ui.task.TaskUM
 
-fun TaskSM.toUiModel(): TaskUM{
+fun TaskSM.toUiModel(): TaskUM {
   return TaskUM(
     id,
     title,
@@ -12,7 +12,7 @@ fun TaskSM.toUiModel(): TaskUM{
   )
 }
 
-fun TaskUM.toStorageModel(): TaskSM{
+fun TaskUM.toStorageModel(): TaskSM {
   return TaskSM(
     id,
     title,

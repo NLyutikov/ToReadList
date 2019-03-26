@@ -1,15 +1,16 @@
-package ru.appkode.base.ui.task.create
+package ru.appkode.base.ui.task.change
 
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.ui.task.TaskUM
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.MviView
 
-interface CreateTaskScreen {
+interface ChangeTaskScreen {
   interface View : MviView<ViewState> {
     fun changeTaskTitleIntent(): Observable<String>
     fun changeTaskDescription(): Observable<String>
-    fun createTaskIntent(): Observable<Unit>
+    fun saveTaskIntent(): Observable<Unit>
+    fun deleteTask(): Observable<Unit>
   }
 
   data class ViewState(
