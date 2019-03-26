@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
-import ru.appkode.base.ui.core.core.NewBasePresenter
+import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
@@ -24,7 +24,7 @@ class TaskListPresenter(
   schedulers: AppSchedulers,
   private val taskRepository: TaskRepository,
   private val router: Router
-) : NewBasePresenter<View, ViewState, ScreenAction>(schedulers) {
+) : BasePresenter<View, ViewState, ScreenAction>(schedulers) {
   override fun createIntents(): List<Observable<out ScreenAction>> {
     return listOf(
       intent(View::switchTaskIntent)

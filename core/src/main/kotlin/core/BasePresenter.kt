@@ -4,8 +4,10 @@ import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.skipFirstIf
+import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import ru.appkode.ui.core.BuildConfig
 import timber.log.Timber
 
@@ -21,6 +23,7 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
    * by reducers.
    */
   private val outputActions = PublishRelay.create<A>()
+  private val disposables = CompositeDisposable()
 
   final override fun bindIntents() {
     val stateChanges = Observable.merge(createIntents().plus(outputActions))
@@ -44,6 +47,11 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
     subscribeViewState(stateChanges) { view, viewState -> view.render(viewState) }
   }
 
+  override fun unbindIntents() {
+    disposables.dispose()
+    super.unbindIntents()
+  }
+
   protected abstract fun reduceViewState(previousState: VS, action: A): Pair<VS, Command<A>?>
 
   protected abstract fun createIntents(): List<Observable<out A>>
@@ -65,6 +73,48 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
             └──────────────────────────────────────────────────────────
             """.trimIndent()
     )
+  }
+
+  protected fun <T> Observable<T>.doLceAction(
+    actionCreator: (LceState<T>) -> A
+  ): Observable<A> {
+    return this
+      .observeOn(schedulers.ui)
+      .toLceEventObservable(actionCreator)
+      .doAfterNext { outputActions.accept(it) }
+  }
+
+  protected fun <T> Observable<T>.doAction(
+    actionCreator: (T) -> A
+  ): Observable<A>{
+    return this.map {
+      val action = actionCreator(it)
+      outputActions.accept(action)
+      action
+    }
+  }
+
+  protected fun <T> Observable<T>.safeSubscribe() {
+    disposables.add(this.subscribe())
+  }
+
+  protected fun Completable.doLceAction(
+    actionCreator: (LceState<Unit>) -> A
+  ): Observable<A> {
+    return this
+      .toLceEventObservable(actionCreator)
+      .doAfterNext { outputActions.accept(it) }
+      .observeOn(schedulers.ui)
+  }
+
+  protected fun Completable.doAction(
+    actionCreator: () -> A
+  ): Completable{
+    return this.doFinally { outputActions.accept(actionCreator()) }
+  }
+
+  protected fun Completable.safeSubscribe() {
+    disposables.add(this.subscribe())
   }
 
   /**
