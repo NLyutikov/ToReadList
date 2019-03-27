@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.change_task_controller.*
 import ru.appkode.base.repository.task.TaskRepositoryImpl
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
+import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setTextSafe
@@ -58,16 +59,20 @@ class ChangeTaskController : BaseMviController<ViewState, View, ChangeTaskPresen
     }
 
     fieldChanged(viewState, { it.state }) {
-      change_task_loading.isVisible = viewState.state.isLoading
-      if (viewState.state.isError) {
-        Snackbar
-          .make(
-            this.containerView!!,
-            viewState.state.asError(),
-            Snackbar.LENGTH_LONG
-          )
-          .show()
-      }
+      renderLceState(viewState.state)
+    }
+  }
+
+  private fun renderLceState(state: LceState<Unit>) {
+    change_task_loading.isVisible = state.isLoading
+    if (state.isError) {
+      Snackbar
+        .make(
+          this.containerView!!,
+          state.asError(),
+          Snackbar.LENGTH_LONG
+        )
+        .show()
     }
   }
 

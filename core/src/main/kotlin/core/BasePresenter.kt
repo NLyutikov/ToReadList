@@ -11,6 +11,7 @@ import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import ru.appkode.ui.core.BuildConfig
 import timber.log.Timber
 
+@Suppress("TooManyFunctions")
 abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
   protected val schedulers: AppSchedulers,
   private val skipRenderOfInitialState: Boolean = false,
