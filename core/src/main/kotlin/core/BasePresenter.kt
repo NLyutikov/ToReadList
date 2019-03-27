@@ -28,7 +28,7 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
 
   final override fun bindIntents() {
     val stateChanges = Observable.merge(createIntents().plus(outputActions))
-      .scan(Pair<VS, Command<A>?>(createInitialState(), null)) { s, a ->
+      .scan(Pair<VS, Command<Observable<A>>?>(createInitialState(), null)) { s, a ->
         val (ps, _) = s
         val (ns, cmd) = reduceViewState(ps, a)
 
@@ -39,8 +39,8 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
       .skipFirstIf(skipRenderOfInitialState)
       .observeOn(schedulers.ui)
       .doAfterNext { (_, cmd) ->
-        val nextAction = cmd?.invoke()
-        if (nextAction != null) outputActions.accept(nextAction)
+        cmd?.invoke()
+          ?.subscribe(outputActions)
       }
       .map { (vs, _) -> vs }
       .distinctUntilChanged()
@@ -48,12 +48,7 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
     subscribeViewState(stateChanges) { view, viewState -> view.render(viewState) }
   }
 
-  override fun unbindIntents() {
-    disposables.dispose()
-    super.unbindIntents()
-  }
-
-  protected abstract fun reduceViewState(previousState: VS, action: A): Pair<VS, Command<A>?>
+  protected abstract fun reduceViewState(previousState: VS, action: A): Pair<VS, Command<Observable<A>>?>
 
   protected abstract fun createIntents(): List<Observable<out A>>
 
@@ -80,23 +75,16 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
     actionCreator: (LceState<T>) -> A
   ): Observable<A> {
     return this
-      .observeOn(schedulers.ui)
       .toLceEventObservable(actionCreator)
-      .doAfterNext { outputActions.accept(it) }
+      .observeOn(schedulers.ui)
   }
 
   protected fun <T> Observable<T>.doAction(
     actionCreator: (T) -> A
-  ): Observable<A>{
-    return this.map {
-      val action = actionCreator(it)
-      outputActions.accept(action)
-      action
-    }
-  }
-
-  protected fun <T> Observable<T>.safeSubscribe() {
-    disposables.add(this.subscribe())
+  ): Observable<A> {
+    return this
+      .map { actionCreator(it) }
+      .observeOn(schedulers.ui)
   }
 
   protected fun Completable.doLceAction(
@@ -104,18 +92,14 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
   ): Observable<A> {
     return this
       .toLceEventObservable(actionCreator)
-      .doAfterNext { outputActions.accept(it) }
       .observeOn(schedulers.ui)
   }
 
   protected fun Completable.doAction(
     actionCreator: () -> A
-  ): Completable{
-    return this.doFinally { outputActions.accept(actionCreator()) }
-  }
-
-  protected fun Completable.safeSubscribe() {
-    disposables.add(this.subscribe())
+  ): Completable {
+    return this
+      .observeOn(schedulers.ui)
   }
 
   /**

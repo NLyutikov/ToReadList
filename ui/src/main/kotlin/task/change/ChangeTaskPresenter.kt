@@ -9,6 +9,7 @@ import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
+import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.View
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.ViewState
 
@@ -46,7 +47,7 @@ class ChangeTaskPresenter(
   override fun reduceViewState(
     previousState: ViewState,
     action: ScreenAction
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return when (action) {
       is ChangeTaskTitle -> processChangeTaskTitle(previousState, action)
       is ChangeTaskDescription -> processChangeTaskDescription(previousState, action)
@@ -60,19 +61,18 @@ class ChangeTaskPresenter(
   private fun processDeleteTask(
     previousState: ViewState,
     action: DeleteTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState to command {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
+    return previousState to command (
       taskRepository.deleteTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
-        .safeSubscribe()
-    }
+      )
   }
 
   private fun processSetTask(
     previousState: ViewState,
     action: SetTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState.copy(
       task = action.task,
       isButtonEnabled = true
@@ -82,26 +82,25 @@ class ChangeTaskPresenter(
   private fun processUpdateState(
     previousState: ViewState,
     action: UpdateState
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState.copy(state = action.state) to null
   }
 
   private fun processSaveTask(
     previousState: ViewState,
     action: SaveTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
-    return previousState to command {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
+    return previousState to command (
       taskRepository.updateTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
-        .safeSubscribe()
-    }
+      )
   }
 
   private fun processChangeTaskTitle(
     previousState: ViewState,
     action: ChangeTaskTitle
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState.copy(
       task = previousState.task.copy(title = action.text),
       isButtonEnabled = action.text.isNotBlank()
@@ -111,7 +110,7 @@ class ChangeTaskPresenter(
   private fun processChangeTaskDescription(
     previousState: ViewState,
     action: ChangeTaskDescription
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState.copy(task = previousState.task.copy(description = action.text)) to null
   }
 

@@ -1,3 +1,16 @@
 <resources>
+  <!-- Common -->
+  <string name="title">Заголовок</string>
+  <string name="description">Описание</string>
+
+  <!-- Change Task -->
+  <string name="change_task_title">@string/title</string>
+  <string name="change_task_description">@string/description</string>
+  <string name="change_task_save">Сохранить</string>
+
+  <!-- Create Task -->
+  <string name="create_task_title">@string/title</string>
+  <string name="create_task_description">@string/description</string>
+  <string name="create_task_create">Создать</string>
 
 </resources>

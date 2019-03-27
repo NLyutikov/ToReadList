@@ -44,7 +44,7 @@ class TaskListPresenter(
   override fun reduceViewState(
     previousState: ViewState,
     action: ScreenAction
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return when (action) {
       is SwitchTask -> processSwitchTask(previousState, action)
       is CreateTask -> processCreateTask(previousState, action)
@@ -56,7 +56,7 @@ class TaskListPresenter(
   private fun processChangeTask(
     previousState: ViewState,
     action: ChangeTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState to command {
       router.pushController(
         ChangeTaskController.createController(action.id)
@@ -68,14 +68,14 @@ class TaskListPresenter(
   private fun processUpdateList(
     previousState: ViewState,
     action: UpdateList
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState.copy(taskState = action.state) to null
   }
 
   private fun processSwitchTask(
     previousState: ViewState,
     action: SwitchTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     var currentTask: TaskUM? = null
     val tasks = previousState.taskState.asContent()
     val list = tasks.map { task ->
@@ -84,16 +84,16 @@ class TaskListPresenter(
         currentTask!!
       } else task
     }
-    return previousState.copy(taskState = LceState.Content(list)) to command {
+    return previousState.copy(taskState = LceState.Content(list)) to command(
       taskRepository.updateTask(currentTask!!)
-        .safeSubscribe()
-    }
+        .toObservable()
+    )
   }
 
   private fun processCreateTask(
     previousState: ViewState,
     action: CreateTask
-  ): Pair<ViewState, Command<ScreenAction>?> {
+  ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     return previousState to command {
       router.pushController(CreateTaskController().obtainHorizontalTransaction())
     }
