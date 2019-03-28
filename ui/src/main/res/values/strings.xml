@@ -3,6 +3,9 @@
   <string name="title">Заголовок</string>
   <string name="description">Описание</string>
 
+  <!-- Task List -->
+  <string name="task_list_empty">Список пуст</string>
+
   <!-- Change Task -->
   <string name="change_task_title">@string/title</string>
   <string name="change_task_description">@string/description</string>

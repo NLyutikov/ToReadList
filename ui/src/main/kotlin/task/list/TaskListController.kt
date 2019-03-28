@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.task_list_controller.*
-import ru.appkode.base.repository.task.TaskRepositoryImpl
+import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -32,6 +32,7 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
     fieldChanged(viewState, { it.taskState }) {
       task_list_loading.isVisible = viewState.taskState.isLoading
       task_list_recycler.isVisible = viewState.taskState.isContent
+      task_list_empty_list.isVisible = (viewState.taskState.isContent && viewState.taskState.asContent().isEmpty())
       if (viewState.taskState.isContent) adapter.data = viewState.taskState.asContent()
     }
   }
@@ -49,6 +50,10 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun createPresenter(): TaskListPresenter {
-    return TaskListPresenter(DefaultAppSchedulers, TaskRepositoryImpl(DefaultAppSchedulers), this.router!!)
+    return TaskListPresenter(
+      DefaultAppSchedulers,
+      RepositoryHelper.getTaskRepository(DefaultAppSchedulers),
+      this.router!!
+    )
   }
 }

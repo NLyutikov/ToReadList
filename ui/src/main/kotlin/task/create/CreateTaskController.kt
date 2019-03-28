@@ -6,7 +6,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.create_task_controller.*
-import ru.appkode.base.repository.task.TaskRepositoryImpl
+import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
@@ -78,7 +78,11 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
   }
 
   override fun createPresenter(): CreateTaskPresenter {
-    return CreateTaskPresenter(DefaultAppSchedulers, TaskRepositoryImpl(DefaultAppSchedulers), router)
+    return CreateTaskPresenter(
+      DefaultAppSchedulers,
+      RepositoryHelper.getTaskRepository(DefaultAppSchedulers),
+      this.router!!
+    )
   }
 }
 
