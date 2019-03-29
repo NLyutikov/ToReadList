@@ -2,14 +2,13 @@ package ru.appkode.base.ui.task.change
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.ui.task.TaskUM
+import ru.appkode.base.entities.core.task.TaskUM
 import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.View
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.ViewState
 
@@ -62,11 +61,11 @@ class ChangeTaskPresenter(
     previousState: ViewState,
     action: DeleteTask
   ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
-    return previousState to command (
+    return previousState to command(
       taskRepository.deleteTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
-      )
+    )
   }
 
   private fun processSetTask(
@@ -90,11 +89,11 @@ class ChangeTaskPresenter(
     previousState: ViewState,
     action: SaveTask
   ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
-    return previousState to command (
+    return previousState to command(
       taskRepository.updateTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
-      )
+    )
   }
 
   private fun processChangeTaskTitle(

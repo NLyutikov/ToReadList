@@ -3,10 +3,10 @@ package ru.appkode.base.repository.task
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.internal.operators.completable.CompletableFromAction
-import ru.appkode.base.data.storage.persistence.TaskPersistence
-import ru.appkode.base.entities.core.mappers.task.toStorageModel
-import ru.appkode.base.entities.core.mappers.task.toUiModel
-import ru.appkode.base.entities.core.ui.task.TaskUM
+import ru.appkode.base.data.storage.persistence.task.TaskPersistence
+import ru.appkode.base.entities.core.task.TaskUM
+import ru.appkode.base.entities.core.task.toStorageModel
+import ru.appkode.base.entities.core.task.toUiModel
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 
 class TaskRepositoryImpl(

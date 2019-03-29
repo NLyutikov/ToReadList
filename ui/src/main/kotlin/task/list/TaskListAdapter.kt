@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.task_list_item.view.*
-import ru.appkode.base.entities.core.ui.task.TaskUM
-import ru.appkode.base.ui.R
+import ru.appkode.base.entities.core.task.TaskUM
 import ru.appkode.base.ui.core.core.util.filterEvents
+import ru.appkode.base.ui.R
 
 class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 

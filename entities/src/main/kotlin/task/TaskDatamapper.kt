@@ -1,7 +1,4 @@
-package ru.appkode.base.entities.core.mappers.task
-
-import ru.appkode.base.entities.core.datasource.task.TaskSM
-import ru.appkode.base.entities.core.ui.task.TaskUM
+package ru.appkode.base.entities.core.task
 
 fun TaskSM.toUiModel(): TaskUM {
   return TaskUM(

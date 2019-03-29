@@ -2,7 +2,7 @@ package ru.appkode.base.repository.task
 
 import io.reactivex.Completable
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.ui.task.TaskUM
+import ru.appkode.base.entities.core.task.TaskUM
 
 interface TaskRepository {
 
