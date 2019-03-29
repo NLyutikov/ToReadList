@@ -2,7 +2,7 @@ package ru.appkode.base.ui.task.list
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.ui.task.TaskUM
+import ru.appkode.base.entities.core.task.TaskUM
 import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
@@ -69,7 +69,7 @@ class TaskListPresenter(
     previousState: ViewState,
     action: UpdateList
   ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
-    return previousState.copy(taskState = action.state) to null
+    return previousState.copy(duckState = action.state) to null
   }
 
   private fun processSwitchTask(
@@ -77,14 +77,14 @@ class TaskListPresenter(
     action: SwitchTask
   ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
     var currentTask: TaskUM? = null
-    val tasks = previousState.taskState.asContent()
+    val tasks = previousState.duckState.asContent()
     val list = tasks.map { task ->
       if (task.id == action.id) {
         currentTask = task.copy(isChecked = !task.isChecked)
         currentTask!!
       } else task
     }
-    return previousState.copy(taskState = LceState.Content(list)) to command(
+    return previousState.copy(duckState = LceState.Content(list)) to command(
       taskRepository.updateTask(currentTask!!)
         .toObservable()
     )
@@ -101,7 +101,7 @@ class TaskListPresenter(
 
   override fun createInitialState(): ViewState {
     return ViewState(
-      taskState = LceState.Loading()
+      duckState = LceState.Loading()
     )
   }
 }

@@ -7,7 +7,6 @@ import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.change_task_controller.*
 import ru.appkode.base.repository.RepositoryHelper
-import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -15,6 +14,7 @@ import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setTextSafe
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.View
 import ru.appkode.base.ui.task.change.ChangeTaskScreen.ViewState
+import ru.appkode.base.ui.R
 
 class ChangeTaskController : BaseMviController<ViewState, View, ChangeTaskPresenter>(), View {
 

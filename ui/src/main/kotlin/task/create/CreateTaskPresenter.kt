@@ -2,14 +2,13 @@ package ru.appkode.base.ui.task.create
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.ui.task.TaskUM
+import ru.appkode.base.entities.core.task.TaskUM
 import ru.appkode.base.repository.task.TaskRepository
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import ru.appkode.base.ui.task.create.CreateTaskScreen.View
 import ru.appkode.base.ui.task.create.CreateTaskScreen.ViewState
 
@@ -60,11 +59,11 @@ class CreateTaskPresenter(
     previousState: ViewState,
     action: CreateTask
   ): Pair<ViewState, Command<Observable<ScreenAction>>?> {
-    return previousState to command (
+    return previousState to command(
       taskRepository.addTask(previousState.task)
         .doLceAction { UpdateState(it) }
         .doOnComplete { router.popCurrentController() }
-      )
+    )
   }
 
   private fun processChangeTaskTitle(

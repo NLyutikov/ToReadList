@@ -62,12 +62,12 @@ dependencies {
   // Picasso
   api 'com.squareup.picasso:picasso:2.71828'
   // Network
-  api 'com.squareup.okhttp3:okhttp:3.14.0'
-  api 'com.squareup.okhttp3:logging-interceptor:3.14.0'
+  api 'com.squareup.okhttp3:okhttp:3.12.0'
+  api 'com.squareup.okhttp3:logging-interceptor:3.11.0'
   api 'com.squareup.retrofit2:retrofit:2.5.0'
   api 'com.squareup.retrofit2:converter-moshi:2.5.0'
-  api 'com.squareup.retrofit2:adapter-rxjava:2.5.0'
+  api 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
   // Json
-  api 'com.squareup.moshi:moshi-kotlin:1.8.0'
+  api 'com.squareup.moshi:moshi:1.8.0'
   api 'com.squareup.retrofit2:converter-moshi:2.5.0'
 }

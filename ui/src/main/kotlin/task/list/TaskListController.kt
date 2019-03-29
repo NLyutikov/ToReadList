@@ -6,11 +6,11 @@ import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.task_list_controller.*
 import ru.appkode.base.repository.RepositoryHelper
-import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.task.list.TaskListScreen.View
 import ru.appkode.base.ui.task.list.TaskListScreen.ViewState
+import ru.appkode.base.ui.R
 
 class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>(), View {
   override fun createConfig(): Config {
@@ -29,11 +29,11 @@ class TaskListController : BaseMviController<ViewState, View, TaskListPresenter>
   }
 
   override fun renderViewState(viewState: ViewState) {
-    fieldChanged(viewState, { it.taskState }) {
-      task_list_loading.isVisible = viewState.taskState.isLoading
-      task_list_recycler.isVisible = viewState.taskState.isContent
-      task_list_empty_list.isVisible = (viewState.taskState.isContent && viewState.taskState.asContent().isEmpty())
-      if (viewState.taskState.isContent) adapter.data = viewState.taskState.asContent()
+    fieldChanged(viewState, { it.duckState }) {
+      task_list_loading.isVisible = viewState.duckState.isLoading
+      task_list_recycler.isVisible = viewState.duckState.isContent
+      task_list_empty_list.isVisible = (viewState.duckState.isContent && viewState.duckState.asContent().isEmpty())
+      if (viewState.duckState.isContent) adapter.data = viewState.duckState.asContent()
     }
   }
 

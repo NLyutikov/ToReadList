@@ -2,8 +2,8 @@ package ru.appkode.base.data.storage.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ru.appkode.base.data.storage.persistence.TaskPersistence
-import ru.appkode.base.entities.core.datasource.task.TaskSM
+import ru.appkode.base.data.storage.persistence.task.TaskPersistence
+import ru.appkode.base.entities.core.task.TaskSM
 
 
 private const val DATABASE_VERSION = 1
