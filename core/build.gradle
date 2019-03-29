@@ -65,7 +65,6 @@ dependencies {
   api 'com.squareup.okhttp3:okhttp:3.12.0'
   api 'com.squareup.okhttp3:logging-interceptor:3.11.0'
   api 'com.squareup.retrofit2:retrofit:2.5.0'
-  api 'com.squareup.retrofit2:converter-moshi:2.5.0'
   api 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
   // Json
   api 'com.squareup.moshi:moshi:1.8.0'
