@@ -1,4 +1,4 @@
-package ru.appkode.base.entities.core.datasource.task
+package ru.appkode.base.entities.core.task
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
