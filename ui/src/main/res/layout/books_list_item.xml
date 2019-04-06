@@ -1,39 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:layout_margin="8dp"
-  app:cardCornerRadius="8dp"
-  app:cardElevation="4dp">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp" android:id="@+id/cardView">
 
-  <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <ImageView
-      android:id="@+id/books_list_item_image"
-      android:layout_width="56dp"
-      android:layout_height="100dp"
-      android:layout_marginBottom="8dp"
-      android:layout_marginStart="16dp"
-      android:layout_marginTop="8dp"
-      android:background="@drawable/test_img"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
+        <ImageView
+                android:id="@+id/books_list_item_image"
+                android:layout_width="110dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/test_img"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+        />
 
-    <TextView
-      android:id="@+id/books_list_item_name"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:text="Hatchet"
-      android:layout_marginTop="8dp"
-      android:layout_marginStart="16dp"
-      app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
-      app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+                android:id="@+id/books_list_item_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hatchet"
+                android:textSize="24sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                app:layout_constraintTop_toTopOf="parent"
+        />
 
-  </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+                android:id="@+id/books_list_item_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="by Gary Paulsen"
+                android:layout_marginStart="18dp"
+                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                app:layout_constraintTop_toBottomOf="@+id/books_list_item_name"
+        />
+
+        <ImageView
+                android:id="@+id/books_list_item_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/outline_turned_in_not_24"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/books_list_item_visible"
+        />
+
+        <ImageView
+                android:id="@+id/books_list_item_visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/outline_visibility_off_24"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/books_list_item_swipe_img"
+        />
+
+        <TextView
+                android:id="@+id/books_list_item_rating_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3.77"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintStart_toEndOf="@+id/books_list_item_rating_img"
+                app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+        <ImageView
+                android:id="@+id/books_list_item_rating_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_star_rate_18"
+                android:layout_marginStart="14dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+        <ImageView
+                android:id="@+id/books_list_item_swipe_img"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/round_drag_handle_24"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
