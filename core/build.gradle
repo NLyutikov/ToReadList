@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion 28
@@ -69,4 +70,10 @@ dependencies {
   // Json
   api 'com.squareup.moshi:moshi:1.8.0'
   api 'com.squareup.retrofit2:converter-moshi:2.5.0'
+
+  //XML
+  api 'com.tickaroo.tikxml:retrofit-converter:0.8.13'
+  api 'com.tickaroo.tikxml:annotation:0.8.13'
+  api 'com.tickaroo.tikxml:core:0.8.13'
+  kapt 'com.tickaroo.tikxml:processor:0.8.13'
 }
