@@ -16,7 +16,4 @@
   <string name="create_task_description">@string/description</string>
   <string name="create_task_create">Создать</string>
 
-  <!-- Network Error -->
-  <string name="no_internet_connection">Неполадки с интернетом.\nПроверьте соединение.</string>
-  <string name="repeat_e_conn">Повторить</string>
 </resources>
