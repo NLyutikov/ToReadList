@@ -11,4 +11,7 @@ interface BooksApi {
     fun getBooksDetails(@Query("key") apiKey: String,
                         @Query("id") bookId: Int): Observable<BookDetailsNM>
 
+    @GET("search/index.xml")
+    fun getBooksSearch(@Query("key") apiKey: String,
+                       @Query("q") text: String)
 }
