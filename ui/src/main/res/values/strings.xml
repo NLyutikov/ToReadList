@@ -1,7 +1,12 @@
 <resources>
   <!-- Common -->
   <string name="title">Заголовок</string>
+  <string name="common_author">Ivan Petrov</string>
+  <string name="common_genres">Action, Fantasy</string>
+  <string name="common_rating">4,8</string>
   <string name="description">Описание</string>
+  <string name="common_pages_num">342</string>
+  <string name="common_description">Orphan Harry learns he is a wizard on his 11th birthday when Hagrid escorts him to magic-teaching Hogwarts School. As a baby, his mothers love protected him and vanquished the villain Voldemort, leaving the child famous as "The Boy who Lived". With his friends Hermione and Ron, Harry has to defeat the returned "He Who Must Not Be Named".</string>
 
   <!-- Task List -->
   <string name="task_list_empty">Список пуст</string>
@@ -19,4 +24,13 @@
   <!-- Network Error -->
   <string name="no_internet_connection">Неполадки с интернетом.\nПроверьте соединение.</string>
   <string name="repeat_e_conn">Повторить</string>
+
+  <!-- BookDetails -->
+  <string name="book_details_reload_btn_text">Reload</string>
+  <string name="book_details_reviews_num_text"> reviews</string>
+  <string name="book_details_number_of_pages">Number of pages</string>
+  <string name="book_details_about_book">About book</string>
+  <string name="book_details_more_info_btn_text">More information</string>
+  <string name="book_details_similar_books_text">Similar books</string>
+
 </resources>

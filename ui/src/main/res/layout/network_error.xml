@@ -4,7 +4,8 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:gravity="center"
-  android:orientation="vertical">
+  android:orientation="vertical"
+  android:id="@+id/network_error_screen_container">
 
   <ImageView
     android:layout_width="wrap_content"
@@ -25,6 +26,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="@string/repeat_e_conn"
-    android:textSize="16sp" />
+    android:background="@color/colorAccent"
+    android:textColor="@color/colorPrimary"
+    android:padding="10dp"
+    android:textSize="16sp"
+    android:id="@+id/network_error_screen_reload_btn"/>
 
 </LinearLayout>
