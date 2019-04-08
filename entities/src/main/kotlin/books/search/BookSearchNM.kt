@@ -26,7 +26,7 @@ data class BookSearchNM(
 
     @Path("work/best_book")
     @Element
-    val best_book: BestBookNM?
+    val best_book: List<BestBookNM>?
 
 )
 
@@ -38,7 +38,7 @@ data class BestBookNM(
     @PropertyElement
     val title: String?,
     @Element
-    val author: AuthorNM?,
+    val author: List<AuthorNM>?,
     @PropertyElement
     val img_url: String?,
     @PropertyElement
