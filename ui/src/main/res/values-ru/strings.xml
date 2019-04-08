@@ -2,7 +2,7 @@
 <resources>
   <string name="title">Заголовок</string>
   <string name="task_list_empty">Список пуст.</string>
-  <string name="no_internet_connection">Неполадки с интернетом.\\nПроверьте соединение.</string>
+  <string name="no_internet_connection">Неполадки с интернетом. Проверьте соединение.</string>
   <string name="no_books_read">В списк нет прочитанных книг.</string>
   <string name="no_favorite_items">В списке избранного пока ничего нет.</string>
   <string name="book_details_more_info_btn_text">Подробнее</string>
