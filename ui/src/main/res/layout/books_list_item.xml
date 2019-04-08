@@ -14,7 +14,7 @@
 
         <ImageView
                 android:id="@+id/books_list_item_image"
-                android:layout_width="110dp"
+                android:layout_width="100dp"
                 android:layout_height="150dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginStart="16dp"
