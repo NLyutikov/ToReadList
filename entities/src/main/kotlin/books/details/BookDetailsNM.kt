@@ -50,29 +50,29 @@ data class BookDetailsNM (
 
     @Path("book/series_works")
     @Element
-    val seriesWorks: List<SeriesWork>?,
+    val seriesWorks: List<SeriesWorkNM>?,
 
     @Path("book/authors")
     @Element
-    val Authors: List<Author>,
+    val authors: List<AuthorNM>?,
 
     @Path("book/similar_books")
     @Element
-    val similarBooks: List<ShortBookDetails>
+    val similarBooks: List<ShortBookDetailsNM>?
 )
 
 @Xml(name = "series_work")
-data class SeriesWork(
+data class SeriesWorkNM(
     @Element
-    val series: Series?,
+    val series: SeriesNM?,
     @PropertyElement
     val user_position: String?,
     @PropertyElement
     val id: String?
 )
 
-@Xml
-data class Series(
+@Xml(name = "series")
+data class SeriesNM(
     @PropertyElement
     val series_works_count: String?,
     @PropertyElement
@@ -84,7 +84,7 @@ data class Series(
 )
 
 @Xml(name = "book")
-data class ShortBookDetails(
+data class ShortBookDetailsNM(
     @PropertyElement
     val id: String?,
     @PropertyElement
@@ -95,8 +95,8 @@ data class ShortBookDetails(
     val smallCoverImageUrl: String?
 )
 
-@Xml
-data class Author(
+@Xml(name = "author")
+data class AuthorNM(
     @PropertyElement(name = "small_image_url")
     val smallImageUrl: String?,
     @PropertyElement(name = "image_url")

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- BookDetails -->
+  <dimen name="book_details_image_cover_height">150dp</dimen>
+  <dimen name="book_details_image_cover_width">100dp</dimen>
+  <dimen name="book_details_container_padding">15dp</dimen>
+  <dimen name="book_details_container_bottom_margin">1dp</dimen>
+  <dimen name="book_details_title_text_size">24sp</dimen>
+  <dimen name="book_details_author_text_size">16sp</dimen>
+  <dimen name="book_details_genres_text_size">13sp</dimen>
+  <dimen name="book_details_small_rating_text_size">16sp</dimen>
+  <dimen name="book_details_small_rating_icon_size">23dp</dimen>
+  <dimen name="book_details_small_rating_reviews_num_text_size">12sp</dimen>
+  <dimen name="book_details_subtitle_text_size">18sp</dimen>
+  <dimen name="book_details_description_text_size">16sp</dimen>
+  <dimen name="book_details_more_info_btn_height">25dp</dimen>
+
+  <!-- SimilarBooksListItem -->
+  <dimen name="similar_books_list_item_cover_image_height">120dp</dimen>
+  <dimen name="similar_books_list_item_cover_image_width">80dp</dimen>
+  <dimen name="similar_books_list_item_width">80dp</dimen>
+
+</resources>
