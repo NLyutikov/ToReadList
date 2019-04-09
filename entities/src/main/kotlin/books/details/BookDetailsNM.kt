@@ -45,8 +45,12 @@ data class BookDetailsNM (
     val description: String?,
 
     @Path("book")
-    @PropertyElement
+    @PropertyElement(name = "ratings_count")
     val ratingsCount: String?,
+
+    @Path("book")
+    @PropertyElement(name = "average_rating")
+    val averageRating: String?,
 
     @Path("book/series_works")
     @Element

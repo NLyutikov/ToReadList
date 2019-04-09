@@ -8,7 +8,6 @@ import ru.appkode.base.entities.core.books.details.BookDetailsNM
 interface BooksApi {
 
     @GET("book/show.xml")
-    fun getBooksDetails(@Query("key") apiKey: String,
-                        @Query("id") bookId: Int): Observable<BookDetailsNM>
+    fun getBooksDetails(@Query("id") bookId: Long): Observable<BookDetailsNM>
 
 }

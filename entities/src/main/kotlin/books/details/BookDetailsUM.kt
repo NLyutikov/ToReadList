@@ -1,9 +1,7 @@
 package ru.appkode.base.entities.core.books.details
 
-import org.intellij.lang.annotations.Language
-
 data class BookDetailsUM(
-    val id: Int,
+    val id: Long,
     val title: String? = null,
     val isbn: String? = null,
     val isbn13: String? = null,
@@ -13,11 +11,12 @@ data class BookDetailsUM(
     val pagesNumber: Int? = null,
     val description: String? = null,
     val ratingsCount: Int? = null,
+    val averageRating: Double? = null,
     val authors: List<AuthorUM>? = null,
     val similarBooks: List<BookDetailsUM>? = null
 )
 
 data class AuthorUM(
-    val id: Int,
+    val id: Long,
     val name: String? = null
 )

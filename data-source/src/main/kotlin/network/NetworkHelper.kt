@@ -4,7 +4,9 @@ import com.squareup.moshi.Moshi
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import io.reactivex.schedulers.Schedulers
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 import okhttp3.logging.HttpLoggingInterceptor.Level.NONE
@@ -19,6 +21,7 @@ object NetworkHelper {
   const val DUCK_API_BASE_URL = "https://duck-appkode.herokuapp.com"
   const val BOOKS_BASE_URL = "https://www.goodreads.com/"
   const val DUCK_API_IMAGE_URL = "$DUCK_API_BASE_URL/static"
+  const val API_KEY = "lEJVSEkHbRKXduThStEg9w"
 
   private val moshi = Moshi.Builder()
     .build()
@@ -32,6 +35,25 @@ object NetworkHelper {
     .addInterceptor(HttpLoggingInterceptor().setLevel(if (BuildConfig.DEBUG) BODY else NONE))
     .build()
 
+  private val okHttpClientWithApiKey = OkHttpClient.Builder()
+    .addInterceptor(HttpLoggingInterceptor().setLevel(if (BuildConfig.DEBUG) BODY else NONE))
+    .addInterceptor(object : Interceptor {
+      override fun intercept(chain: Interceptor.Chain): Response {
+        val original = chain.request()
+        val url = original.url()
+          .newBuilder()
+          .addQueryParameter("key", API_KEY)
+          .build()
+
+        val request = original.newBuilder()
+          .url(url)
+          .build()
+
+        return chain.proceed(request)
+      }
+    })
+    .build()
+
   private val duckApi = Retrofit.Builder()
     .baseUrl(DUCK_API_BASE_URL)
     .client(okHttpClient)
@@ -42,7 +64,7 @@ object NetworkHelper {
 
   private val booksApi = Retrofit.Builder()
     .baseUrl(BOOKS_BASE_URL)
-    .client(okHttpClient)
+    .client(okHttpClientWithApiKey)
     .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
     .addConverterFactory(TikXmlConverterFactory.create(xml))
     .build()

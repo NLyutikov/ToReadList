@@ -6,7 +6,7 @@ import java.util.*
 
 fun BookDetailsNM.toUiModel(): BookDetailsUM {
     return BookDetailsUM (
-        goodReadsBookId.requireField("BookDetails.goodReadsId").toInt(),
+        goodReadsBookId.requireField("BookDetails.goodReadsId").toLong(),
         title,
         isbn,
         isbn13,
@@ -16,6 +16,7 @@ fun BookDetailsNM.toUiModel(): BookDetailsUM {
         pagesNumber?.toInt(),
         description,
         ratingsCount?.toInt(),
+        averageRating?.toDouble(),
         authors?.toAuthorUM(),
         similarBooks?.toBookDetailsUM()
     )
@@ -27,8 +28,9 @@ fun List<ShortBookDetailsNM>.toBookDetailsUM(): List<BookDetailsUM> {
 
 fun ShortBookDetailsNM.toBookDetailsUM(): BookDetailsUM {
     return BookDetailsUM(
-        id.requireField("similarBookNM.id").toInt(),
+        id.requireField("similarBookNM.id").toLong(),
         title,
+        coverImageUrl = coverImageUrl,
         smallCoverImageUrl = smallCoverImageUrl
     )
 }
@@ -39,7 +41,7 @@ fun List<AuthorNM>.toAuthorUM(): List<AuthorUM> {
 
 fun AuthorNM.toAuthorUM(): AuthorUM {
     return AuthorUM(
-        id.requireField("authorNM.id").toInt(),
+        id.requireField("authorNM.id").toLong(),
         name
     )
 }

@@ -1,6 +1,8 @@
 package ru.appkode.base.repository.books
 
-interface BooksNetworkRepository {
-    fun getBookDetails(bookId: Int)
+import io.reactivex.Observable
+import ru.appkode.base.entities.core.books.details.BookDetailsUM
 
+interface BooksNetworkRepository {
+    fun getBookDetails(bookId: Long): Observable<BookDetailsUM>
 }

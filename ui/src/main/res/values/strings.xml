@@ -27,7 +27,7 @@
 
   <!-- BookDetails -->
   <string name="book_details_reload_btn_text">Reload</string>
-  <string name="book_details_reviews_num_text"> reviews</string>
+  <string name="book_details_reviews_num_text">\u0020reviews</string>
   <string name="book_details_number_of_pages">Number of pages</string>
   <string name="book_details_about_book">About book</string>
   <string name="book_details_more_info_btn_text">More information</string>
