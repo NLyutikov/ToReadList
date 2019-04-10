@@ -11,7 +11,7 @@
     android:layout_height="?attr/actionBarSize"
     app:navigationIcon="@drawable/ic_arrow_back_24dp"
     android:elevation="10dp"
-    app:popupTheme="@style/BooksAppTheme.PopupOverlay"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent">

@@ -9,8 +9,7 @@ import ru.appkode.base.entities.core.books.search.BookSearchNM
 interface BooksApi {
 
     @GET("book/show.xml")
-    fun getBooksDetails(@Query("key") apiKey: String,
-                        @Query("id") bookId: Int): Observable<BookDetailsNM>
+    fun getBooksDetails(@Query("id") bookId: Long): Observable<BookDetailsNM>
 
     @GET("search/index.xml")
     fun getBooksSearch(@Query("key") apiKey: String,
