@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="title">Заголовок</string>
+  <string name="task_list_empty">Список пуст.</string>
+  <string name="no_internet_connection">Неполадки с интернетом. Проверьте соединение.</string>
+  <string name="no_books_read">В списк нет прочитанных книг.</string>
+  <string name="no_favorite_items">Список желаемого пуст</string>
+  <string name="book_details_more_info_btn_text">Подробнее</string>
+  <string name="book_details_similar_books_text">Похожие книги</string>
+  <string name="book_details_about_book">О книге</string>
+  <string name="book_details_number_of_pages">Количество страниц</string>
+  <string name="book_details_reviews_num_text">\u0020обзоров</string>
+  <string name="repeat_e_conn">Повторить</string>
+  <string name="create_task_create">Создать</string>
+  <string name="change_task_save">Сохранить</string>
+  <string name="common_description">Эта книга об истории двух друзей...</string>
+  <string name="description">Описание</string>
+  <string name="book_details_reload_btn_text">Перезагрузить</string>
+</resources>

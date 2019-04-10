@@ -1,24 +1,24 @@
 <resources>
   <!-- Common -->
   <string name="title">Заголовок</string>
-  <string name="common_author">Ivan Petrov</string>
-  <string name="common_genres">Action, Fantasy</string>
-  <string name="common_rating">4,8</string>
+  <string name="common_author" translatable="false">Ivan Petrov</string>
+  <string name="common_genres" translatable="false">Action, Fantasy</string>
+  <string name="common_rating" translatable="false">4,8</string>
   <string name="description">Описание</string>
-  <string name="common_pages_num">342</string>
+  <string name="common_pages_num" translatable="false">342</string>
   <string name="common_description">Orphan Harry learns he is a wizard on his 11th birthday when Hagrid escorts him to magic-teaching Hogwarts School. As a baby, his mothers love protected him and vanquished the villain Voldemort, leaving the child famous as "The Boy who Lived". With his friends Hermione and Ron, Harry has to defeat the returned "He Who Must Not Be Named".</string>
 
   <!-- Task List -->
   <string name="task_list_empty">Список пуст</string>
 
   <!-- Change Task -->
-  <string name="change_task_title">@string/title</string>
-  <string name="change_task_description">@string/description</string>
+  <string name="change_task_title" translatable="false">@string/title</string>
+  <string name="change_task_description" translatable="false">@string/description</string>
   <string name="change_task_save">Сохранить</string>
 
   <!-- Create Task -->
-  <string name="create_task_title">@string/title</string>
-  <string name="create_task_description">@string/description</string>
+  <string name="create_task_title" translatable="false">@string/title</string>
+  <string name="create_task_description" translatable="false">@string/description</string>
   <string name="create_task_create">Создать</string>
 
   <!-- Network Error -->
@@ -32,5 +32,7 @@
   <string name="book_details_about_book">About book</string>
   <string name="book_details_more_info_btn_text">More information</string>
   <string name="book_details_similar_books_text">Similar books</string>
+    <string name="no_books_read">history is empty</string>
+  <string name="no_favorite_items">wishlist is empty</string>
 
 </resources>
