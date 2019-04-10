@@ -1,6 +1,5 @@
-package ru.appkode.base.entities.core.books
+package ru.appkode.base.entities.core.books.details
 
-import ru.appkode.base.entities.core.books.details.*
 import ru.appkode.base.entities.core.util.requireField
 import java.util.*
 

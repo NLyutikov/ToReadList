@@ -4,7 +4,7 @@
   <string name="task_list_empty">Список пуст.</string>
   <string name="no_internet_connection">Неполадки с интернетом. Проверьте соединение.</string>
   <string name="no_books_read">В списк нет прочитанных книг.</string>
-  <string name="no_favorite_items">Список желаемого пуст</string>
+  <string name="no_favorite_items">В списке избранного пока ничего нет.</string>
   <string name="book_details_more_info_btn_text">Подробнее</string>
   <string name="book_details_similar_books_text">Похожие книги</string>
   <string name="book_details_about_book">О книге</string>
