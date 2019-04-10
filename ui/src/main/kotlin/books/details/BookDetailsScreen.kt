@@ -9,6 +9,7 @@ interface BookDetailsScreen {
 
     interface View : MviView<ViewState> {
         fun showSimilarBookIntent(): Observable<Long>
+        fun showMoreInfoIntent(): Observable<Unit>
     }
 
     data class ViewState(

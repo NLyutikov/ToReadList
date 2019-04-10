@@ -2,6 +2,7 @@ package ru.appkode.base.ui.books.details
 
 import android.app.ProgressDialog.show
 import com.bluelinelabs.conductor.Router
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.repository.books.BooksNetworkRepository
@@ -16,6 +17,7 @@ sealed class ScreenAction
 
 data class LoadBookDetails(val state: LceState<BookDetailsUM>) : ScreenAction()
 data class ShowSimilarBook(val bookId: Long) : ScreenAction()
+object ShowMoreInformation : ScreenAction()
 
 class BookDetailsPresenter(
     schedulers: AppSchedulers,
@@ -26,7 +28,9 @@ class BookDetailsPresenter(
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
-            intent (BookDetailsScreen.View::showSimilarBookIntent)
+            intent(BookDetailsScreen.View::showMoreInfoIntent)
+                .map{ShowMoreInformation},
+            intent(BookDetailsScreen.View::showSimilarBookIntent)
                 .map{ShowSimilarBook(it)},
             intent { networkRepository.getBookDetails(bookId) }
                 .doLceAction { LoadBookDetails(it) }
@@ -40,6 +44,7 @@ class BookDetailsPresenter(
         return when(action) {
             is ShowSimilarBook -> processShowSimilarBook(previousState, action)
             is LoadBookDetails -> processLoadBookDetails(previousState, action)
+            is ShowMoreInformation -> processShowMoreInformation(previousState, action)
         }
     }
 
@@ -66,6 +71,15 @@ class BookDetailsPresenter(
             router.pushController(
                 BookDetailsController.createController(action.bookId).obtainHorizontalTransaction()
             )
+        }
+    }
+
+    private fun processShowMoreInformation(
+        previousState: BookDetailsScreen.ViewState,
+        action: ShowMoreInformation
+    ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>> {
+        return previousState to command {
+            //TODO
         }
     }
 

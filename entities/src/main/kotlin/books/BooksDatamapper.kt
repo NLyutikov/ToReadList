@@ -17,6 +17,7 @@ fun BookDetailsNM.toUiModel(): BookDetailsUM {
         description,
         ratingsCount?.toInt(),
         averageRating?.toDouble(),
+        shelves?.toShelfUM()?.sortedByDescending { shelf -> shelf.count },
         authors?.toAuthorUM(),
         similarBooks?.toBookDetailsUM()
     )
@@ -43,5 +44,16 @@ fun AuthorNM.toAuthorUM(): AuthorUM {
     return AuthorUM(
         id.requireField("authorNM.id").toLong(),
         name
+    )
+}
+
+fun List<ShelfNM>.toShelfUM(): List<ShelfUM> {
+    return map { shelf -> shelf.toShelfUM() }
+}
+
+fun ShelfNM.toShelfUM(): ShelfUM {
+    return ShelfUM(
+        name,
+        count?.toInt()
     )
 }

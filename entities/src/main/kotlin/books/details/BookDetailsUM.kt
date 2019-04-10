@@ -12,6 +12,7 @@ data class BookDetailsUM(
     val description: String? = null,
     val ratingsCount: Int? = null,
     val averageRating: Double? = null,
+    val shelves: List<ShelfUM>? = null,
     val authors: List<AuthorUM>? = null,
     val similarBooks: List<BookDetailsUM>? = null
 )
@@ -19,4 +20,9 @@ data class BookDetailsUM(
 data class AuthorUM(
     val id: Long,
     val name: String? = null
+)
+
+data class ShelfUM (
+    val name: String? = null,
+    val count: Int? = null
 )

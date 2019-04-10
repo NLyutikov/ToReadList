@@ -1,9 +1,6 @@
 package ru.appkode.base.entities.core.books.details
 
-import com.tickaroo.tikxml.annotation.Element
-import com.tickaroo.tikxml.annotation.Path
-import com.tickaroo.tikxml.annotation.PropertyElement
-import com.tickaroo.tikxml.annotation.Xml
+import com.tickaroo.tikxml.annotation.*
 
 @Xml(name = "GoodreadsResponse")
 data class BookDetailsNM (
@@ -56,6 +53,10 @@ data class BookDetailsNM (
     @Element
     val seriesWorks: List<SeriesWorkNM>?,
 
+    @Path("book/popular_shelves")
+    @Element
+    val shelves: List<ShelfNM>?,
+
     @Path("book/authors")
     @Element
     val authors: List<AuthorNM>?,
@@ -85,6 +86,14 @@ data class SeriesNM(
     val title: String?,
     @PropertyElement
     val primary_work_count: String?
+)
+
+@Xml(name = "shelf")
+data class ShelfNM(
+    @Attribute
+    val name: String? = null,
+    @Attribute
+    val count: String? = null
 )
 
 @Xml(name = "book")

@@ -3,19 +3,19 @@ package ru.appkode.base.ui.books.details
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.book_details_controller.*
-import kotlinx.android.synthetic.main.duck_list_controller.*
 import kotlinx.android.synthetic.main.network_error.*
-import ru.appkode.base.entities.core.books.details.BookDetailsUM
+import ru.appkode.base.entities.core.books.details.*
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setVisibilityAndText
-import ru.appkode.base.ui.task.change.ChangeTaskDescription
-import timber.log.Timber
 
 class BookDetailsController :
     BaseMviController<BookDetailsScreen.ViewState, BookDetailsScreen.View, BookDetailsPresenter>(),
@@ -41,6 +41,17 @@ class BookDetailsController :
 
     override fun initializeView(rootView: View) {
         book_details_toolbar.setNavigationOnClickListener { router.handleBack() }
+
+        //TODO
+        book_details_add_to_want_to_read_btn.setOnClickListener {
+            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
+        }
+
+        book_details_about_book_container.setOnClickListener {
+            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
+            eventsRelay.accept(EVENT_ID_MORE_INFO to Unit)
+        }
+
         similarBooksAdapter = SimilarBooksListAdapter()
         book_details_similar_books_list.layoutManager = LinearLayoutManager(
             applicationContext,
@@ -53,7 +64,7 @@ class BookDetailsController :
     override fun renderViewState(viewState: BookDetailsScreen.ViewState) {
         fieldChanged(viewState, {viewState -> viewState.bookDetailsState }) {
             book_details_load_progress_bar.isVisible = viewState.bookDetailsState.isLoading
-            book_details_scroll_content_view.isVisible = viewState.bookDetailsState.isContent
+            book_details_content_view.isVisible = viewState.bookDetailsState.isContent
             network_error_screen_container.isVisible = viewState.bookDetailsState.isError
             if (viewState.bookDetailsState.isContent)
                 showContent(viewState)
@@ -63,7 +74,7 @@ class BookDetailsController :
     private fun showContent(viewState: BookDetailsScreen.ViewState) {
         val book = viewState.bookDetailsState.asContent()
         with(book) {
-            showHeader(title, coverImageUrl)
+            showHeader(title, shelves, authors, coverImageUrl)
             showSmallRatingAndNumPages(averageRating, ratingsCount, pagesNumber)
             showDescription(description)
             showSimilarBooks(similarBooks)
@@ -90,20 +101,28 @@ class BookDetailsController :
         book_details_description_text.setVisibilityAndText(description)
     }
 
-    private fun showHeader(title: String?, imageCoverUrl: String?) {
+    private fun showHeader(title: String?, shelves: List<ShelfUM>?, authors: List<AuthorUM>?, imageCoverUrl: String?) {
         book_details_title_container.isVisible = !title.isNullOrBlank() || !imageCoverUrl.isNullOrBlank()
 
+        //Title
         book_details_title_text.setVisibilityAndText(title)
+        //Authors
+        book_details_author_text.setVisibilityAndText(authors?.toAuthorsLine(0..2))
+        //Genres
+        book_details_genres_text.setVisibilityAndText(shelves?.toShelvesLine(0..2))
+        //Cover Image
         Picasso.Builder(applicationContext!!).build()
             .load(imageCoverUrl)
             .error(R.drawable.test_img)
             .into(book_details_cover_image)
-
-        //TODO Author and genres
     }
 
     override fun showSimilarBookIntent(): Observable<Long> {
         return similarBooksAdapter.itemClicked
+    }
+
+    override fun showMoreInfoIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(EVENT_ID_MORE_INFO)
     }
 
     override fun createPresenter(): BookDetailsPresenter {
@@ -117,3 +136,5 @@ class BookDetailsController :
 }
 
 private const val ARG_BOOK_ID = "book_id"
+
+private const val EVENT_ID_MORE_INFO = 100

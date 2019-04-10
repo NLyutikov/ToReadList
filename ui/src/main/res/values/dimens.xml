@@ -6,7 +6,7 @@
   <dimen name="book_details_image_cover_width">100dp</dimen>
   <dimen name="book_details_container_padding">15dp</dimen>
   <dimen name="book_details_container_bottom_margin">1dp</dimen>
-  <dimen name="book_details_title_text_size">24sp</dimen>
+  <dimen name="book_details_title_text_size">20sp</dimen>
   <dimen name="book_details_author_text_size">16sp</dimen>
   <dimen name="book_details_genres_text_size">13sp</dimen>
   <dimen name="book_details_small_rating_text_size">16sp</dimen>
