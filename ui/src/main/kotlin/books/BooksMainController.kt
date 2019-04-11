@@ -1,39 +1,93 @@
 package ru.appkode.base.ui.books
 
+import android.view.MenuItem
 import android.view.View
+import com.bluelinelabs.conductor.Router
+import com.bluelinelabs.conductor.RouterTransaction
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.books_main_controller.*
 import ru.appkode.base.ui.R
+import ru.appkode.base.ui.books.color.ColorController
 import ru.appkode.base.ui.core.core.BaseMviController
-import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.*
 
 class BooksMainController :
     BaseMviController<BooksMainScreen.ViewState, BooksMainScreen.View, BooksMainPresenter>(),
-    BooksMainScreen.View {
+    BooksMainScreen.View,
+    BottomNavigationView.OnNavigationItemSelectedListener {
+
+    private lateinit var childRouter: Router
 
     override fun createConfig(): Config {
         return object : Config {
-            override val viewLayoutResource = R.layout.book_details_controller
+            override val viewLayoutResource = R.layout.books_main_controller
         }
     }
 
     override fun initializeView(rootView: View) {
-
-
+        childRouter = getChildRouter(books_main_lists_container)
+        books_main_bottom_navigation.setOnNavigationItemSelectedListener(this)
     }
 
     override fun renderViewState(viewState: BooksMainScreen.ViewState) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        fieldChanged(viewState, {state -> state.currentViewTag}) {
+            showControllerByTag(viewState.currentViewTag)
+        }
     }
 
-    override fun wishListIntent() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun showControllerByTag(tag: Int) {
+        //TODO реализовать отображение wish list и history
+        if (childRouter.backstackSize > 1) {
+            childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
+        } else {
+            if (childRouter.getControllerWithTag(tag.toString()) == null)
+                childRouter.pushController(ColorController().obtainFadeTransactionWithTag(tag.toString()))
+        }
     }
 
-    override fun historyListIntent() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
+        val trans = backstack.find { it.tag() == tag }
+        val newBackstack = ArrayList(backstack.filter { it.tag() != tag })
+        newBackstack.add(trans)
+        return newBackstack.toList()
+    }
+
+    override fun showListIntent(): Observable<Int> {
+        return eventsRelay.filterEvents(EVENT_ID_SHOW_LIST)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem) = when(item.itemId) {
+        R.id.wish_list_navigation ->  {
+            eventsRelay.accept(EVENT_ID_SHOW_LIST to VIEW_TAG_1)
+            true
+        }
+        R.id.history_navigation -> {
+            eventsRelay.accept(EVENT_ID_SHOW_LIST to VIEW_TAG_2)
+            true
+        }
+        else -> false
+    }
+
+    override fun handleBack(): Boolean {
+        router.backstack.clear()
+        activity?.finish()
+        return false
     }
 
     override fun createPresenter(): BooksMainPresenter {
-        return BooksMainPresenter(DefaultAppSchedulers)
+        return BooksMainPresenter(
+            DefaultAppSchedulers,
+            router
+        )
     }
 
 }
+
+const val EVENT_ID_SHOW_LIST = 200
+
+
+const val VIEW_TAG_1 = 1
+const val VIEW_TAG_2 = 2
+

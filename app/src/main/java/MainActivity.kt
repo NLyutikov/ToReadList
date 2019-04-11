@@ -6,6 +6,7 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
+import ru.appkode.base.ui.books.BooksMainController
 import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
@@ -26,7 +27,8 @@ class MainActivity : AppCompatActivity() {
         // Just math random. Nothing else.
         //if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
         //else TaskListController().obtainHorizontalTransaction()
-        BookDetailsController.createController(136251).obtainVerticalTransaction()
+        //BookDetailsController.createController(136251).obtainVerticalTransaction()
+        BooksMainController().obtainHorizontalTransaction()
       )
   }
 
