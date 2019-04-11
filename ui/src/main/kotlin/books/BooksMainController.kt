@@ -9,9 +9,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_main_controller.*
 import ru.appkode.base.ui.R
-import ru.appkode.base.ui.books.color.ColorController
 import ru.appkode.base.ui.core.core.BaseMviController
-import ru.appkode.base.ui.core.core.util.*
+import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.filterEvents
 
 class BooksMainController :
     BaseMviController<BooksMainScreen.ViewState, BooksMainScreen.View, BooksMainPresenter>(),
@@ -41,9 +41,6 @@ class BooksMainController :
         //TODO реализовать отображение wish list и history
         if (childRouter.backstackSize > 1) {
             childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
-        } else {
-            if (childRouter.getControllerWithTag(tag.toString()) == null)
-                childRouter.pushController(ColorController().obtainFadeTransactionWithTag(tag.toString()))
         }
     }
 
