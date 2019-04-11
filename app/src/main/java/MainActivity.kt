@@ -7,6 +7,7 @@ import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
 import ru.appkode.base.ui.books.BooksMainController
+import ru.appkode.base.ui.books.color.ColorController
 import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
@@ -24,10 +25,6 @@ class MainActivity : AppCompatActivity() {
     router = Conductor.attachRouter(this, main_container, savedInstanceState)
     if (!router.hasRootController())
       router.setRoot(
-        // Just math random. Nothing else.
-        //if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
-        //else TaskListController().obtainHorizontalTransaction()
-        //BookDetailsController.createController(136251).obtainVerticalTransaction()
         BooksMainController().obtainHorizontalTransaction()
       )
   }

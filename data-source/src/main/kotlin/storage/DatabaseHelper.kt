@@ -15,4 +15,6 @@ object DatabaseHelper {
   }
 
   fun getTaskPersistence(): TaskPersistence = database.taskPersistence()
+  fun getWishListPersistence() = database.wishListPersistence()
+  fun getHistoryPersistence() = database.historyPersistence()
 }
