@@ -7,12 +7,7 @@ import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
 import ru.appkode.base.ui.books.BooksMainController
-import ru.appkode.base.ui.books.color.ColorController
-import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
-import ru.appkode.base.ui.duck.DuckListController
-import ru.appkode.base.ui.task.list.TaskListController
 
 class MainActivity : AppCompatActivity() {
 

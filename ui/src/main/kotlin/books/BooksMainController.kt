@@ -35,7 +35,7 @@ class BooksMainController :
         }
     }
 
-    fun showControllerByTag(tag: Int) {
+    private fun showControllerByTag(tag: Int) {
         //TODO реализовать отображение wish list и history
 //        if (childRouter.backstackSize > 1) {
 //            childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
@@ -45,7 +45,7 @@ class BooksMainController :
 //        }
     }
 
-    fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
+    private fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
         val trans = backstack.find { it.tag() == tag }
         val newBackstack = ArrayList(backstack.filter { it.tag() != tag })
         newBackstack.add(trans)
