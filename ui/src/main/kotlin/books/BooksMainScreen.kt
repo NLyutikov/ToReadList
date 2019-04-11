@@ -1,12 +1,13 @@
 package ru.appkode.base.ui.books
 
+import io.reactivex.Observable
 import ru.appkode.base.ui.core.core.MviView
+import java.util.*
 
-class BooksMainScreen {
+interface BooksMainScreen {
     interface View : MviView<ViewState> {
-        fun wishListIntent()
-        fun historyListIntent()
+        fun showListIntent(): Observable<Int>
     }
 
-    data class ViewState(val currentViewId: Int)
+    data class ViewState(val currentViewTag: Int)
 }

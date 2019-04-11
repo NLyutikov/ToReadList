@@ -33,7 +33,7 @@ class BookDetailsPresenter(
             intent(BookDetailsScreen.View::showSimilarBookIntent)
                 .map{ShowSimilarBook(it)},
             intent { networkRepository.getBookDetails(bookId) }
-                .doLceAction { LoadBookDetails(it) }
+                .doLceAction { LoadBookDetails(it) }//TODO add error check
         )
     }
 
