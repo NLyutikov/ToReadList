@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:title="Wish list"
-        android:id="@+id/wish_list_navigation"/>
+        android:id="@+id/wish_list_navigation"
+        android:icon="@drawable/outline_turned_in_24"/>
     <item
         android:title="History"
-        android:id="@+id/history_navigation"/>
+        android:id="@+id/history_navigation"
+        android:icon="@drawable/ic_history_24dp"/>
 </menu>
