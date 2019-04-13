@@ -37,7 +37,14 @@ internal class DraggableAdapter() : ListActions,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val inflater = LayoutInflater.from(parent.context)
+        val v = inflater.inflate(
+            R.layout.books_list_item,
+            parent,
+            false
+        )
+        return ViewHolder(v)
     }
 
     var data: LinkedList<BookUM> = emptyList<BookUM>() as LinkedList<BookUM>
