@@ -33,23 +33,6 @@ abstract class CommonListController :
 
     protected fun initRecyclerView() = with (books_list_recycler) {
         layoutManager = LinearLayoutManager(applicationContext!!)
-//        addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                val manager = layoutManager as LinearLayoutManager
-//
-//                val totalItemCount = manager.itemCount
-//                val visibleItemCount = manager.childCount
-//                val firstVisibleItem = manager.findFirstVisibleItemPosition()
-//
-//                val isLoading: Boolean? = previousViewState?.loadNewPageState?.isLoading
-//                val nextPage: Int? = previousViewState?.curPage
-//
-//                if (nextPage != null && isLoading != null && !isLoading  &&
-//                    firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
-//                    eventsRelay.accept(COMMON_LIST_EVENT_LOAD_PAGE to  nextPage)
-//                }
-//            }
-//        })
         adapter = listAdapter
     }
 
@@ -80,6 +63,9 @@ abstract class CommonListController :
         }
     }
 
+    /**
+     * FIXME При паджинации подвисает
+     */
     override fun loadNextPageOfBooksIntent(): Observable<Int> {
         return books_list_recycler.scrollEvents()
             .filter {
@@ -94,7 +80,7 @@ abstract class CommonListController :
                         isLoading != null &&
                         !isLoading  &&
                         firstVisibleItem + visibleItemCount >= totalItemCount / 2
-            }.throttleFirst(500, TimeUnit.MILLISECONDS)
+            }.throttleFirst(1, TimeUnit.SECONDS)
             .map { previousViewState!!.curPage + 1 }
     }
 
@@ -105,6 +91,7 @@ abstract class CommonListController :
 
     override fun itemClickedIntent(): Observable<Int> {
         return listAdapter.itemClicked
+            .throttleFirst(500, TimeUnit.MILLISECONDS)
     }
 
     override fun itemSwipedLeftIntent(): Observable<Int> {

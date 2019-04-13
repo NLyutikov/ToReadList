@@ -8,8 +8,8 @@ import ru.appkode.base.ui.books.lists.CommonListScreen
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 
 class WishListController : CommonListController() {
-    //TODO когда будет реализована поддержка бд заменит парметр на true
-    override val listAdapter: CommonListAdapter = CommonListAdapter(false)
+
+    override val listAdapter: CommonListAdapter = CommonListAdapter(true)
 
     override fun createPresenter(): CommonListPresenter {
         return WishListPresenter(

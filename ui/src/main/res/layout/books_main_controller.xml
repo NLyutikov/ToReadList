@@ -8,28 +8,35 @@
 
 >
 
-
-    <RelativeLayout
+    <com.bluelinelabs.conductor.ChangeHandlerFrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/books_main_lists_container"
+            android:layout_alignBottom="@id/books_main_lists_container"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            />
 
-        <com.bluelinelabs.conductor.ChangeHandlerFrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/books_main_lists_container"
-                android:layout_alignBottom="@id/books_main_lists_container"
-                />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:id="@+id/books_main_bottom_navigation"
+            android:layout_gravity="bottom"
+            app:itemIconTint="@color/bottom_navigation_color"
+            app:itemTextColor="@color/text_black_color"
+            app:menu="@menu/books_lists_navigation"
+            app:layout_behavior="ru.appkode.base.ui.behavior.BottomNavigationBehavior"
+            android:layout_alignParentBottom="true"/>
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:id="@+id/books_main_bottom_navigation"
-                app:itemIconTint="@color/colorAccent"
-                app:itemTextColor="@color/text_black_color"
-                app:menu="@menu/books_lists_navigation"
-                android:layout_alignParentBottom="true"/>
-
-    </RelativeLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/books_main_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:src="@drawable/ic_search_white_24dp"
+            app:fabSize="normal"
+            app:layout_anchor="@id/books_main_bottom_navigation"
+            app:layout_anchorGravity="top|end"
+            app:useCompatPadding="true"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

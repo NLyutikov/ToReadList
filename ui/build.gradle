@@ -39,5 +39,6 @@ dependencies {
   implementation project(':entities')
   implementation project(':repository')
 
-  implementation 'com.jakewharton.rxbinding3:rxbinding-recyclerview:3.0.0-alpha2'
+  api 'com.jakewharton.rxbinding3:rxbinding-recyclerview:3.0.0-alpha2'
+  api 'com.roughike:bottom-bar:2.3.1'
 }

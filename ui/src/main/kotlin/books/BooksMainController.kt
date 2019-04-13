@@ -5,12 +5,12 @@ import android.view.View
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_main_controller.*
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
-import ru.appkode.base.ui.core.core.util.bottomNavigationHandleBack
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.isOnlyControllersWithTagsInBackstack
 
@@ -38,6 +38,10 @@ class BooksMainController :
         return eventsRelay.filterEvents(EVENT_ID_SHOW_LIST)
     }
 
+    override fun showSearchList(): Observable<Unit> {
+        return books_main_fab.clicks()
+    }
+
     override fun onNavigationItemSelected(item: MenuItem) = when(item.itemId) {
         R.id.wish_list_navigation ->  {
             eventsRelay.accept(EVENT_ID_SHOW_LIST to WISH_LIST_CONTROLLER_TAG)
@@ -50,6 +54,9 @@ class BooksMainController :
         else -> false
     }
 
+    /**
+     * Если в backstack лежат только контроллеры отвечающие за навигацию то убиваем активность, к которой привязанны
+     */
     override fun handleBack(): Boolean {
         if (!router.isOnlyControllersWithTagsInBackstack(WISH_LIST_CONTROLLER_TAG, HISTORY_CONTROLLER_TAG))
             return super.handleBack()
@@ -60,14 +67,14 @@ class BooksMainController :
     override fun createPresenter(): BooksMainPresenter {
         return BooksMainPresenter(
             DefaultAppSchedulers,
-            childRouter
+            childRouter,
+            router
         )
     }
 
 }
 
 const val EVENT_ID_SHOW_LIST = 200
-
 
 const val WISH_LIST_CONTROLLER_TAG = "1"
 const val HISTORY_CONTROLLER_TAG = "2"

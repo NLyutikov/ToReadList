@@ -12,6 +12,7 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
+import ru.appkode.base.ui.core.core.util.toLceEventObservable
 import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
@@ -31,18 +32,19 @@ abstract class CommonListPresenter(
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
-            loadNextPage(intent(CommonListScreen.View::loadNextPageOfBooksIntent))
-                .doLceAction { state -> LoadNextPageIntent(state) },
-            intent(CommonListScreen.View::pageOfBooksLoaded)
-                .map { PageLoadedIntent(it) },
             intent(CommonListScreen.View::itemClickedIntent)
                 .map { position -> ItemClickedIntent(position) },
             intent(CommonListScreen.View::itemSwipedLeftIntent)
                 .map { position -> ItemSwipedLeftIntent(position) },
             intent(CommonListScreen.View::itemSwipedRightIntent)
                 .map { position -> ItemSwipedRigthIntent(position) },
-            intent { loadNextPage(Observable.just(1)) }
-                .doLceAction { state -> LoadNextPageIntent(state) }
+            intent(CommonListScreen.View::pageOfBooksLoaded)
+                .map { PageLoadedIntent(it) },
+            intent(CommonListScreen.View::loadNextPageOfBooksIntent)
+                .flatMap { page -> loadNextPage(page) }
+                .doLceAction { lceState ->  LoadNextPageIntent(lceState)},
+            intent { loadNextPage(1) }
+                .doLceAction { lceState ->  LoadNextPageIntent(lceState) }
         )
     }
 
@@ -62,7 +64,7 @@ abstract class CommonListPresenter(
     /**
      * Возвращает observable списка книг из бд или api.
      */
-    abstract fun loadNextPage(page: Observable<Int>): Observable< List<BookListItemUM> >
+    abstract fun loadNextPage(page: Int): Observable< List<BookListItemUM> >
 
     protected fun processLoadNextPage(
         previousState: CommonListScreen.ViewState,
@@ -103,6 +105,6 @@ abstract class CommonListPresenter(
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
 
     override fun createInitialState(): CommonListScreen.ViewState {
-        return CommonListScreen.ViewState(1, emptyList(), LceState.Loading())
+        return CommonListScreen.ViewState(0, emptyList(), LceState.Loading())
     }
 }

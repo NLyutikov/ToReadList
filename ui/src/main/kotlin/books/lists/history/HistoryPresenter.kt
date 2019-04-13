@@ -18,25 +18,9 @@ class HistoryPresenter(
     router: Router
 ) : CommonListPresenter(schedulers, booksLocalRepository, booksNetworkRepository, router) {
 
-    override fun loadNextPage(page: Observable<Int>): Observable<List<BookListItemUM>> {
-        //return page.flatMap { booksLocalRepository.getHistoryList() } //TODO реализовать получение данных по странице из бд
-        //Моковые данные для проверки пагинации
-        return page.map {listOf(
-            getRandomBooksListItem(),
-            getRandomBooksListItem(),
-            getRandomBooksListItem(),
-            getRandomBooksListItem(),
-            getRandomBooksListItem(),
-            getRandomBooksListItem(),
-            getRandomBooksListItem()
-        ) }
+    override fun loadNextPage(page: Int): Observable<List<BookListItemUM>> {
+        return booksLocalRepository.getHistory()
     }
-
-    fun getRandomBooksListItem() = BookListItemUM(
-        Random.nextLong(1, 1000),
-        Random.nextInt(1, 1000).toString(),
-        imagePath = "https://static.independent.co.uk/s3fs-public/thumbnails/image/2017/09/12/11/naturo-monkey-selfie.jpg?w968h681"
-    )
 
     override fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
