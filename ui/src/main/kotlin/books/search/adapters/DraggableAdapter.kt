@@ -7,21 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
-import ru.appkode.base.entities.core.books.search.*
+import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.ui.R
-import ru.appkode.base.ui.books.search.BooksSearchAdapter
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.*
+import java.util.Collections.swap
 
 
 internal class DraggableAdapter() : ListActions,
@@ -46,11 +44,12 @@ internal class DraggableAdapter() : ListActions,
         return ViewHolder(v)
     }
 
-    var data: LinkedList<BookUM> = emptyList<BookUM>() as LinkedList<BookUM>
+    var data: List<BookUM> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+
 
     init {
         // DraggableItemAdapter requires stable ID, and also
@@ -79,10 +78,8 @@ internal class DraggableAdapter() : ListActions,
         if (fromPosition == toPosition) {
             return
         }
+        swap(data,fromPosition,toPosition)
 
-        val item = data.removeAt(fromPosition)
-
-        data.add(toPosition, item)
     }
 
     override fun getItemCount(): Int {
@@ -93,7 +90,7 @@ internal class DraggableAdapter() : ListActions,
         val bookImg: ImageView = view.books_list_item_image
         val bookName: TextView = view.books_list_item_name
         val bookRating: TextView = view.books_list_item_rating_text
-        val bookCard:ConstraintLayout = view.book_card
+        val bookCard: ConstraintLayout = view.book_card
 
         init {
             bookImg.setOnClickListener {
