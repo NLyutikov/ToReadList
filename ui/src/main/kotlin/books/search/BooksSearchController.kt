@@ -3,12 +3,17 @@ package ru.appkode.base.ui.books.search
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.jakewharton.rxbinding2.view.clicks
+import com.squareup.picasso.Picasso
+import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_search_controller.*
 import kotlinx.android.synthetic.main.network_error.*
+import ru.appkode.base.entities.core.books.search.SearchResultUM
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
+import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 
@@ -43,17 +48,41 @@ class BooksSearchController :
 
     override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
         fieldChanged(viewState, { it.booksSearchState }) {
-            books_search_loading.isVisible = viewState.booksSearchState.isLoading
-            books_search_recycler.isVisible = viewState.booksSearchState.isContent
-            network_error_screen_container.isVisible = viewState.booksSearchState.isError
+            renderSearchState(viewState.booksSearchState)
         }
-        if (viewState.booksSearchState.isContent) {
-            adapter.data = viewState.booksSearchState.asContent()
+        fieldChanged(viewState, { it.url.orEmpty() }) {
+            if (viewState.url.isNullOrBlank()) return@fieldChanged
+            StfalconImageViewer.Builder<String>(activity, listOf(viewState.url)) { view, url ->
+                Picasso.get().load(url).into(view)
+            }
+                .withDismissListener { eventsRelay.accept(EVENT_ID_IMAGE_DISMISS to Unit) }
+                .show()
+        }
+    }
+
+    private fun renderSearchState(searchState: LceState<List<SearchResultUM>>) {
+        books_search_loading.isVisible = searchState.isLoading
+        books_search_recycler.isVisible = searchState.isContent
+        network_error_screen_container.isVisible = searchState.isError
+        if (searchState.isContent) {
+            adapter.data = searchState.asContent()
         }
     }
 
     override fun searchBookIntent(): Observable<String> {
         return eventsRelay.filterEvents(EVENT_ID_SEARCH_CHANGED)
+    }
+
+    override fun showImageIntent(): Observable<String> {
+        return adapter.imageClicked
+    }
+
+    override fun dismissImageIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(EVENT_ID_IMAGE_DISMISS)
+    }
+
+    override fun repeatSearchIntent(): Observable<Unit> {
+        return network_error_screen_reload_btn.clicks()
     }
 
     override fun createPresenter(): BooksSearchPresenter {
@@ -66,3 +95,4 @@ class BooksSearchController :
 }
 
 private const val EVENT_ID_SEARCH_CHANGED = 0
+private const val EVENT_ID_IMAGE_DISMISS = 1
