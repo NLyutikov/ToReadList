@@ -1,6 +1,7 @@
 package ru.appkode.base.data.network.books
 
 import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 import ru.appkode.base.entities.core.books.details.BookDetailsNM
@@ -12,7 +13,5 @@ interface BooksApi {
     fun getBooksDetails(@Query("id") bookId: Long): Observable<BookDetailsNM>
 
     @GET("search/index.xml")
-    fun getBooksSearch(@Query("key") apiKey: String,
-                       @Query("q") text: String
-    ): Observable<BookSearchNM>
+    fun getBooksSearch(@Query("q") text: String): Single<BookSearchNM>
 }

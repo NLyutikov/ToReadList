@@ -6,48 +6,38 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp" android:id="@+id/cardView">
+        app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
         <ImageView
-          android:id="@+id/books_list_item_image"
-          android:layout_width="100dp"
-          android:layout_height="150dp"
-          android:layout_marginBottom="8dp"
-          android:layout_marginStart="16dp"
-          android:layout_marginTop="8dp"
-          android:background="@drawable/test_img"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/books_list_item_image"
+                android:layout_width="56dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
         />
 
         <TextView
-          android:id="@+id/books_list_item_name"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:text="Hatchet"
-          android:textColor="#000"
-          android:textSize="20sp"
-          android:layout_marginTop="8dp"
-          android:layout_marginStart="16dp"
-          app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
-          app:layout_constraintTop_toTopOf="parent"
-        />
-
-        <TextView
-          android:id="@+id/books_list_item_author"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="by Gary Paulsen"
-          android:textSize="12sp"
-          android:layout_marginStart="18dp"
-          app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
-          app:layout_constraintTop_toBottomOf="@+id/books_list_item_name"
-        />
+                android:id="@+id/books_list_item_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hatchet"
+                android:textColor="#000"
+                android:textSize="24sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/books_list_item_swipe_img"/>
 
         <ImageView
                 android:id="@+id/books_list_item_favorites"
@@ -76,6 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3.77"
+                android:textSize="18sp"
                 android:layout_marginBottom="10dp"
                 app:layout_constraintStart_toEndOf="@+id/books_list_item_rating_img"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -83,8 +74,8 @@
 
         <ImageView
                 android:id="@+id/books_list_item_rating_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:background="@drawable/round_star_rate_18"
                 android:layout_marginStart="14dp"
                 android:layout_marginBottom="8dp"

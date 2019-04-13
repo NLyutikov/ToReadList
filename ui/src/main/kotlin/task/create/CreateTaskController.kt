@@ -7,6 +7,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.create_task_controller.*
 import ru.appkode.base.repository.RepositoryHelper
+import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -14,7 +15,6 @@ import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setTextSafe
 import ru.appkode.base.ui.task.create.CreateTaskScreen.View
 import ru.appkode.base.ui.task.create.CreateTaskScreen.ViewState
-import ru.appkode.base.ui.R
 
 class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresenter>(), View {
   override fun createConfig(): Config {
@@ -53,7 +53,7 @@ class CreateTaskController : BaseMviController<ViewState, View, CreateTaskPresen
   }
 
   private fun renderLceState(state: LceState<Unit>) {
-    create_task_loading.isVisible = state.isLoading
+      books_search_loading.isVisible = state.isLoading
     if (state.isError) {
       Snackbar
         .make(

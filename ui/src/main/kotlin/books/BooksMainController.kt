@@ -9,7 +9,8 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_main_controller.*
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
-import ru.appkode.base.ui.core.core.util.*
+import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.filterEvents
 
 class BooksMainController :
     BaseMviController<BooksMainScreen.ViewState, BooksMainScreen.View, BooksMainPresenter>(),

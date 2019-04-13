@@ -11,7 +11,7 @@ import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var router: Router
+    private lateinit var router: Router
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
       )
   }
 
-  override fun onBackPressed() {
-    if (!router.handleBack())
-      super.onBackPressed()
-  }
+    override fun onBackPressed() {
+        if (!router.handleBack())
+            super.onBackPressed()
+    }
 }
