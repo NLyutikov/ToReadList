@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
+import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
@@ -106,6 +107,10 @@ class BooksSearchController :
 
     override fun dismissImageIntent(): Observable<Unit> {
         return eventsRelay.filterEvents(EVENT_ID_IMAGE_DISMISS)
+    }
+
+    override fun repeatSearchIntent(): Observable<Unit> {
+        return network_error_screen_reload_btn.clicks()
     }
 
     override fun createPresenter(): BooksSearchPresenter {
