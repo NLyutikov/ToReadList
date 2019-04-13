@@ -1,16 +1,22 @@
 package ru.appkode.base.ui.books.search
 
+import android.graphics.drawable.NinePatchDrawable
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
+import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_search_controller.*
 import kotlinx.android.synthetic.main.network_error.*
-import ru.appkode.base.entities.core.books.search.SearchResultUM
+import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
+import ru.appkode.base.ui.books.search.adapters.DraggableAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -41,8 +47,30 @@ class BooksSearchController :
             }
 
         })
+        /*оставил код на всякий случай, когда будет рабочее RV с drag & drop тогда можно стереть
         books_search_recycler.layoutManager = LinearLayoutManager(applicationContext)
         books_search_recycler.adapter = adapter
+        */
+        //реализация RV with drag & drop (потом и свайп)
+        val layoutManager: RecyclerView.LayoutManager? = LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
+
+        val recyclerViewDragDropManager: RecyclerViewDragDropManager? = RecyclerViewDragDropManager()
+        recyclerViewDragDropManager!!.setDraggingItemShadowDrawable(
+            ContextCompat.getDrawable(applicationContext!!, R.drawable.material_shadow) as NinePatchDrawable?
+        )
+
+        //adapter
+        val dragDropAdapter = DraggableAdapter()
+
+        val wrappedAdapter = recyclerViewDragDropManager.createWrappedAdapter(dragDropAdapter)      // wrap for dragging
+
+        val animator = DraggableItemAnimator()
+
+        books_search_recycler.layoutManager = layoutManager
+        books_search_recycler.adapter = wrappedAdapter  // requires *wrapped* adapter
+        books_search_recycler.itemAnimator = animator
+
+        recyclerViewDragDropManager.attachRecyclerView(books_search_recycler!!)
     }
 
     override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
@@ -59,7 +87,7 @@ class BooksSearchController :
         }
     }
 
-    private fun renderSearchState(searchState: LceState<List<SearchResultUM>>) {
+    private fun renderSearchState(searchState: LceState<List<BookUM>>) {
         books_search_loading.isVisible = searchState.isLoading
         books_search_recycler.isVisible = searchState.isContent
         network_error_screen_container.isVisible = searchState.isError

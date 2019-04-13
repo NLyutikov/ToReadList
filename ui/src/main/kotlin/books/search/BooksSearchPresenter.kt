@@ -2,7 +2,7 @@ package ru.appkode.base.ui.books.search
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.books.search.SearchResultUM
+import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.search.BooksSearchScreen.View
 import ru.appkode.base.ui.core.core.BasePresenter
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
 
-data class UpdateList(val state: LceState<List<SearchResultUM>>) : ScreenAction()
+data class UpdateList(val state: LceState<List<BookUM>>) : ScreenAction()
 data class SearchBook(val inputText: String) : ScreenAction()
 data class ShowImage(val url: String) : ScreenAction()
 object DismissImage : ScreenAction()
