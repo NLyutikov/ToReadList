@@ -7,51 +7,25 @@ import com.tickaroo.tikxml.annotation.Xml
 
 @Xml(name = "GoodreadsResponse")
 data class BookSearchNM(
-
-    @Path("work")
-    @PropertyElement
-    val original_publication_year: Int?,
-
-    @Path("work")
-    @PropertyElement
-    val original_publication_month: Int?,
-
-    @Path("work")
-    @PropertyElement
-    val original_publication_day: Int?,
-
-    @Path("work")
-    @PropertyElement
-    val average_rating: String?,
-
-    @Path("work/best_book")
+    @Path("search/results")
     @Element
-    val best_book: List<BestBookNM>?
-
+    val work: List<SearchResultNM>?
 )
 
-@Xml(name = "best_book")
-data class BestBookNM(
-
+@Xml(name = "work")
+data class SearchResultNM(
     @PropertyElement
-    val id: Int?,
+    val average_rating: Double?,
+
+    @Path("best_book")
+    @PropertyElement
+    val id: Long?,
+
+    @Path("best_book")
     @PropertyElement
     val title: String?,
-    @Element
-    val author: List<AuthorNM>?,
-    @PropertyElement
-    val img_url: String?,
-    @PropertyElement
-    val small_img_url: String?
 
-)
-
-@Xml(name = "author")
-data class AuthorNM(
-
+    @Path("best_book")
     @PropertyElement
-    val id: Int?,
-    @PropertyElement
-    val name: String?
-
+    val image_url: String?
 )

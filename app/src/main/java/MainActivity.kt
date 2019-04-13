@@ -7,33 +7,29 @@ import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
 import ru.appkode.base.ui.books.BooksMainController
-import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
-import ru.appkode.base.ui.duck.DuckListController
-import ru.appkode.base.ui.task.list.TaskListController
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var router: Router
+    private lateinit var router: Router
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    DatabaseHelper.createDatabase(applicationContext)
-    router = Conductor.attachRouter(this, main_container, savedInstanceState)
-    if (!router.hasRootController())
-      router.setRoot(
-        // Just math random. Nothing else.
-        //if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
-        //else TaskListController().obtainHorizontalTransaction()
-        //BookDetailsController.createController(136251).obtainVerticalTransaction()
-        BooksMainController().obtainHorizontalTransaction()
-      )
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        DatabaseHelper.createDatabase(applicationContext)
+        router = Conductor.attachRouter(this, main_container, savedInstanceState)
+        if (!router.hasRootController())
+            router.setRoot(
+                // Just math random. Nothing else.
+                //if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
+                //else TaskListController().obtainHorizontalTransaction()
+                //BookDetailsController.createController(136251).obtainVerticalTransaction()
+                BooksMainController().obtainHorizontalTransaction()
+            )
+    }
 
-  override fun onBackPressed() {
-    if (!router.handleBack())
-      super.onBackPressed()
-  }
+    override fun onBackPressed() {
+        if (!router.handleBack())
+            super.onBackPressed()
+    }
 }

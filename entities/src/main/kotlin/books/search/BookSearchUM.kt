@@ -1,22 +1,14 @@
 package ru.appkode.base.entities.core.books.search
 
 data class BookSearchUM(
-    val original_publication_year: Int? = null,
-    val original_publication_month: Int? = null,
-    val original_publication_day: Int? = null,
-    val average_rating: String? = null,
-    val best_book: List<BestBookUM>? = null
+    val book: List<SearchResultUM>?
 )
 
-data class BestBookUM(
-    val id: Int?,
+data class SearchResultUM(
+    val id: Long?,
     val title: String? = null,
-    val author: List<AuthorUM>? = null,
-    val img_url: String? = null,
-    val small_img_url: String? = null
-)
-
-data class AuthorUM(
-    val id: Int,
-    val name: String? = null
+    val imgPath: String? = null,
+    val averageRating: Double? = null,
+    val isInWish: Boolean? = false,
+    val isInHistory: Boolean? = false
 )
