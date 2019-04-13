@@ -8,9 +8,12 @@ import ru.appkode.base.ui.core.core.MviView
 interface BooksSearchScreen {
     interface View : MviView<ViewState> {
         fun searchBookIntent(): Observable<String>
+        fun showImageIntent(): Observable<String>
+        fun dismissImageIntent(): Observable<Unit>
     }
 
     data class ViewState(
-        val booksSearchState: LceState<List<SearchResultUM>>
+        val booksSearchState: LceState<List<SearchResultUM>>,
+        val url: String?
     )
 }

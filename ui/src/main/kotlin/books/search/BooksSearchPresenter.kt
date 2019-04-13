@@ -16,6 +16,8 @@ sealed class ScreenAction
 
 data class UpdateList(val state: LceState<List<SearchResultUM>>) : ScreenAction()
 data class SearchBook(val inputText: String) : ScreenAction()
+data class ShowImage(val url: String) : ScreenAction()
+object DismissImage : ScreenAction()
 
 class BooksSearchPresenter(
     schedulers: AppSchedulers,
@@ -28,7 +30,11 @@ class BooksSearchPresenter(
             intent(View::searchBookIntent)
                 .map { SearchBook(it) }
                 .debounce(1000, TimeUnit.MILLISECONDS)
-                .distinctUntilChanged()
+                .distinctUntilChanged(),
+            intent(View::showImageIntent)
+                .map { ShowImage(it) },
+            intent(View::dismissImageIntent)
+                .map { DismissImage }
         )
     }
 
@@ -37,9 +43,19 @@ class BooksSearchPresenter(
         action: ScreenAction
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when (action) {
+            is DismissImage -> previousState.copy(url = null) to null
+            is ShowImage -> processShowImage(previousState, action)
             is SearchBook -> processSearchBook(previousState, action)
             is UpdateList -> processUpdateList(previousState, action)
         }
+    }
+
+    private fun processShowImage(
+        previousState: BooksSearchScreen.ViewState,
+        action: ShowImage
+    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+
+        return previousState.copy(url = action.url) to null
     }
 
     private fun processSearchBook(
@@ -65,7 +81,8 @@ class BooksSearchPresenter(
 
     override fun createInitialState(): BooksSearchScreen.ViewState {
         return BooksSearchScreen.ViewState(
-            booksSearchState = LceState.Content(emptyList())
+            booksSearchState = LceState.Content(emptyList()),
+            url = null
         )
     }
 }
