@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
                 //else TaskListController().obtainHorizontalTransaction()
                 //BookDetailsController.createController(136251).obtainVerticalTransaction()
                 BooksMainController().obtainHorizontalTransaction()
+                //BooksSearchController().obtainFadeTransaction()
             )
     }
 
