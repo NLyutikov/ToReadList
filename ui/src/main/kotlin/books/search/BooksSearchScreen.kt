@@ -10,10 +10,12 @@ interface BooksSearchScreen {
         fun searchBookIntent(): Observable<String>
         fun showImageIntent(): Observable<String>
         fun dismissImageIntent(): Observable<Unit>
+        fun repeatSearchIntent(): Observable<Unit>
     }
 
     data class ViewState(
         val booksSearchState: LceState<List<SearchResultUM>>,
-        val url: String?
+        val url: String?,
+        val query: String?
     )
 }

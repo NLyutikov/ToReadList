@@ -3,6 +3,7 @@ package ru.appkode.base.ui.books.search
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
@@ -78,6 +79,10 @@ class BooksSearchController :
 
     override fun dismissImageIntent(): Observable<Unit> {
         return eventsRelay.filterEvents(EVENT_ID_IMAGE_DISMISS)
+    }
+
+    override fun repeatSearchIntent(): Observable<Unit> {
+        return network_error_screen_reload_btn.clicks()
     }
 
     override fun createPresenter(): BooksSearchPresenter {
