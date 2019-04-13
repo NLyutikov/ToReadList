@@ -10,7 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" android:id="@+id/book_card">
 
         <ImageView
                 android:id="@+id/books_list_item_image"
@@ -84,16 +84,16 @@
         />
 
         <ImageView
-          android:id="@+id/books_list_item_swipe_img"
-          android:layout_width="30dp"
-          android:layout_height="30dp"
-          android:background="@drawable/round_drag_handle_24"
-          android:layout_marginTop="8dp"
-          android:layout_marginEnd="16dp"
-          android:layout_marginBottom="8dp"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/books_list_item_swipe_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/round_drag_handle_24"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
         />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

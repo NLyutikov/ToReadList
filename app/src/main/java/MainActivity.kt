@@ -7,6 +7,7 @@ import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
 import ru.appkode.base.ui.books.BooksMainController
+import ru.appkode.base.ui.books.search.BooksSearchController
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     router = Conductor.attachRouter(this, main_container, savedInstanceState)
     if (!router.hasRootController())
       router.setRoot(
-        BooksMainController().obtainHorizontalTransaction()
+        BooksSearchController().obtainHorizontalTransaction()
       )
   }
 
