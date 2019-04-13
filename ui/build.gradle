@@ -38,4 +38,5 @@ dependencies {
   implementation project(':core')
   implementation project(':entities')
   implementation project(':repository')
+  implementation "com.github.stfalcon:stfalcon-imageviewer:0.1.0"
 }
