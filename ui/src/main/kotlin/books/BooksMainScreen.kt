@@ -6,8 +6,8 @@ import java.util.*
 
 interface BooksMainScreen {
     interface View : MviView<ViewState> {
-        fun showListIntent(): Observable<Int>
+        fun showListIntent(): Observable<String>
     }
 
-    data class ViewState(val currentViewTag: Int)
+    data class ViewState(val currentViewTag: String)
 }

@@ -30,7 +30,8 @@ object RepositoryHelper {
     return BooksLocalRepositoryImpl(
       schedulers,
       DatabaseHelper.getWishListPersistence(),
-      DatabaseHelper.getHistoryPersistence(), context
+      DatabaseHelper.getHistoryPersistence(),
+      context
     )
   }
 

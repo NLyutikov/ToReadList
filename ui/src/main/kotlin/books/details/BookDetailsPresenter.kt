@@ -79,7 +79,7 @@ class BookDetailsPresenter(
         action: ShowMoreInformation
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>> {
         return previousState to command {
-            //TODO
+            //TODO показать доп. информацию о книге
         }
     }
 

@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
-import io.reactivex.Observable
 import kotlinx.android.synthetic.main.book_details_similar_books_list_item.view.*
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.ui.R
@@ -22,7 +21,7 @@ class SimilarBooksListAdapter : RecyclerView.Adapter<SimilarBooksListAdapter.Vie
 
     private val eventsRelay = PublishRelay.create<Pair<Int, Long>>()
 
-    val itemClicked = eventsRelay.filterEvents(EVENT_ID_ITEM_CLICKED)
+    val itemClicked = eventsRelay.filterEvents(SIMILAR_BOOKS_EVENT_ID_ITEM_CLICKED)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -47,10 +46,10 @@ class SimilarBooksListAdapter : RecyclerView.Adapter<SimilarBooksListAdapter.Vie
 
         init {
             view.setOnClickListener {
-                eventsRelay.accept(EVENT_ID_ITEM_CLICKED to data[adapterPosition].id)
+                eventsRelay.accept(SIMILAR_BOOKS_EVENT_ID_ITEM_CLICKED to data[adapterPosition].id)
             }
         }
     }
 }
 
-private const val EVENT_ID_ITEM_CLICKED = 0
+private const val SIMILAR_BOOKS_EVENT_ID_ITEM_CLICKED = 0

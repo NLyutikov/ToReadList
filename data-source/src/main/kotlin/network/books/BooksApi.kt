@@ -13,5 +13,5 @@ interface BooksApi {
     fun getBooksDetails(@Query("id") bookId: Long): Observable<BookDetailsNM>
 
     @GET("search/index.xml")
-    fun getBooksSearch(@Query("q") text: String): Single<BookSearchNM>
+    fun getBooksSearch(@Query("q") text: String, @Query("page") page: Int): Single<BookSearchNM>
 }

@@ -36,6 +36,10 @@ class BooksLocalRepositoryImpl(
     private val context: Context
 ) : BooksLocalRepository {
 
+    companion object {
+        fun getImageNameById(id: Long) = BASE_IMAGE_NAME + id.toString() + "png"
+    }
+
     override fun addToWishList(book: BookListItemUM): Completable {
         val imageName = getImageNameById(book.id)
         Picasso.get().load(book.imagePath).into(picassoImageTarget(IMAGE_DIR, imageName))
@@ -101,8 +105,6 @@ class BooksLocalRepositoryImpl(
             .map { num -> num > 0}
             .subscribeOn(appSchedulers.io)
     }
-
-    private fun getImageNameById(id: Long) = BASE_IMAGE_NAME + id.toString() + "png"
 
     private fun picassoImageTarget(imageDir: String, imageName: String): Target {
         val contextWrapper = ContextWrapper(context)

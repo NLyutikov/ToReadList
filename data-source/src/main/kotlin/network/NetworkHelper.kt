@@ -28,7 +28,6 @@ object NetworkHelper {
 
   private val xml = TikXml.Builder()
     .exceptionOnUnreadXml(false)
-    //.addTypeConverter(String::class.java, HtmlTypeEscapeConverter())
     .build()
 
   private val okHttpClient = OkHttpClient.Builder()
@@ -37,7 +36,7 @@ object NetworkHelper {
 
   private val okHttpClientWithApiKey = OkHttpClient.Builder()
     .addInterceptor(HttpLoggingInterceptor().setLevel(if (BuildConfig.DEBUG) BODY else NONE))
-    .addInterceptor(object : Interceptor {
+    .addInterceptor(object : Interceptor {//FIXME написать как отдельный кдасс
       override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
         val url = original.url()

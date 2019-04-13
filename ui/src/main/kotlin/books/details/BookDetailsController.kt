@@ -125,6 +125,8 @@ class BookDetailsController :
         return eventsRelay.filterEvents(EVENT_ID_MORE_INFO)
     }
 
+
+
     override fun createPresenter(): BookDetailsPresenter {
         return BookDetailsPresenter(
             DefaultAppSchedulers,

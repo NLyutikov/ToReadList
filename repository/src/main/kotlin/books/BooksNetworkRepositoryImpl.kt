@@ -19,8 +19,8 @@ class BooksNetworkRepositoryImpl(
             .map { book -> book.toUiModel() }
     }
 
-    override fun getBookSearch(text: String): Single<List<SearchResultUM>> {
-        return booksApi.getBooksSearch(text)
+    override fun getBookSearch(text: String, page: Int): Single<List<SearchResultUM>> {
+        return booksApi.getBooksSearch(text, page)
             .map { list -> list.toUiModel() }
     }
 
