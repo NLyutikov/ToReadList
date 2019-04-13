@@ -31,6 +31,7 @@ internal class DraggableAdapter() : ListActions,
             Picasso.get().load(data[position].imgPath).into(bookImg)
             bookName.text = data[position].title
             bookRating.text = data[position].averageRating.toString()
+
         }
     }
 
