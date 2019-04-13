@@ -13,21 +13,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var router: Router
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        DatabaseHelper.createDatabase(applicationContext)
-        router = Conductor.attachRouter(this, main_container, savedInstanceState)
-        if (!router.hasRootController())
-            router.setRoot(
-                // Just math random. Nothing else.
-                //if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
-                //else TaskListController().obtainHorizontalTransaction()
-                //BookDetailsController.createController(136251).obtainVerticalTransaction()
-                BooksMainController().obtainHorizontalTransaction()
-                //BooksSearchController().obtainFadeTransaction()
-            )
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    DatabaseHelper.createDatabase(applicationContext)
+    router = Conductor.attachRouter(this, main_container, savedInstanceState)
+    if (!router.hasRootController())
+      router.setRoot(
+        BooksMainController().obtainHorizontalTransaction()
+      )
+  }
 
     override fun onBackPressed() {
         if (!router.handleBack())

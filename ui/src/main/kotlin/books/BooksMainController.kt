@@ -4,7 +4,6 @@ import android.view.MenuItem
 import android.view.View
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
-import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_main_controller.*
@@ -37,14 +36,17 @@ class BooksMainController :
         }
     }
 
-    fun showControllerByTag(tag: Int) {
+    private fun showControllerByTag(tag: Int) {
         //TODO реализовать отображение wish list и history
-        if (childRouter.backstackSize > 1) {
-            childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
-        }
+//        if (childRouter.backstackSize > 1) {
+//            childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
+//        } else {
+//            if (childRouter.getControllerWithTag(tag.toString()) == null)
+//                childRouter.pushController(ColorController().obtainFadeTransactionWithTag(tag.toString()))
+//        }
     }
 
-    fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
+    private fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
         val trans = backstack.find { it.tag() == tag }
         val newBackstack = ArrayList(backstack.filter { it.tag() != tag })
         newBackstack.add(trans)
