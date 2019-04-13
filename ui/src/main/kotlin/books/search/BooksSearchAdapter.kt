@@ -10,13 +10,13 @@ import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
-import ru.appkode.base.entities.core.books.search.SearchResultUM
+import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
 
 class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>() {
 
-    var data: List<SearchResultUM> = emptyList()
+    var data: List<BookUM> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -53,4 +53,4 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
     }
 }
 
-private const val EVENT_ID_IMAGE_CLICKED = 3
+const val EVENT_ID_IMAGE_CLICKED = 3
