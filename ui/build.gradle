@@ -38,6 +38,8 @@ dependencies {
   implementation project(':core')
   implementation project(':entities')
   implementation project(':repository')
+
+  api 'com.jakewharton.rxbinding3:rxbinding-recyclerview:3.0.0-alpha2'
   implementation "com.github.stfalcon:stfalcon-imageviewer:0.1.0"
 
   //Advanced recycler view

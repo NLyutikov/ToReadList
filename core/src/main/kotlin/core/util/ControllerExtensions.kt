@@ -62,3 +62,5 @@ fun Controller.obtainFadeTransactionWithTag(tag: String): RouterTransaction {
     .popChangeHandler(FadeChangeHandler(SLIDE_FADE_POP_ANIM_DURATION))
     .tag(tag)
 }
+
+fun getFadeChangeHandler() = FadeChangeHandler(SLIDE_FADE_PUSH_ANIM_DURATION)

@@ -5,12 +5,14 @@ import android.view.View
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_main_controller.*
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
+import ru.appkode.base.ui.core.core.util.isOnlyControllersWithTagsInBackstack
 
 class BooksMainController :
     BaseMviController<BooksMainScreen.ViewState, BooksMainScreen.View, BooksMainPresenter>(),
@@ -30,47 +32,34 @@ class BooksMainController :
         books_main_bottom_navigation.setOnNavigationItemSelectedListener(this)
     }
 
-    override fun renderViewState(viewState: BooksMainScreen.ViewState) {
-        fieldChanged(viewState, {state -> state.currentViewTag}) {
-            showControllerByTag(viewState.currentViewTag)
-        }
-    }
+    override fun renderViewState(viewState: BooksMainScreen.ViewState) {}
 
-    private fun showControllerByTag(tag: Int) {
-        //TODO реализовать отображение wish list и history
-//        if (childRouter.backstackSize > 1) {
-//            childRouter.setBackstack(newBackstack(tag.toString(), childRouter.backstack), FadeChangeHandler())
-//        } else {
-//            if (childRouter.getControllerWithTag(tag.toString()) == null)
-//                childRouter.pushController(ColorController().obtainFadeTransactionWithTag(tag.toString()))
-//        }
-    }
-
-    private fun newBackstack(tag: String, backstack: List<RouterTransaction>): List<RouterTransaction> {
-        val trans = backstack.find { it.tag() == tag }
-        val newBackstack = ArrayList(backstack.filter { it.tag() != tag })
-        newBackstack.add(trans)
-        return newBackstack.toList()
-    }
-
-    override fun showListIntent(): Observable<Int> {
+    override fun showListIntent(): Observable<String> {
         return eventsRelay.filterEvents(EVENT_ID_SHOW_LIST)
+    }
+
+    override fun showSearchList(): Observable<Unit> {
+        return books_main_fab.clicks()
     }
 
     override fun onNavigationItemSelected(item: MenuItem) = when(item.itemId) {
         R.id.wish_list_navigation ->  {
-            eventsRelay.accept(EVENT_ID_SHOW_LIST to VIEW_TAG_1)
+            eventsRelay.accept(EVENT_ID_SHOW_LIST to WISH_LIST_CONTROLLER_TAG)
             true
         }
         R.id.history_navigation -> {
-            eventsRelay.accept(EVENT_ID_SHOW_LIST to VIEW_TAG_2)
+            eventsRelay.accept(EVENT_ID_SHOW_LIST to HISTORY_CONTROLLER_TAG)
             true
         }
         else -> false
     }
 
+    /**
+     * Если в backstack лежат только контроллеры отвечающие за навигацию то убиваем активность, к которой привязанны
+     */
     override fun handleBack(): Boolean {
-        router.backstack.clear()
+        if (!router.isOnlyControllersWithTagsInBackstack(WISH_LIST_CONTROLLER_TAG, HISTORY_CONTROLLER_TAG))
+            return super.handleBack()
         activity?.finish()
         return false
     }
@@ -78,6 +67,7 @@ class BooksMainController :
     override fun createPresenter(): BooksMainPresenter {
         return BooksMainPresenter(
             DefaultAppSchedulers,
+            childRouter,
             router
         )
     }
@@ -86,7 +76,6 @@ class BooksMainController :
 
 const val EVENT_ID_SHOW_LIST = 200
 
-
-const val VIEW_TAG_1 = 1
-const val VIEW_TAG_2 = 2
+const val WISH_LIST_CONTROLLER_TAG = "1"
+const val HISTORY_CONTROLLER_TAG = "2"
 

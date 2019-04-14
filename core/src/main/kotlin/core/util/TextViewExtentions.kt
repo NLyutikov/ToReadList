@@ -4,14 +4,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 
 fun TextView.setVisibilityAndText(text: String?) {
-    when (text.isNullOrBlank()) {
-        true -> {
-            isVisible = false
-            this.text = ""
-        }
-        else -> {
-            isVisible = true
-            this.text = text
-        }
-    }
+    isVisible = !text.isNullOrBlank()
+    this.text = text ?: ""
 }
