@@ -7,5 +7,5 @@ import ru.appkode.base.entities.core.books.search.BookUM
 
 interface BooksNetworkRepository {
     fun getBookDetails(bookId: Long): Observable<BookDetailsUM>
-    fun getBookSearch(text: String): Single<List<BookUM>>
+    fun getBookSearch(text: String, page: Int = 1): Single<List<BookUM>>
 }

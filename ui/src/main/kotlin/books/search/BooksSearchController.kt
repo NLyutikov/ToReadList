@@ -48,30 +48,29 @@ class BooksSearchController :
             }
 
         })
-        /*оставил код на всякий случай, когда будет рабочее RV с drag & drop тогда можно стереть
+        //оставил код на всякий случай, когда будет рабочее RV с drag & drop тогда можно стереть
         books_search_recycler.layoutManager = LinearLayoutManager(applicationContext)
         books_search_recycler.adapter = adapter
-        */
         //реализация RV with drag & drop (потом и свайп)
-        val layoutManager: RecyclerView.LayoutManager? = LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
-
-        val recyclerViewDragDropManager: RecyclerViewDragDropManager? = RecyclerViewDragDropManager()
-        recyclerViewDragDropManager!!.setDraggingItemShadowDrawable(
-            ContextCompat.getDrawable(applicationContext!!, R.drawable.material_shadow) as NinePatchDrawable?
-        )
-
-        //adapter
-        val dragDropAdapter = DraggableAdapter()
-
-        val wrappedAdapter = recyclerViewDragDropManager.createWrappedAdapter(dragDropAdapter)      // wrap for dragging
-
-        val animator = DraggableItemAnimator()
-
-        books_search_recycler.layoutManager = layoutManager
-        books_search_recycler.adapter = wrappedAdapter  // requires *wrapped* adapter
-        books_search_recycler.itemAnimator = animator
-
-        recyclerViewDragDropManager.attachRecyclerView(books_search_recycler!!)
+//        val layoutManager: RecyclerView.LayoutManager? = LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
+//
+//        val recyclerViewDragDropManager: RecyclerViewDragDropManager? = RecyclerViewDragDropManager()
+//        recyclerViewDragDropManager!!.setDraggingItemShadowDrawable(
+//            ContextCompat.getDrawable(applicationContext!!, R.drawable.material_shadow) as NinePatchDrawable?
+//        )
+//
+//        //adapter
+//        val dragDropAdapter = DraggableAdapter()
+//
+//        val wrappedAdapter = recyclerViewDragDropManager.createWrappedAdapter(dragDropAdapter)      // wrap for dragging
+//
+//        val animator = DraggableItemAnimator()
+//
+//        books_search_recycler.layoutManager = layoutManager
+//        books_search_recycler.adapter = wrappedAdapter  // requires *wrapped* adapter
+//        books_search_recycler.itemAnimator = animator
+//
+//        recyclerViewDragDropManager.attachRecyclerView(books_search_recycler!!)
     }
 
     override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
