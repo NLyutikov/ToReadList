@@ -50,8 +50,6 @@ abstract class CommonListController :
                 books_list_loading.isVisible = loadNewPageState.isLoading && list.isEmpty()
                 books_list_empty_list.isVisible =
                      loadNewPageState.isContent && loadNewPageState.asContent().isEmpty() && list.isEmpty()
-                if(loadNewPageState.isContent)
-                    eventsRelay.accept(COMMON_LIST_EVENT_PAGE_LOADED to  loadNewPageState.asContent())
             }
         }
 
@@ -76,17 +74,14 @@ abstract class CommonListController :
                 val isLoading: Boolean? = previousViewState?.loadNewPageState?.isLoading
                 val nextPage: Int? = previousViewState?.curPage
 
+                val limit = if (totalItemCount >= 60) totalItemCount - 20 else totalItemCount / 2
+
                 return@filter nextPage != null &&
                         isLoading != null &&
                         !isLoading  &&
-                        firstVisibleItem + visibleItemCount >= totalItemCount / 2
-            }.throttleFirst(1, TimeUnit.SECONDS)
+                        firstVisibleItem + visibleItemCount >= limit
+            }.throttleFirst( 500, TimeUnit.MILLISECONDS)
             .map { previousViewState!!.curPage + 1 }
-    }
-
-    override fun pageOfBooksLoaded(): Observable<List<BookListItemUM>> {
-        return eventsRelay.filterEvents<List<BookListItemUM>>(COMMON_LIST_EVENT_PAGE_LOADED)
-            .throttleFirst(500, TimeUnit.MILLISECONDS)
     }
 
     override fun itemClickedIntent(): Observable<Int> {
@@ -104,4 +99,3 @@ abstract class CommonListController :
 }
 
 val COMMON_LIST_EVENT_PAGE_LOADED = 300
-val COMMON_LIST_EVENT_LOAD_PAGE = 301

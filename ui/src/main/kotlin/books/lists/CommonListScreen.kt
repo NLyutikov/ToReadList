@@ -8,7 +8,6 @@ import ru.appkode.base.ui.core.core.MviView
 interface CommonListScreen {
     interface View : MviView<ViewState> {
         fun loadNextPageOfBooksIntent(): Observable<Int>
-        fun pageOfBooksLoaded(): Observable<List<BookListItemUM>>
         fun itemClickedIntent(): Observable<Int>
         fun itemSwipedLeftIntent(): Observable<Int>
         fun itemSwipedRightIntent(): Observable<Int>

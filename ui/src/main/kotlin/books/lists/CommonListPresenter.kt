@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit
 sealed class ScreenAction
 
 data class LoadNextPageIntent(val state: LceState<List<BookListItemUM>>) : ScreenAction()
-data class PageLoadedIntent(val list: List<BookListItemUM>) : ScreenAction()
 data class ItemClickedIntent(val position: Int) : ScreenAction()
 data class ItemSwipedLeftIntent(val position: Int) : ScreenAction()
 data class ItemSwipedRigthIntent(val position: Int) : ScreenAction()
@@ -38,8 +37,6 @@ abstract class CommonListPresenter(
                 .map { position -> ItemSwipedLeftIntent(position) },
             intent(CommonListScreen.View::itemSwipedRightIntent)
                 .map { position -> ItemSwipedRigthIntent(position) },
-            intent(CommonListScreen.View::pageOfBooksLoaded)
-                .map { PageLoadedIntent(it) },
             intent(CommonListScreen.View::loadNextPageOfBooksIntent)
                 .flatMap { page -> loadNextPage(page) }
                 .doLceAction { lceState ->  LoadNextPageIntent(lceState)},
@@ -54,7 +51,6 @@ abstract class CommonListPresenter(
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when(action) {
             is LoadNextPageIntent -> processLoadNextPage(previousState, action)
-            is PageLoadedIntent -> processPageLoaded(previousState, action)
             is ItemClickedIntent -> processItemClicked(previousState, action)
             is ItemSwipedLeftIntent -> processItemSwipedLeft(previousState, action)
             is ItemSwipedRigthIntent -> processItemSwipedRight(previousState, action)
@@ -70,18 +66,16 @@ abstract class CommonListPresenter(
         previousState: CommonListScreen.ViewState,
         action: LoadNextPageIntent
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        var page = previousState.curPage
+        if (action.state.isContent){
+            list = list.plus(action.state.asContent())
+            page += 1
+        }
         return previousState.copy(
+            list = list,
+            curPage = page,
             loadNewPageState = action.state
-        ) to null
-    }
-
-    protected fun processPageLoaded(
-        previousState: CommonListScreen.ViewState,
-        action: PageLoadedIntent
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState.copy(
-            curPage = previousState.curPage + 1,
-            list = previousState.list.plus(action.list)
         ) to null
     }
 

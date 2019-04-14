@@ -1,6 +1,5 @@
 package ru.appkode.base.data.network
 
-import com.squareup.moshi.Moshi
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import io.reactivex.schedulers.Schedulers
@@ -12,7 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 import okhttp3.logging.HttpLoggingInterceptor.Level.NONE
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.appkode.base.data.network.books.BooksApi
 import ru.appkode.ui.core.BuildConfig
 
