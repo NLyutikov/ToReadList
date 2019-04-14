@@ -22,8 +22,8 @@
             android:background="@android:color/white"
             android:id="@+id/books_main_bottom_navigation"
             android:layout_gravity="bottom"
-            app:itemIconTint="@color/bottom_navigation_color"
-            app:itemTextColor="@color/text_black_color"
+            app:itemIconTint="@color/bottom_navigation_icon_color"
+            app:itemTextColor="@color/bottom_navigation_text_color"
             app:menu="@menu/books_lists_navigation"
             app:layout_behavior="ru.appkode.base.ui.behavior.BottomNavigationBehavior"
             android:layout_alignParentBottom="true"/>
