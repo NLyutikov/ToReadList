@@ -33,6 +33,8 @@ class BooksSearchController :
     private val adapter: BooksSearchAdapter = BooksSearchAdapter()
 
     override fun initializeView(rootView: View) {
+        books_search_toolbar.setNavigationOnClickListener { router.handleBack() }
+
         books_search_toolbar_search.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
