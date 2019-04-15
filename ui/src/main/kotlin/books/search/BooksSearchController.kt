@@ -1,13 +1,8 @@
 package ru.appkode.base.ui.books.search
 
-import android.graphics.drawable.NinePatchDrawable
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
@@ -17,7 +12,6 @@ import kotlinx.android.synthetic.main.network_error.*
 import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
-import ru.appkode.base.ui.books.search.adapters.DraggableAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
@@ -76,6 +70,7 @@ class BooksSearchController :
     override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
         fieldChanged(viewState, { it.booksSearchState }) {
             renderSearchState(viewState.booksSearchState)
+            books_search_toolbar_search.onActionViewExpanded()
         }
         fieldChanged(viewState, { it.url.orEmpty() }) {
             if (viewState.url.isNullOrBlank()) return@fieldChanged
