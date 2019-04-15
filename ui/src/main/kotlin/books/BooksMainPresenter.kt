@@ -75,8 +75,9 @@ class BooksMainPresenter(
                         HistoryController().obtainFadeTransactionWithTag(HISTORY_CONTROLLER_TAG)
                     )
                 }
-            else
+            else {
                 navigationRouter.displayControllerFromBackstackByTag(action.controllerTag)
+            }
         }
     }
 

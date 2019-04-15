@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="@dimen/similar_books_list_item_width"
-  android:layout_height="wrap_content"
-  android:layout_marginRight="@dimen/book_details_container_padding"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="@dimen/similar_books_list_item_width"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/book_details_container_padding"
 >
 
   <ImageView

@@ -17,11 +17,9 @@ import ru.appkode.base.entities.core.books.lists.toHistorySM
 import ru.appkode.base.entities.core.books.lists.toWishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
 import kotlin.concurrent.thread
 
 const val BASE_IMAGE_NAME = "to_read_list_book_"
@@ -90,10 +88,12 @@ class BooksLocalRepositoryImpl(
     }
 
     override fun getWishListPage(page: Int): Observable<List<BookListItemUM>> {
-        return wishListPersistence.getBooks(
+        return wishListPersistence
+            .getBooks(
             limit = PAGE_SIZE,
             offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+            )
+            .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
