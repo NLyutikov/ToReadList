@@ -19,7 +19,7 @@ class HistoryPresenter(
 ) : CommonListPresenter(schedulers, booksLocalRepository, booksNetworkRepository, router) {
 
     override fun loadNextPage(page: Int): Observable<List<BookListItemUM>> {
-        return booksLocalRepository.getHistory()
+        return booksLocalRepository.getHistoryPage(page)
     }
 
     override fun processItemSwipedLeft(

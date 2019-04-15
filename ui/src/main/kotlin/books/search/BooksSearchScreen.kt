@@ -11,6 +11,7 @@ interface BooksSearchScreen {
         fun showImageIntent(): Observable<String>
         fun dismissImageIntent(): Observable<Unit>
         fun repeatSearchIntent(): Observable<Unit>
+        fun itemClickedIntent(): Observable<Long>
     }
 
     data class ViewState(

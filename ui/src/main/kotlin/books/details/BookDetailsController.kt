@@ -16,10 +16,12 @@ import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setVisibilityAndText
+import java.util.concurrent.TimeUnit
 
 class BookDetailsController :
     BaseMviController<BookDetailsScreen.ViewState, BookDetailsScreen.View, BookDetailsPresenter>(),
-    BookDetailsScreen.View {
+    BookDetailsScreen.View,
+    BookDetailsScreen.ViewControl {
 
     companion object {
         fun createController(bookId: Long): BookDetailsController {
@@ -40,7 +42,7 @@ class BookDetailsController :
     private lateinit var similarBooksAdapter: SimilarBooksListAdapter
 
     override fun initializeView(rootView: View) {
-        book_details_toolbar.setNavigationOnClickListener { router.handleBack() }
+        book_details_back_btn.setOnClickListener { router.handleBack() }
 
         //TODO
         book_details_add_to_want_to_read_btn.setOnClickListener {
@@ -66,18 +68,30 @@ class BookDetailsController :
             book_details_load_progress_bar.isVisible = viewState.bookDetailsState.isLoading
             book_details_content_view.isVisible = viewState.bookDetailsState.isContent
             network_error_screen_container.isVisible = viewState.bookDetailsState.isError
-            if (viewState.bookDetailsState.isContent)
+            if(viewState.bookDetailsState.isContent)
                 showContent(viewState)
+        }
+
+        fieldChanged(viewState, {viewState ->  viewState.bookDetails?.isInHistory ?: 1}) {
+            if (viewState.bookDetails != null)
+                showHistoryAndWishListIcons(viewState.bookDetails.isInHistory, viewState.bookDetails.isInWishList)
+        }
+
+        fieldChanged(viewState, {viewState ->  viewState.bookDetails?.isInWishList ?: 1}) {
+            if (viewState.bookDetails != null)
+                showHistoryAndWishListIcons(viewState.bookDetails.isInHistory, viewState.bookDetails.isInWishList)
         }
     }
 
     private fun showContent(viewState: BookDetailsScreen.ViewState) {
-        val book = viewState.bookDetailsState.asContent()
+        val book = viewState.bookDetails
+        check(book != null)
         with(book) {
             showHeader(title, shelves, authors, coverImageUrl)
             showSmallRatingAndNumPages(averageRating, ratingsCount, pagesNumber)
             showDescription(description)
             showSimilarBooks(similarBooks)
+            showHistoryAndWishListIcons(isInHistory, isInWishList)
         }
     }
 
@@ -117,6 +131,24 @@ class BookDetailsController :
             .into(book_details_cover_image)
     }
 
+    override fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
+        book_details_add_to_want_to_read_btn.isVisible = isInWishList || !isInHistory && !isInWishList
+        book_details_add_to_history_btn.isVisible = isInHistory || !isInHistory && !isInWishList
+
+        when {
+            !isInHistory && !isInWishList -> {
+                book_details_add_to_want_to_read_btn.setImageResource(R.drawable.outline_turned_in_not_24)
+                book_details_add_to_history_btn.setImageResource(R.drawable.ic_history_24dp)
+            }
+            isInHistory -> {
+                book_details_add_to_history_btn.setImageResource(R.drawable.ic_history_blue_24dp)
+            }
+            isInWishList -> {
+                book_details_add_to_want_to_read_btn.setImageResource(R.drawable.outline_turned_in_24)
+            }
+        }
+    }
+
     override fun showSimilarBookIntent(): Observable<Long> {
         return similarBooksAdapter.itemClicked
     }
@@ -125,14 +157,22 @@ class BookDetailsController :
         return eventsRelay.filterEvents(EVENT_ID_MORE_INFO)
     }
 
+    override fun historyBtnPressed(): Observable<Unit> {
+        return book_details_add_to_history_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+    }
 
+    override fun wishListBtnPressed(): Observable<Unit> {
+        return book_details_add_to_want_to_read_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+    }
 
     override fun createPresenter(): BookDetailsPresenter {
         return BookDetailsPresenter(
             DefaultAppSchedulers,
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
+            RepositoryHelper.getBooksLocalRepository(applicationContext!!, DefaultAppSchedulers),
             this.router!!,
-            bookId
+            bookId,
+            this
         )
     }
 }

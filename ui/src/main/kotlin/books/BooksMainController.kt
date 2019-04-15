@@ -13,6 +13,7 @@ import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.isOnlyControllersWithTagsInBackstack
+import java.util.concurrent.TimeUnit
 
 class BooksMainController :
     BaseMviController<BooksMainScreen.ViewState, BooksMainScreen.View, BooksMainPresenter>(),
@@ -39,7 +40,7 @@ class BooksMainController :
     }
 
     override fun showSearchList(): Observable<Unit> {
-        return books_main_fab.clicks()
+        return books_main_fab.clicks().throttleFirst(700, TimeUnit.MILLISECONDS)
     }
 
     override fun onNavigationItemSelected(item: MenuItem) = when(item.itemId) {
@@ -58,7 +59,7 @@ class BooksMainController :
      * Если в backstack лежат только контроллеры отвечающие за навигацию то убиваем активность, к которой привязанны
      */
     override fun handleBack(): Boolean {
-        if (!router.isOnlyControllersWithTagsInBackstack(WISH_LIST_CONTROLLER_TAG, HISTORY_CONTROLLER_TAG))
+        if (!childRouter.isOnlyControllersWithTagsInBackstack(WISH_LIST_CONTROLLER_TAG, HISTORY_CONTROLLER_TAG))
             return super.handleBack()
         activity?.finish()
         return false

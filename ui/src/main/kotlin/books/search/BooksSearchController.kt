@@ -96,6 +96,10 @@ class BooksSearchController :
         }
     }
 
+    override fun itemClickedIntent(): Observable<Long> {
+        return adapter.itemClicked
+    }
+
     override fun searchBookIntent(): Observable<String> {
         return eventsRelay.filterEvents(EVENT_ID_SEARCH_CHANGED)
     }
@@ -111,6 +115,7 @@ class BooksSearchController :
     override fun repeatSearchIntent(): Observable<Unit> {
         return network_error_screen_reload_btn.clicks()
     }
+
 
     override fun createPresenter(): BooksSearchPresenter {
         return BooksSearchPresenter(

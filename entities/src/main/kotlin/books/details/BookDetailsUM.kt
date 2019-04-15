@@ -14,7 +14,9 @@ data class BookDetailsUM(
     val averageRating: Double? = null,
     val shelves: List<ShelfUM>? = null,
     val authors: List<AuthorUM>? = null,
-    val similarBooks: List<BookDetailsUM>? = null
+    val similarBooks: List<BookDetailsUM>? = null,
+    val isInWishList: Boolean = false,
+    val isInHistory: Boolean = false
 )
 
 data class AuthorUM(
