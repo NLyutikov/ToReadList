@@ -2,7 +2,6 @@ package ru.appkode.base.ui.core.core.util
 
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.Router
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 fun Router.displayControllerFromBackstackByTag(tag: String, changeHandler: ControllerChangeHandler? = null) {
     val requestedTransaction = backstack.find { it.tag() == tag }
@@ -20,10 +19,13 @@ fun Router.isControllersWithTagsInBackstack(vararg tag: String, allInBackstack: 
 }
 
 fun Router.isOnlyControllersWithTagsInBackstack(vararg tag: String): Boolean {
-    val backstackOnlyWithTagControllersSize = backstack.filter { trans ->
-        if (trans.tag() != null) !tag.contains(trans.tag()) else true
+    val backstackWithoutTagControllersSize = backstack.filter { trans ->
+        if (trans.tag() != null)
+            !tag.contains(trans.tag())
+        else
+            true
     }.size
-    return backstackOnlyWithTagControllersSize == tag.size
+    return backstackWithoutTagControllersSize == 0
 }
 
 fun Router.deleteAllControllersFromBackstackExcept(

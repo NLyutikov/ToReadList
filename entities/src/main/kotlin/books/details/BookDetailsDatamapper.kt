@@ -1,5 +1,6 @@
 package ru.appkode.base.entities.core.books.details
 
+import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.util.requireField
 import java.util.*
 
@@ -54,5 +55,16 @@ fun ShelfNM.toShelfUM(): ShelfUM {
     return ShelfUM(
         name,
         count?.toInt()
+    )
+}
+
+fun BookDetailsUM.toBookListItemUM(): BookListItemUM {
+    return BookListItemUM(
+        id,
+        title,
+        averageRating,
+        coverImageUrl,
+        isInWishList,
+        isInWishList
     )
 }

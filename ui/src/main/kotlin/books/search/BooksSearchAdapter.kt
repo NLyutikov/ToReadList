@@ -24,6 +24,7 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
 
     private val eventsRelay: PublishRelay<Pair<Int, Any>> = PublishRelay.create<Pair<Int, Any>>()
     val imageClicked: Observable<String> = eventsRelay.filterEvents(EVENT_ID_IMAGE_CLICKED)
+    val itemClicked = eventsRelay.filterEvents<Long>(EVENT_ID_ITEM_CLICKED)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.books_list_item, parent, false)
@@ -49,8 +50,13 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
             bookImg.setOnClickListener {
                 eventsRelay.accept(EVENT_ID_IMAGE_CLICKED to data[adapterPosition].imgPath!!)
             }
+            view.setOnClickListener {v ->
+                if (v !is ImageView)
+                    eventsRelay.accept(EVENT_ID_ITEM_CLICKED to data[adapterPosition].id!!)
+            }
         }
     }
 }
 
 const val EVENT_ID_IMAGE_CLICKED = 3
+const val EVENT_ID_ITEM_CLICKED = 4

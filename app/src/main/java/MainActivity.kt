@@ -7,6 +7,7 @@ import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
 import ru.appkode.base.ui.books.BooksMainController
+import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.books.search.BooksSearchController
 import ru.appkode.base.ui.core.core.util.obtainFadeTransaction
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction

@@ -20,7 +20,7 @@ class WishListPresenter(
 ) : CommonListPresenter(schedulers, booksLocalRepository, booksNetworkRepository, router) {
 
     override fun loadNextPage(page: Int): Observable<List<BookListItemUM>> {
-        return booksLocalRepository.getWishList()
+        return booksLocalRepository.getWishListPage(page)
     }
 
     override fun processItemSwipedLeft(

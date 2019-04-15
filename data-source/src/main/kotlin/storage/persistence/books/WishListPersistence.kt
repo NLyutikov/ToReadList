@@ -11,15 +11,18 @@ import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 interface WishListPersistence : BasePersistence<WishListSM> {
 
     @Query("SELECT * FROM wish_list WHERE id=:bookId")
-    fun getBookById(bookId: Long): Single<WishListSM>
+    fun getBookById(bookId: Long): Observable<WishListSM>
 
     @Query("SELECT COUNT(id) FROM wish_list WHERE id=:bookId")
-    fun countNumById(bookId: Long): Single<Int>
+    fun countNumById(bookId: Long): Observable<Int>
 
     @Query("SELECT * FROM wish_list")
     fun getAllBooks(): Observable<List<WishListSM>>
 
+    @Query("SELECT * FROM wish_list LIMIT :limit OFFSET  :offset")
+    fun getBooks(limit: Int, offset: Int): Observable<List<WishListSM>>
+
     @Query("SELECT COUNT(id) FROM wish_list")
-    fun getSize(): Single<Int>
+    fun getSize(): Observable<Int>
 
 }

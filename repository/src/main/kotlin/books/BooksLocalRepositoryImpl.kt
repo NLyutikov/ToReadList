@@ -8,14 +8,12 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.Single
+import io.reactivex.internal.operators.completable.CompletableFromAction
 import ru.appkode.base.data.storage.persistence.books.HistoryPersistence
 import ru.appkode.base.data.storage.persistence.books.WishListPersistence
-import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.books.lists.history.toBookListItemUM
-import ru.appkode.base.entities.core.books.lists.toHistoryListSM
+import ru.appkode.base.entities.core.books.lists.toHistorySM
 import ru.appkode.base.entities.core.books.lists.toWishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
@@ -28,6 +26,7 @@ import kotlin.concurrent.thread
 
 const val BASE_IMAGE_NAME = "to_read_list_book_"
 const val IMAGE_DIR = "image_dir"
+private const val PAGE_SIZE = 20
 
 class BooksLocalRepositoryImpl(
     private val appSchedulers: AppSchedulers,
@@ -41,44 +40,40 @@ class BooksLocalRepositoryImpl(
     }
 
     override fun addToWishList(book: BookListItemUM): Completable {
-        val imageName = getImageNameById(book.id)
-        Picasso.get().load(book.imagePath).into(picassoImageTarget(IMAGE_DIR, imageName))
+        loadImg(getImageNameById(book.id))
+        return CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+    }
 
-        return Completable.fromAction {
-            wishListPersistence.insert(book.toWishListSM())
-        }.subscribeOn(appSchedulers.io)
+    override fun addToWishListFromHistory(book: BookListItemUM): Completable {
+        val add = CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        val del = CompletableFromAction { historyPersistence.delete(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+        return del.mergeWith(add)
     }
 
     override fun addToHistory(book: BookListItemUM): Completable {
-        val imageName = getImageNameById(book.id)
-        Picasso.get().load(book.imagePath).into(picassoImageTarget(IMAGE_DIR, imageName))
+        loadImg(getImageNameById(book.id))
+        return CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+    }
 
-        return Completable.fromAction {
-            historyPersistence.insert(book.toHistoryListSM())
-        }.subscribeOn(appSchedulers.io)
+    override fun addToHistoryFromWishList(book: BookListItemUM): Completable {
+        val del = CompletableFromAction { wishListPersistence.delete(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        val add = CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+        loadImg(book.imagePath)
+        return del.mergeWith(add)
     }
 
     override fun deleteFromWishList(book: BookListItemUM): Completable {
-        val imageName = getImageNameById(book.id)
         val directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE)
-        val imageFile = File(directory, imageName.toString())
-        val d = imageFile.delete()
-        Timber.d("Image delete $imageFile, result $d")
-
+        val imageFile = File(directory, book.imagePath)
+        imageFile.delete()
         return Completable.fromAction {
             wishListPersistence.delete(book.toWishListSM())
         }.subscribeOn(appSchedulers.io)
     }
 
     override fun deleteFromHistory(book: BookListItemUM): Completable {
-        val imageName = getImageNameById(book.id)
-        val directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE)
-        val imageFile = File(directory, imageName)
-        val d = imageFile.delete()
-        Timber.d("Image delete $imageFile, result $d")
-
         return Completable.fromAction {
-            historyPersistence.delete(book.toHistoryListSM())
+            historyPersistence.delete(book.toHistorySM())
         }.subscribeOn(appSchedulers.io)
     }
 
@@ -94,19 +89,39 @@ class BooksLocalRepositoryImpl(
             .subscribeOn(appSchedulers.io)
     }
 
-    override fun isInHistory(book: BookListItemUM): Single<Boolean> {
+    override fun getWishListPage(page: Int): Observable<List<BookListItemUM>> {
+        return wishListPersistence.getBooks(
+            limit = PAGE_SIZE,
+            offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
+        ).map { bookSM -> bookSM.toBookListItemUM() }
+            .subscribeOn(appSchedulers.io)
+    }
+
+    override fun getHistoryPage(page: Int): Observable<List<BookListItemUM>> {
+        return historyPersistence.getBooks(
+            limit = PAGE_SIZE,
+            offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
+        ).map { bookSM -> bookSM.toBookListItemUM() }
+            .subscribeOn(appSchedulers.io)
+    }
+
+    override fun isInHistory(book: BookListItemUM): Observable<Boolean> {
         return historyPersistence.countNumById(book.id)
             .map { num -> num > 0}
             .subscribeOn(appSchedulers.io)
     }
 
-    override fun isInWishList(book: BookListItemUM): Single<Boolean> {
+    override fun isInWishList(book: BookListItemUM): Observable<Boolean> {
         return wishListPersistence.countNumById(book.id)
             .map { num -> num > 0}
             .subscribeOn(appSchedulers.io)
     }
 
-    private fun picassoImageTarget(imageDir: String, imageName: String): Target {
+    private fun loadImg(imagePath: String?) {
+        Picasso.get().load(imagePath).into(picassoImageTarget(IMAGE_DIR, imagePath))
+    }
+
+    private fun picassoImageTarget(imageDir: String, imageName: String?): Target {
         val contextWrapper = ContextWrapper(context)
         val directory = contextWrapper.getDir(imageDir, Context.MODE_PRIVATE)
         return object : Target {

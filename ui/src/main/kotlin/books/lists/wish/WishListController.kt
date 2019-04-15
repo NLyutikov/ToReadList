@@ -1,5 +1,8 @@
 package ru.appkode.base.ui.books.lists.wish
 
+import com.jakewharton.rxbinding3.recyclerview.scrollEvents
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.books.lists.CommonListAdapter
 import ru.appkode.base.ui.books.lists.CommonListController
@@ -18,5 +21,9 @@ class WishListController : CommonListController() {
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
             router
         )
+    }
+
+    override fun loadNextPageOfBooksIntent(): Observable<Int> {
+        return books_list_recycler.scrollEvents().filter { false }.map { 1 }
     }
 }

@@ -2,11 +2,14 @@ package ru.appkode.base.ui.books.search
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.repository.books.BooksNetworkRepository
+import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.books.search.BooksSearchScreen.View
 import ru.appkode.base.ui.core.core.*
 import ru.appkode.base.ui.core.core.util.AppSchedulers
+import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
@@ -16,6 +19,7 @@ data class SearchBook(val inputText: String) : ScreenAction()
 data class ShowImage(val url: String) : ScreenAction()
 object DismissImage : ScreenAction()
 object RepeatSearch : ScreenAction()
+data class ItemClicked(val position: Long) : ScreenAction()
 
 class BooksSearchPresenter(
     schedulers: AppSchedulers,
@@ -34,7 +38,9 @@ class BooksSearchPresenter(
             intent(View::dismissImageIntent)
                 .map { DismissImage },
             intent(View::repeatSearchIntent)
-                .map { RepeatSearch }
+                .map { RepeatSearch },
+            intent(View::itemClickedIntent)
+                .map { ItemClicked(it) }
         )
     }
 
@@ -48,6 +54,7 @@ class BooksSearchPresenter(
             is ShowImage -> processShowImage(previousState, action)
             is SearchBook -> processSearchBook(previousState, action)
             is UpdateList -> processUpdateList(previousState, action)
+            is ItemClicked -> processItemClicked(previousState, action)
         }
     }
 
@@ -90,6 +97,13 @@ class BooksSearchPresenter(
         return previousState.copy(
             booksSearchState = action.state
         ) to null
+    }
+
+    private fun processItemClicked(
+        previousState: BooksSearchScreen.ViewState,
+        action: ItemClicked
+    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to command { router.pushController(BookDetailsController.createController(action.position).obtainHorizontalTransaction())}
     }
 
     override fun createInitialState(): BooksSearchScreen.ViewState {

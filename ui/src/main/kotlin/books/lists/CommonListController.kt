@@ -61,9 +61,6 @@ abstract class CommonListController :
         }
     }
 
-    /**
-     * FIXME При паджинации подвисает
-     */
     override fun loadNextPageOfBooksIntent(): Observable<Int> {
         return books_list_recycler.scrollEvents()
             .filter {

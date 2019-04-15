@@ -7,6 +7,6 @@ fun BookListItemUM.toWishListSM(): WishListSM {
     return WishListSM(id, title, averageRating, imagePath)
 }
 
-fun BookListItemUM.toHistoryListSM(): HistorySM {
+fun BookListItemUM.toHistorySM(): HistorySM {
     return HistorySM(id, title, averageRating, imagePath)
 }
