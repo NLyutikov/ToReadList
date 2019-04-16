@@ -12,6 +12,7 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
+import timber.log.Timber
 
 sealed class ScreenAction
 
@@ -44,6 +45,13 @@ class BookDetailsPresenter(
                 .map { HistoryBtnPressed },
             intent { networkRepository.getBookDetails(bookId).onErrorReturn { BookDetailsUM(-1) }}
                 .doLceAction { LoadBookDetails(it) }
+                .doOnError { e -> Timber.e(e.message) }
+                .onErrorReturn { e ->
+                    LoadBookDetails(LceState.Error(
+                        e.message ?: "unknown error",
+                        BookDetailsUM(-1)
+                    ))
+                }
         )
     }
 

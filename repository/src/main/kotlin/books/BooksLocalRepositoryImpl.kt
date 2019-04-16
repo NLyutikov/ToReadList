@@ -105,6 +105,22 @@ class BooksLocalRepositoryImpl(
             .subscribeOn(appSchedulers.io)
     }
 
+    override fun getFirstWishListPages(numPages: Int): Observable<List<BookListItemUM>> {
+        return wishListPersistence.getBooks(
+            limit = numPages * PAGE_SIZE,
+            offset = 0
+        ).map { bookSM -> bookSM.toBookListItemUM() }
+            .subscribeOn(appSchedulers.io)
+    }
+
+    override fun getFirstHistoryPages(numPages: Int): Observable<List<BookListItemUM>> {
+        return historyPersistence.getBooks(
+            limit = numPages * PAGE_SIZE,
+            offset = 0
+        ).map { bookSM -> bookSM.toBookListItemUM() }
+            .subscribeOn(appSchedulers.io)
+    }
+
     override fun isInHistory(book: BookListItemUM): Observable<Boolean> {
         return historyPersistence.countNumById(book.id)
             .map { num -> num > 0}

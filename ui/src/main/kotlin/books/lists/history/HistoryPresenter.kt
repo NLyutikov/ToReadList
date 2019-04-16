@@ -22,6 +22,10 @@ class HistoryPresenter(
         return booksLocalRepository.getHistoryPage(page)
     }
 
+    override fun updateData(numPages: Int): Observable<List<BookListItemUM>> {
+        return booksLocalRepository.getFirstHistoryPages(numPages)
+    }
+
     override fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
         action: ItemSwipedLeftIntent
