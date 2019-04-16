@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import ru.appkode.base.data.storage.db.AppDatabase
 import ru.appkode.base.data.storage.db.DATABASE_NAME
-import ru.appkode.base.data.storage.persistence.task.TaskPersistence
 
 object DatabaseHelper {
 
@@ -14,5 +13,6 @@ object DatabaseHelper {
     database = Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()
   }
 
-  fun getTaskPersistence(): TaskPersistence = database.taskPersistence()
+  fun getWishListPersistence() = database.wishListPersistence()
+  fun getHistoryPersistence() = database.historyPersistence()
 }

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion 28
@@ -36,4 +37,10 @@ androidExtensions{
 dependencies {
   implementation project(":core")
   implementation "androidx.room:room-common:2.1.0-alpha05"
+
+  //XML
+  api 'com.tickaroo.tikxml:retrofit-converter:0.8.13'
+  api 'com.tickaroo.tikxml:annotation:0.8.13'
+  api 'com.tickaroo.tikxml:core:0.8.13'
+  kapt 'com.tickaroo.tikxml:processor:0.8.13'
 }

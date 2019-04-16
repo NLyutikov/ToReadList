@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="@dimen/similar_books_list_item_width"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/book_details_container_padding"
+>
+
+  <ImageView
+    android:layout_width="@dimen/similar_books_list_item_cover_image_width"
+    android:layout_height="@dimen/similar_books_list_item_cover_image_height"
+    android:id="@+id/similar_books_list_image_cover"
+    android:src="@drawable/test_img"
+  />
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/similar_books_list_title_title"
+    android:maxLines="2"
+    android:ellipsize="end"
+    android:textColor="@color/text_black_color"
+    android:text="@string/title"
+    android:gravity="center"
+  />
+
+</LinearLayout>

@@ -6,13 +6,15 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.appkode.base.data.storage.DatabaseHelper
+import ru.appkode.base.ui.books.BooksMainController
+import ru.appkode.base.ui.books.details.BookDetailsController
+import ru.appkode.base.ui.books.search.BooksSearchController
+import ru.appkode.base.ui.core.core.util.obtainFadeTransaction
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import ru.appkode.base.ui.duck.DuckListController
-import ru.appkode.base.ui.task.list.TaskListController
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var router: Router
+    private lateinit var router: Router
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -21,14 +23,12 @@ class MainActivity : AppCompatActivity() {
     router = Conductor.attachRouter(this, main_container, savedInstanceState)
     if (!router.hasRootController())
       router.setRoot(
-        // Just math random. Nothing else.
-        if (Math.random() > 0.5f) DuckListController().obtainHorizontalTransaction()
-        else TaskListController().obtainHorizontalTransaction()
+        BooksMainController().obtainFadeTransaction()
       )
   }
 
-  override fun onBackPressed() {
-    if (!router.handleBack())
-      super.onBackPressed()
-  }
+    override fun onBackPressed() {
+        if (!router.handleBack())
+            super.onBackPressed()
+    }
 }

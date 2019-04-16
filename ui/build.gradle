@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion 28
@@ -37,4 +38,10 @@ dependencies {
   implementation project(':core')
   implementation project(':entities')
   implementation project(':repository')
+
+  api 'com.jakewharton.rxbinding3:rxbinding-recyclerview:3.0.0-alpha2'
+  implementation "com.github.stfalcon:stfalcon-imageviewer:0.1.0"
+
+  //Advanced recycler view
+  implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
 }
