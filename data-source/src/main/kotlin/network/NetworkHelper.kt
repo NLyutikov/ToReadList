@@ -11,34 +11,20 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 import okhttp3.logging.HttpLoggingInterceptor.Level.NONE
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import ru.appkode.base.data.network.NetworkHelper.API_KEY
 import ru.appkode.base.data.network.books.BooksApi
 import ru.appkode.ui.core.BuildConfig
 
 object NetworkHelper {
   const val BOOKS_BASE_URL = "https://www.goodreads.com/"
   const val API_KEY = "lEJVSEkHbRKXduThStEg9w"
-
   private val xml = TikXml.Builder()
     .exceptionOnUnreadXml(false)
     .build()
 
   private val okHttpClientWithApiKey = OkHttpClient.Builder()
     .addInterceptor(HttpLoggingInterceptor().setLevel(if (BuildConfig.DEBUG) BODY else NONE))
-    .addInterceptor(object : Interceptor {//FIXME написать как отдельный кдасс
-      override fun intercept(chain: Interceptor.Chain): Response {
-        val original = chain.request()
-        val url = original.url()
-          .newBuilder()
-          .addQueryParameter("key", API_KEY)
-          .build()
-
-        val request = original.newBuilder()
-          .url(url)
-          .build()
-
-        return chain.proceed(request)
-      }
-    })
+    .addInterceptor(KeyInterceptor)
     .build()
 
   private val booksApi = Retrofit.Builder()
@@ -49,6 +35,22 @@ object NetworkHelper {
     .build()
     .create(BooksApi::class.java)
 
-  fun getBooksApi() = booksApi
+  fun getBooksApi(): BooksApi = booksApi
 
+}
+
+object KeyInterceptor : Interceptor {
+  override fun intercept(chain: Interceptor.Chain): Response {
+    val original = chain.request()
+    val url = original.url()
+      .newBuilder()
+      .addQueryParameter("key", API_KEY)
+      .build()
+
+    val request = original.newBuilder()
+      .url(url)
+      .build()
+
+    return chain.proceed(request)
+  }
 }

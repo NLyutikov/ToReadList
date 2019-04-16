@@ -118,30 +118,37 @@ class BooksLocalRepositoryImpl(
     }
 
     private fun loadImg(imagePath: String?) {
-        Picasso.get().load(imagePath).into(picassoImageTarget(IMAGE_DIR, imagePath))
+        Picasso.get().load(imagePath).into(ImageTarget(context, IMAGE_DIR, imagePath))
+    }
+}
+
+class ImageTarget(
+    context: Context,
+    imageDir: String?,
+    imageName: String?
+) : Target {
+
+    private val contextWrapper = ContextWrapper(context)
+    private val directory = contextWrapper.getDir(imageDir, Context.MODE_PRIVATE)
+    private val imgName = imageName
+
+    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
     }
 
-    private fun picassoImageTarget(imageDir: String, imageName: String?): Target {
-        val contextWrapper = ContextWrapper(context)
-        val directory = contextWrapper.getDir(imageDir, Context.MODE_PRIVATE)
-        return object : Target {
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+    override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
+    }
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                thread {
-                    val imageFile = File(directory, imageName)
-                    var fos: FileOutputStream? = null
-                    try {
-                        fos = FileOutputStream(imageFile)
-                        bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    } finally {
-                        fos?.close()
-                    }
-                }
+    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+        thread {
+            val imageFile = File(directory, imgName)
+            var fos: FileOutputStream? = null
+            try {
+                fos = FileOutputStream(imageFile)
+                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } finally {
+                fos?.close()
             }
         }
     }
