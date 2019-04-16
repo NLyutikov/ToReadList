@@ -20,8 +20,7 @@ import java.util.concurrent.TimeUnit
 
 class BookDetailsController :
     BaseMviController<BookDetailsScreen.ViewState, BookDetailsScreen.View, BookDetailsPresenter>(),
-    BookDetailsScreen.View,
-    BookDetailsScreen.ViewControl {
+    BookDetailsScreen.View {
 
     companion object {
         fun createController(bookId: Long): BookDetailsController {
@@ -131,7 +130,7 @@ class BookDetailsController :
             .into(book_details_cover_image)
     }
 
-    override fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
+    fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
         book_details_add_to_want_to_read_btn.isVisible = isInWishList || !isInHistory && !isInWishList
         book_details_add_to_history_btn.isVisible = isInHistory || !isInHistory && !isInWishList
 
@@ -171,8 +170,7 @@ class BookDetailsController :
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
             RepositoryHelper.getBooksLocalRepository(applicationContext!!, DefaultAppSchedulers),
             this.router!!,
-            bookId,
-            this
+            bookId
         )
     }
 }

@@ -2,6 +2,7 @@ package ru.appkode.base.ui.books.details
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import io.reactivex.functions.Function3
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
@@ -23,14 +24,14 @@ object HistoryBtnPressed : ScreenAction()
 object WishListBtnPressed : ScreenAction()
 data class HistoryState(val state: LceState<Unit>) : ScreenAction()
 data class WishListState(val state: LceState<Unit>) : ScreenAction()
+data class InDbStatus(val state: LceState<BookDetailsUM>) : ScreenAction()
 
 class BookDetailsPresenter(
     schedulers: AppSchedulers,
     private val networkRepository: BooksNetworkRepository,
     private val localRepository: BooksLocalRepository,
     private val router: Router,
-    private val bookId: Long,
-    private val view: BookDetailsScreen.ViewControl
+    private val bookId: Long
 ) : BasePresenter<BookDetailsScreen.View, BookDetailsScreen.ViewState, ScreenAction>(schedulers){
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
@@ -43,7 +44,7 @@ class BookDetailsPresenter(
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent { networkRepository.getBookDetails(bookId).onErrorReturn { BookDetailsUM(-1) }}
+            intent { networkRepository.getBookDetails(bookId).onErrorReturn { null }}
                 .doLceAction { LoadBookDetails(it) }
                 .doOnError { e -> Timber.e(e.message) }
                 .onErrorReturn { e ->
@@ -67,7 +68,25 @@ class BookDetailsPresenter(
             is WishListBtnPressed -> processWishListBtnPressed(previousState, action)
             is HistoryState -> processHistoryState(previousState, action)
             is WishListState -> processWishListState(previousState, action)
+            is InDbStatus -> processInDbStatus(previousState, action)
         }
+    }
+
+    private fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
+        val isInHistory = localRepository.isInHistory(book.toBookListItemUM())
+        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM())
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
     }
 
     private fun processLoadBookDetails(
@@ -75,11 +94,28 @@ class BookDetailsPresenter(
         action: LoadBookDetails
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var bookDetails: BookDetailsUM? = previousState.bookDetails
-        if (action.state.isContent)
+        var com: Command<Observable<ScreenAction>>? = null
+        if (action.state.isContent) {
             bookDetails = action.state.asContent()
+            com = command(
+                getInBaseState(bookDetails).doLceAction { lceState ->  InDbStatus(lceState)}
+            )
+        }
         return previousState.copy(
             bookDetails = bookDetails,
             bookDetailsState = action.state
+        ) to com
+    }
+
+    private fun processInDbStatus(
+        previousState: BookDetailsScreen.ViewState,
+        action: InDbStatus
+    ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var details = previousState.bookDetails
+        if (action.state.isContent)
+            details = action.state.asContent()
+        return previousState.copy(
+            bookDetails = details
         ) to null
     }
 

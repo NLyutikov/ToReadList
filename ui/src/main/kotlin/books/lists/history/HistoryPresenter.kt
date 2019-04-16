@@ -9,7 +9,6 @@ import ru.appkode.base.ui.books.lists.*
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import kotlin.random.Random
 
 class HistoryPresenter(
     schedulers: AppSchedulers,
@@ -28,14 +27,14 @@ class HistoryPresenter(
 
     override fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeftIntent
+        action: ItemSwipedLeft
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {  } //TODO релизовать свайпы
     }
 
     override fun processItemSwipedRight(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRigthIntent
+        action: ItemSwipedRight
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {  } //TODO релизовать свайпы
     }

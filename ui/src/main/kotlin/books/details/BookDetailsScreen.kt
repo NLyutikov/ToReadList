@@ -14,10 +14,6 @@ interface BookDetailsScreen {
         fun wishListBtnPressed(): Observable<Unit>
     }
 
-    interface ViewControl {
-        fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean)
-    }
-
     data class ViewState(
         val bookDetailsState: LceState<BookDetailsUM>,
         val bookDetails: BookDetailsUM? = null

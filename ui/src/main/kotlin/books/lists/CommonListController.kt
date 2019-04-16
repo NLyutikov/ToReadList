@@ -26,6 +26,10 @@ abstract class CommonListController :
     abstract protected val listAdapter: CommonListAdapter
 
     override fun initializeView(rootView: View) {
+        books_list_swipe_refresh.setOnRefreshListener {
+            eventsRelay.accept(COMMON_LIST_REFRESH_EVENT_ID to Unit)
+        }
+
         initRecyclerView()
         initSwipes()
         initDragAndDrop()
@@ -59,6 +63,10 @@ abstract class CommonListController :
                 listAdapter.data = list
             }
         }
+
+        fieldChanged(viewState, {state -> state.isRefreshing}) {
+            books_list_swipe_refresh.isRefreshing = viewState.isRefreshing
+        }
     }
 
     override fun loadNextPageOfBooksIntent(): Observable<Int> {
@@ -86,6 +94,10 @@ abstract class CommonListController :
             .throttleFirst(500, TimeUnit.MILLISECONDS)
     }
 
+    override fun refreshIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(COMMON_LIST_REFRESH_EVENT_ID)
+    }
+
     override fun itemSwipedLeftIntent(): Observable<Int> {
         return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
     }
@@ -95,4 +107,4 @@ abstract class CommonListController :
     }
 }
 
-val COMMON_LIST_EVENT_PAGE_LOADED = 300
+const val COMMON_LIST_REFRESH_EVENT_ID = 31

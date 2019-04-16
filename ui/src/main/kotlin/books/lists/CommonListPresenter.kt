@@ -12,17 +12,17 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
-import ru.appkode.base.ui.core.core.util.toLceEventObservable
-import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
 
-data class LoadNextPageIntent(val state: LceState<List<BookListItemUM>>) : ScreenAction()
-data class ItemClickedIntent(val position: Int) : ScreenAction()
-data class ItemSwipedLeftIntent(val position: Int) : ScreenAction()
-data class ItemSwipedRigthIntent(val position: Int) : ScreenAction()
+data class LoadNextPage(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+data class ItemClicked(val position: Int) : ScreenAction()
+data class ItemSwipedLeft(val position: Int) : ScreenAction()
+data class ItemSwipedRight(val position: Int) : ScreenAction()
 object UpdateData : ScreenAction()
 data class UpdateDataState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+object Refreshing : ScreenAction()
+data class RefreshingState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 
 abstract class CommonListPresenter(
     schedulers: AppSchedulers,
@@ -34,14 +34,16 @@ abstract class CommonListPresenter(
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
             intent(CommonListScreen.View::itemClickedIntent)
-                .map { position -> ItemClickedIntent(position) },
+                .map { position -> ItemClicked(position) },
             intent(CommonListScreen.View::itemSwipedLeftIntent)
-                .map { position -> ItemSwipedLeftIntent(position) },
+                .map { position -> ItemSwipedLeft(position) },
             intent(CommonListScreen.View::itemSwipedRightIntent)
-                .map { position -> ItemSwipedRigthIntent(position) },
+                .map { position -> ItemSwipedRight(position) },
             intent(CommonListScreen.View::loadNextPageOfBooksIntent)
                 .flatMap { page -> loadNextPage(page) }
-                .doLceAction { lceState ->  LoadNextPageIntent(lceState)},
+                .doLceAction { lceState ->  LoadNextPage(lceState)},
+            intent(CommonListScreen.View::refreshIntent)
+                .map { Refreshing },
             intent { Observable.just(UpdateData) }
         )
     }
@@ -51,12 +53,14 @@ abstract class CommonListPresenter(
         action: ScreenAction
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when(action) {
-            is LoadNextPageIntent -> processLoadNextPage(previousState, action)
-            is ItemClickedIntent -> processItemClicked(previousState, action)
-            is ItemSwipedLeftIntent -> processItemSwipedLeft(previousState, action)
-            is ItemSwipedRigthIntent -> processItemSwipedRight(previousState, action)
-            is UpdateData -> processUpdateData(previousState, action)
+            is LoadNextPage -> processLoadNextPage(previousState, action)
+            is ItemClicked -> processItemClicked(previousState, action)
+            is ItemSwipedLeft -> processItemSwipedLeft(previousState, action)
+            is ItemSwipedRight -> processItemSwipedRight(previousState, action)
+            is UpdateData -> processUpdateData(previousState)
             is UpdateDataState -> processUpdateDataState(previousState, action)
+            is Refreshing -> processRefreshing(previousState)
+            is RefreshingState -> processRefreshingState(previousState, action)
         }
     }
 
@@ -69,11 +73,11 @@ abstract class CommonListPresenter(
 
     protected fun processLoadNextPage(
         previousState: CommonListScreen.ViewState,
-        action: LoadNextPageIntent
+        action: LoadNextPage
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var list = previousState.list
         var page = previousState.curPage
-        if (action.state.isContent){
+        if (action.state.isContent) {
             list = list.plus(action.state.asContent())
             page += 1
         }
@@ -86,23 +90,22 @@ abstract class CommonListPresenter(
 
     protected fun processItemClicked(
         previousState: CommonListScreen.ViewState,
-        action: ItemClickedIntent
+        action: ItemClicked
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command { router.pushController(
             BookDetailsController.createController(previousState.list[action.position].id).obtainVerticalTransaction()
         ) }
     }
 
-    private fun processUpdateData(
-        previousState: CommonListScreen.ViewState,
-        action: UpdateData
+    protected fun processUpdateData(
+        previousState: CommonListScreen.ViewState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command(
             updateData(previousState.curPage).doLceAction { UpdateDataState(it) }
         )
     }
 
-    private fun processUpdateDataState(
+    protected fun processUpdateDataState(
         previousState: CommonListScreen.ViewState,
         action: UpdateDataState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
@@ -115,17 +118,48 @@ abstract class CommonListPresenter(
         ) to null
     }
 
+    protected fun processRefreshing(
+        previousState: CommonListScreen.ViewState
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(
+            curPage = 1,
+            isRefreshing = true
+        ) to command(
+            loadNextPage(1).doLceAction { lceState ->  RefreshingState(lceState) }
+        )
+    }
+
+    protected fun processRefreshingState(
+        previousState: CommonListScreen.ViewState,
+        action: RefreshingState
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        var page = previousState.curPage
+        var isRefreshing = previousState.isRefreshing
+        if (action.state.isContent) {
+            list = action.state.asContent()
+            page = 1
+            isRefreshing = false
+        }
+        return previousState.copy(
+            list = list,
+            curPage = page,
+            loadNewPageState = action.state,
+            isRefreshing = isRefreshing
+        ) to null
+    }
+
     abstract fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeftIntent
+        action: ItemSwipedLeft
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
 
     abstract fun processItemSwipedRight(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRigthIntent
+        action: ItemSwipedRight
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
 
     override fun createInitialState(): CommonListScreen.ViewState {
-        return CommonListScreen.ViewState(1, emptyList(), LceState.Loading())
+        return CommonListScreen.ViewState(1, emptyList(), LceState.Loading(), false)
     }
 }
