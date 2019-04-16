@@ -23,6 +23,10 @@ class WishListPresenter(
         return booksLocalRepository.getWishListPage(page)
     }
 
+    override fun updateData(numPages: Int): Observable<List<BookListItemUM>> {
+        return booksLocalRepository.getFirstWishListPages(numPages)
+    }
+
     override fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
         action: ItemSwipedLeftIntent

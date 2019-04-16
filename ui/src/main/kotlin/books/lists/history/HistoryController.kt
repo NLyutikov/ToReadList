@@ -22,8 +22,4 @@ class HistoryController : CommonListController() {
         )
     }
 
-    override fun loadNextPageOfBooksIntent(): Observable<Int> {
-        return books_list_recycler.scrollEvents().filter { false }.map { 1 }
-    }
-
 }

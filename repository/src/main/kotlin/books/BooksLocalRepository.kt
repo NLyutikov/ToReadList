@@ -23,9 +23,13 @@ interface BooksLocalRepository {
 
     fun getWishListPage(page: Int): Observable<List<BookListItemUM>>
 
+    fun getFirstWishListPages(numPages: Int): Observable<List<BookListItemUM>>
+
     fun getHistory(): Observable<List<BookListItemUM>>
 
     fun getHistoryPage(page: Int): Observable<List<BookListItemUM>>
+
+    fun getFirstHistoryPages(numPages: Int): Observable<List<BookListItemUM>>
 
     fun isInHistory(book: BookListItemUM): Observable<Boolean>
 
