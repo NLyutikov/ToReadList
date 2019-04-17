@@ -21,7 +21,7 @@ abstract class CommonListController :
         }
     }
 
-    abstract protected val listAdapter: CommonListAdapter
+    protected abstract val listAdapter: CommonListAdapter
 
     override fun initializeView(rootView: View) {
         initSwipeRefresh()
@@ -118,7 +118,6 @@ abstract class CommonListController :
     override fun deleteIconClickedIntent(): Observable<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 }
 
 const val COMMON_LIST_REFRESH_EVENT_ID = 31

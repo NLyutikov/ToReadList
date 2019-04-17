@@ -1,25 +1,22 @@
 package ru.appkode.base.ui.books.lists
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.jakewharton.rxrelay2.PublishRelay
-import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
-import ru.appkode.base.repository.books.BooksLocalRepositoryImpl
-import ru.appkode.base.repository.books.IMAGE_DIR
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
-import java.io.File
 
 class CommonListAdapter(
-    private val fromLocalDataSource: Boolean = false
+    private val fromLocalDataSource: Boolean = false,
+    private val draggable: Boolean = false
 ) : RecyclerView.Adapter<CommonListAdapter.ViewHolder>() {
 
     var data = emptyList<BookListItemUM>()
@@ -48,20 +45,15 @@ class CommonListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder) {
-            if (fromLocalDataSource)
-                Picasso.get()
-                    .load(
-                        File(
-                            view.context.getDir(IMAGE_DIR, Context.MODE_PRIVATE),
-                            BooksLocalRepositoryImpl.getImageNameById(data[position].id)
-                        )
-                    ).into(image)
-            else
-                Picasso.get().load(data[position].imagePath).into(image)
+            Glide.with(view.context)
+                .load(data[position].imagePath)
+                .onlyRetrieveFromCache(fromLocalDataSource)
+                .into(image)
             title.text = data[position].title
             rating.text = data[position].averageRating.toString()
             wishListIcon.isVisible = !data[position].isInWishList
             historyIcon.isVisible = !data[position].isInHistory
+            dragIcon.isVisible = draggable
         }
     }
 
@@ -74,6 +66,7 @@ class CommonListAdapter(
         val wishListIcon = view.books_list_item_wish_list
         val historyIcon = view.books_list_item_history
         val deleteIcon = view.books_list_item_delete
+        val dragIcon = view.books_list_item_drag_img
 
         init {
             view.setOnClickListener { view ->

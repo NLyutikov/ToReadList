@@ -13,7 +13,6 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import timber.log.Timber
 
 sealed class ScreenAction
 
@@ -24,7 +23,6 @@ object HistoryBtnPressed : ScreenAction()
 object WishListBtnPressed : ScreenAction()
 data class HistoryState(val state: LceState<Unit>) : ScreenAction()
 data class WishListState(val state: LceState<Unit>) : ScreenAction()
-data class InDbStatus(val state: LceState<BookDetailsUM>) : ScreenAction()
 
 class BookDetailsPresenter(
     schedulers: AppSchedulers,
@@ -44,15 +42,12 @@ class BookDetailsPresenter(
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent { networkRepository.getBookDetails(bookId).onErrorReturn { null }}
-                .doLceAction { LoadBookDetails(it) }
-                .doOnError { e -> Timber.e(e.message) }
-                .onErrorReturn { e ->
-                    LoadBookDetails(LceState.Error(
-                        e.message ?: "unknown error",
-                        BookDetailsUM(-1)
-                    ))
+            intent {
+                    networkRepository.getBookDetails(bookId)
+                        .flatMap { book -> getInBaseState(book) }
+                        .onErrorReturn { null }
                 }
+                .doLceAction { LoadBookDetails(it) }
         )
     }
 
@@ -68,7 +63,6 @@ class BookDetailsPresenter(
             is WishListBtnPressed -> processWishListBtnPressed(previousState, action)
             is HistoryState -> processHistoryState(previousState, action)
             is WishListState -> processWishListState(previousState, action)
-            is InDbStatus -> processInDbStatus(previousState, action)
         }
     }
 
@@ -94,28 +88,12 @@ class BookDetailsPresenter(
         action: LoadBookDetails
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var bookDetails: BookDetailsUM? = previousState.bookDetails
-        var com: Command<Observable<ScreenAction>>? = null
         if (action.state.isContent) {
             bookDetails = action.state.asContent()
-            com = command(
-                getInBaseState(bookDetails).doLceAction { lceState ->  InDbStatus(lceState)}
-            )
         }
         return previousState.copy(
             bookDetails = bookDetails,
             bookDetailsState = action.state
-        ) to com
-    }
-
-    private fun processInDbStatus(
-        previousState: BookDetailsScreen.ViewState,
-        action: InDbStatus
-    ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        var details = previousState.bookDetails
-        if (action.state.isContent)
-            details = action.state.asContent()
-        return previousState.copy(
-            bookDetails = details
         ) to null
     }
 

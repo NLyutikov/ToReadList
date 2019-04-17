@@ -12,7 +12,7 @@ import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 
 class WishListController : CommonListController() {
 
-    override val listAdapter: CommonListAdapter = CommonListAdapter(true)
+    override val listAdapter: CommonListAdapter = CommonListAdapter(true, true)
 
     override fun createPresenter(): CommonListPresenter {
         return WishListPresenter(
