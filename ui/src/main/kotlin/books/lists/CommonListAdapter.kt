@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxrelay2.PublishRelay
@@ -16,9 +17,10 @@ import ru.appkode.base.repository.books.IMAGE_DIR
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.io.File
-import java.util.*
 
-class CommonListAdapter(var fromLocalDataSource: Boolean = false) : RecyclerView.Adapter<CommonListAdapter.ViewHolder>() {
+class CommonListAdapter(
+    private val fromLocalDataSource: Boolean = false
+) : RecyclerView.Adapter<CommonListAdapter.ViewHolder>() {
 
     var data = emptyList<BookListItemUM>()
         set(value) {
@@ -29,6 +31,15 @@ class CommonListAdapter(var fromLocalDataSource: Boolean = false) : RecyclerView
     private val eventRelay: PublishRelay< Pair<Int, Int> > = PublishRelay.create()
 
     val itemClicked: Observable<Int> = eventRelay.filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED)
+
+    val wishListIconClicked: Observable<Int> = eventRelay
+        .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED)
+
+    val historyIconClicked: Observable<Int> = eventRelay
+        .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED)
+
+    val deleteIconClicked: Observable<Int> = eventRelay
+        .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.books_list_item, parent, false)
@@ -49,8 +60,8 @@ class CommonListAdapter(var fromLocalDataSource: Boolean = false) : RecyclerView
                 Picasso.get().load(data[position].imagePath).into(image)
             title.text = data[position].title
             rating.text = data[position].averageRating.toString()
-            wishListIcon.isVisible = data[position].isInWishList!!
-            historyIcon.isVisible = data[position].isInHistory!!
+            wishListIcon.isVisible = !data[position].isInWishList
+            historyIcon.isVisible = !data[position].isInHistory
         }
     }
 
@@ -60,15 +71,35 @@ class CommonListAdapter(var fromLocalDataSource: Boolean = false) : RecyclerView
         val image = view.books_list_item_image
         val title = view.books_list_item_name
         val rating = view.books_list_item_rating_text
-        val wishListIcon = view.books_list_item_favorites
-        val historyIcon = view.books_list_item_visible
+        val wishListIcon = view.books_list_item_wish_list
+        val historyIcon = view.books_list_item_history
+        val deleteIcon = view.books_list_item_delete
 
         init {
-            view.setOnClickListener {
-                eventRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED to adapterPosition)
+            view.setOnClickListener { view ->
+                    if (view !is ImageView)
+                        eventRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED to adapterPosition)
+            }
+            wishListIcon.setOnClickListener {
+                eventRelay.accept(
+                    COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED to adapterPosition
+                )
+            }
+            historyIcon.setOnClickListener {
+                eventRelay.accept(
+                    COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED to adapterPosition
+                )
+            }
+            deleteIcon.setOnClickListener {
+                eventRelay.accept(
+                    COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED to adapterPosition
+                )
             }
         }
     }
 }
 
 const val COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED = 12
+const val COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED = 13
+const val COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED = 14
+const val COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED = 15

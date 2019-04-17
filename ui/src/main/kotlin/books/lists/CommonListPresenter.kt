@@ -23,6 +23,11 @@ object UpdateData : ScreenAction()
 data class UpdateDataState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 object Refreshing : ScreenAction()
 data class RefreshingState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+data class AddToHistory(val position: Int) : ScreenAction()
+data class AddToWishList(val position: Int) : ScreenAction()
+data class DeleteFromHistory(val position: Int) : ScreenAction()
+data class DeleteFromWishList(val position: Int) : ScreenAction()
+data class ChangeList(val changeAction: (List<BookListItemUM>) -> (List<BookListItemUM>)) : ScreenAction()
 
 abstract class CommonListPresenter(
     schedulers: AppSchedulers,
@@ -61,6 +66,11 @@ abstract class CommonListPresenter(
             is UpdateDataState -> processUpdateDataState(previousState, action)
             is Refreshing -> processRefreshing(previousState)
             is RefreshingState -> processRefreshingState(previousState, action)
+            is AddToHistory -> processAddToHistory(previousState, action)
+            is AddToWishList -> processAddToWishList(previousState, action)
+            is DeleteFromHistory -> processDeleteFromHistory(previousState, action)
+            is DeleteFromWishList -> processDeleteFromWishList(previousState, action)
+            is ChangeList -> processChangeList(previousState, action)
         }
     }
 
@@ -71,7 +81,7 @@ abstract class CommonListPresenter(
 
     abstract fun updateData(numPages: Int): Observable< List<BookListItemUM> >
 
-    protected fun processLoadNextPage(
+    protected open fun processLoadNextPage(
         previousState: CommonListScreen.ViewState,
         action: LoadNextPage
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
@@ -88,7 +98,7 @@ abstract class CommonListPresenter(
         ) to null
     }
 
-    protected fun processItemClicked(
+    protected open fun processItemClicked(
         previousState: CommonListScreen.ViewState,
         action: ItemClicked
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
@@ -97,7 +107,7 @@ abstract class CommonListPresenter(
         ) }
     }
 
-    protected fun processUpdateData(
+    protected open fun processUpdateData(
         previousState: CommonListScreen.ViewState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command(
@@ -105,7 +115,7 @@ abstract class CommonListPresenter(
         )
     }
 
-    protected fun processUpdateDataState(
+    protected open fun processUpdateDataState(
         previousState: CommonListScreen.ViewState,
         action: UpdateDataState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
@@ -118,7 +128,7 @@ abstract class CommonListPresenter(
         ) to null
     }
 
-    protected fun processRefreshing(
+    protected open fun processRefreshing(
         previousState: CommonListScreen.ViewState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState.copy(
@@ -129,7 +139,7 @@ abstract class CommonListPresenter(
         )
     }
 
-    protected fun processRefreshingState(
+    protected open fun processRefreshingState(
         previousState: CommonListScreen.ViewState,
         action: RefreshingState
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
@@ -149,6 +159,26 @@ abstract class CommonListPresenter(
         ) to null
     }
 
+    abstract fun processAddToHistory(
+        previousState: CommonListScreen.ViewState,
+        action: AddToHistory
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
+
+    abstract fun processAddToWishList(
+        previousState: CommonListScreen.ViewState,
+        action: AddToWishList
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
+
+    abstract fun processDeleteFromHistory(
+        previousState: CommonListScreen.ViewState,
+        action: DeleteFromHistory
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
+
+    abstract fun processDeleteFromWishList(
+        previousState: CommonListScreen.ViewState,
+        action: DeleteFromWishList
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
+
     abstract fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
         action: ItemSwipedLeft
@@ -158,6 +188,13 @@ abstract class CommonListPresenter(
         previousState: CommonListScreen.ViewState,
         action: ItemSwipedRight
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
+
+    protected open fun processChangeList(
+        previousState: CommonListScreen.ViewState,
+        action: ChangeList
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(list = action.changeAction(previousState.list)) to null
+    }
 
     override fun createInitialState(): CommonListScreen.ViewState {
         return CommonListScreen.ViewState(1, emptyList(), LceState.Loading(), false)

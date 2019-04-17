@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
-import java.util.*
 import java.util.Collections.swap
 
 
@@ -91,7 +90,7 @@ internal class DraggableAdapter() : ListActions,
         val bookImg: ImageView = view.books_list_item_image
         val bookName: TextView = view.books_list_item_name
         val bookRating: TextView = view.books_list_item_rating_text
-        val bookCard: ConstraintLayout = view.book_card
+        val bookCard: ConstraintLayout = view.book_list_item_card
 
         init {
             bookImg.setOnClickListener {

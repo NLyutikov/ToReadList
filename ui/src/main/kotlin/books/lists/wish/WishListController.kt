@@ -22,4 +22,12 @@ class WishListController : CommonListController() {
             router
         )
     }
+
+    override fun historyIconClickedIntent(): Observable<Int> {
+        return listAdapter.historyIconClicked
+    }
+
+    override fun deleteIconClickedIntent(): Observable<Int> {
+        return listAdapter.deleteIconClicked
+    }
 }

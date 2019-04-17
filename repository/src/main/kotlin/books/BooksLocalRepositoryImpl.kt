@@ -56,7 +56,6 @@ class BooksLocalRepositoryImpl(
     override fun addToHistoryFromWishList(book: BookListItemUM): Completable {
         val del = CompletableFromAction { wishListPersistence.delete(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
         val add = CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
-        loadImg(book.imagePath)
         return del.mergeWith(add)
     }
 
@@ -90,34 +89,38 @@ class BooksLocalRepositoryImpl(
     override fun getWishListPage(page: Int): Observable<List<BookListItemUM>> {
         return wishListPersistence
             .getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
+                limit = PAGE_SIZE,
+                offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
             )
             .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getHistoryPage(page: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = PAGE_SIZE,
+                offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
+            )
+            .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstWishListPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return wishListPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return wishListPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstHistoryPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
