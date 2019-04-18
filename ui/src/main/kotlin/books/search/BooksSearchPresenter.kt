@@ -31,7 +31,7 @@ class BooksSearchPresenter(
         return listOf(
             intent(View::searchBookIntent)
                 .map { SearchBook(it) }
-                .debounce(1000, TimeUnit.MILLISECONDS)
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged(),
             intent(View::showImageIntent)
                 .map { ShowImage(it) },

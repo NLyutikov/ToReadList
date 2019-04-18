@@ -9,7 +9,6 @@ import ru.appkode.base.ui.books.lists.*
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import kotlin.random.Random
 
 class HistoryPresenter(
     schedulers: AppSchedulers,
@@ -17,6 +16,15 @@ class HistoryPresenter(
     booksNetworkRepository: BooksNetworkRepository,
     router: Router
 ) : CommonListPresenter(schedulers, booksLocalRepository, booksNetworkRepository, router) {
+
+    override fun createIntents(): List<Observable<out ScreenAction>> {
+        return listOf(
+            intent(CommonListScreen.View::wishListIconCickedIntent)
+                .map { AddToWishList(it) },
+            intent(CommonListScreen.View::deleteIconClickedIntent)
+                .map { DeleteFromHistory(it) }
+        ).plus(super.createIntents())
+    }
 
     override fun loadNextPage(page: Int): Observable<List<BookListItemUM>> {
         return booksLocalRepository.getHistoryPage(page)
@@ -28,15 +36,49 @@ class HistoryPresenter(
 
     override fun processItemSwipedLeft(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeftIntent
+        action: ItemSwipedLeft
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to command {  } //TODO релизовать свайпы
+        return previousState to null //TODO релизовать свайпы
     }
 
     override fun processItemSwipedRight(
         previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRigthIntent
+        action: ItemSwipedRight
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to command {  } //TODO релизовать свайпы
+        return previousState to null //TODO релизовать свайпы
+    }
+
+    override fun processAddToHistory(
+        previousState: CommonListScreen.ViewState,
+        action: AddToHistory
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to null
+    }
+
+    override fun processAddToWishList(
+        previousState: CommonListScreen.ViewState,
+        action: AddToWishList
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to command(
+            booksLocalRepository.addToWishListFromHistory(previousState.list[action.position])
+                .doAction { ChangeList { list -> list.minus(previousState.list[action.position]) } }
+        )
+    }
+
+    override fun processDeleteFromHistory(
+        previousState: CommonListScreen.ViewState,
+        action: DeleteFromHistory
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to command(
+            booksLocalRepository.deleteFromHistory(previousState.list[action.position])
+                .doAction { ChangeList { list -> list.minus(previousState.list[action.position]) } }
+        )
+    }
+
+    override fun processDeleteFromWishList(
+        previousState: CommonListScreen.ViewState,
+        action: DeleteFromWishList
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to null
     }
 }

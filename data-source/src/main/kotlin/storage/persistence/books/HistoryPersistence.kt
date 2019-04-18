@@ -21,7 +21,7 @@ interface HistoryPersistence : BasePersistence<HistorySM>{
     fun getAllBooks(): Observable<List<HistorySM>>
 
     @Query("SELECT * FROM history LIMIT :limit OFFSET :offset")
-    fun getBooks(limit: Int, offset: Int): Observable<List<WishListSM>>
+    fun getBooks(limit: Int, offset: Int): Observable<List<HistorySM>>
 
     @Query("SELECT COUNT(id) FROM history")
     fun getSize(): Observable<Int>

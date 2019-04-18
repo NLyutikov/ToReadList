@@ -3,11 +3,9 @@ package ru.appkode.base.ui.books.lists
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxbinding3.recyclerview.scrollEvents
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_controller.*
-import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.filterEvents
@@ -23,12 +21,19 @@ abstract class CommonListController :
         }
     }
 
-    abstract protected val listAdapter: CommonListAdapter
+    protected abstract val listAdapter: CommonListAdapter
 
     override fun initializeView(rootView: View) {
+        initSwipeRefresh()
         initRecyclerView()
         initSwipes()
         initDragAndDrop()
+    }
+
+    protected fun initSwipeRefresh() {
+        books_list_swipe_refresh.setOnRefreshListener {
+            eventsRelay.accept(COMMON_LIST_REFRESH_EVENT_ID to Unit)
+        }
     }
 
     protected fun initRecyclerView() = with (books_list_recycler) {
@@ -59,6 +64,10 @@ abstract class CommonListController :
                 listAdapter.data = list
             }
         }
+
+        fieldChanged(viewState, {state -> state.isRefreshing}) {
+            books_list_swipe_refresh.isRefreshing = viewState.isRefreshing
+        }
     }
 
     override fun loadNextPageOfBooksIntent(): Observable<Int> {
@@ -86,6 +95,10 @@ abstract class CommonListController :
             .throttleFirst(500, TimeUnit.MILLISECONDS)
     }
 
+    override fun refreshIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(COMMON_LIST_REFRESH_EVENT_ID)
+    }
+
     override fun itemSwipedLeftIntent(): Observable<Int> {
         return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
     }
@@ -93,6 +106,18 @@ abstract class CommonListController :
     override fun itemSwipedRightIntent(): Observable<Int> {
         return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
     }
+
+    override fun historyIconClickedIntent(): Observable<Int> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun wishListIconCickedIntent(): Observable<Int> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun deleteIconClickedIntent(): Observable<Int> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 
-val COMMON_LIST_EVENT_PAGE_LOADED = 300
+const val COMMON_LIST_REFRESH_EVENT_ID = 31

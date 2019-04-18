@@ -11,11 +11,16 @@ interface CommonListScreen {
         fun itemClickedIntent(): Observable<Int>
         fun itemSwipedLeftIntent(): Observable<Int>
         fun itemSwipedRightIntent(): Observable<Int>
+        fun refreshIntent(): Observable<Unit>
+        fun historyIconClickedIntent(): Observable<Int>
+        fun wishListIconCickedIntent(): Observable<Int>
+        fun deleteIconClickedIntent(): Observable<Int>
     }
 
     data class ViewState(
         val curPage: Int,
         val list: List<BookListItemUM>,
-        val loadNewPageState: LceState<List<BookListItemUM>>
+        val loadNewPageState: LceState<List<BookListItemUM>>,
+        val isRefreshing: Boolean
     )
 }

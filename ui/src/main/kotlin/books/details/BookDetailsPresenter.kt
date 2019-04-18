@@ -2,6 +2,7 @@ package ru.appkode.base.ui.books.details
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import io.reactivex.functions.Function3
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
@@ -12,7 +13,6 @@ import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import timber.log.Timber
 
 sealed class ScreenAction
 
@@ -29,8 +29,7 @@ class BookDetailsPresenter(
     private val networkRepository: BooksNetworkRepository,
     private val localRepository: BooksLocalRepository,
     private val router: Router,
-    private val bookId: Long,
-    private val view: BookDetailsScreen.ViewControl
+    private val bookId: Long
 ) : BasePresenter<BookDetailsScreen.View, BookDetailsScreen.ViewState, ScreenAction>(schedulers){
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
@@ -43,15 +42,12 @@ class BookDetailsPresenter(
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent { networkRepository.getBookDetails(bookId).onErrorReturn { BookDetailsUM(-1) }}
-                .doLceAction { LoadBookDetails(it) }
-                .doOnError { e -> Timber.e(e.message) }
-                .onErrorReturn { e ->
-                    LoadBookDetails(LceState.Error(
-                        e.message ?: "unknown error",
-                        BookDetailsUM(-1)
-                    ))
+            intent {
+                    networkRepository.getBookDetails(bookId)
+                        .flatMap { book -> getInBaseState(book) }
+                        .onErrorReturn { null }
                 }
+                .doLceAction { LoadBookDetails(it) }
         )
     }
 
@@ -70,13 +66,31 @@ class BookDetailsPresenter(
         }
     }
 
+    private fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
+        val isInHistory = localRepository.isInHistory(book.toBookListItemUM())
+        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM())
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
     private fun processLoadBookDetails(
         previousState: BookDetailsScreen.ViewState,
         action: LoadBookDetails
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var bookDetails: BookDetailsUM? = previousState.bookDetails
-        if (action.state.isContent)
+        if (action.state.isContent) {
             bookDetails = action.state.asContent()
+        }
         return previousState.copy(
             bookDetails = bookDetails,
             bookDetailsState = action.state

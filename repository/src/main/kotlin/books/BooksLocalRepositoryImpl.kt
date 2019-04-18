@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.material.circularreveal.CircularRevealHelper
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import io.reactivex.Completable
@@ -22,8 +25,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.concurrent.thread
 
-const val BASE_IMAGE_NAME = "to_read_list_book_"
-const val IMAGE_DIR = "image_dir"
 private const val PAGE_SIZE = 20
 
 class BooksLocalRepositoryImpl(
@@ -33,12 +34,8 @@ class BooksLocalRepositoryImpl(
     private val context: Context
 ) : BooksLocalRepository {
 
-    companion object {
-        fun getImageNameById(id: Long) = BASE_IMAGE_NAME + id.toString() + "png"
-    }
-
     override fun addToWishList(book: BookListItemUM): Completable {
-        loadImg(getImageNameById(book.id))
+        loadImg(book.imagePath)
         return CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
     }
 
@@ -49,21 +46,17 @@ class BooksLocalRepositoryImpl(
     }
 
     override fun addToHistory(book: BookListItemUM): Completable {
-        loadImg(getImageNameById(book.id))
+        loadImg(book.imagePath)
         return CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
     }
 
     override fun addToHistoryFromWishList(book: BookListItemUM): Completable {
         val del = CompletableFromAction { wishListPersistence.delete(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
         val add = CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
-        loadImg(book.imagePath)
         return del.mergeWith(add)
     }
 
     override fun deleteFromWishList(book: BookListItemUM): Completable {
-        val directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE)
-        val imageFile = File(directory, book.imagePath)
-        imageFile.delete()
         return Completable.fromAction {
             wishListPersistence.delete(book.toWishListSM())
         }.subscribeOn(appSchedulers.io)
@@ -90,34 +83,38 @@ class BooksLocalRepositoryImpl(
     override fun getWishListPage(page: Int): Observable<List<BookListItemUM>> {
         return wishListPersistence
             .getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
+                limit = PAGE_SIZE,
+                offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
             )
             .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getHistoryPage(page: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = PAGE_SIZE,
+                offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
+            )
+            .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstWishListPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return wishListPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return wishListPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstHistoryPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
@@ -134,38 +131,9 @@ class BooksLocalRepositoryImpl(
     }
 
     private fun loadImg(imagePath: String?) {
-        Picasso.get().load(imagePath).into(ImageTarget(context, IMAGE_DIR, imagePath))
-    }
-}
-
-class ImageTarget(
-    context: Context,
-    imageDir: String?,
-    imageName: String?
-) : Target {
-
-    private val contextWrapper = ContextWrapper(context)
-    private val directory = contextWrapper.getDir(imageDir, Context.MODE_PRIVATE)
-    private val imgName = imageName
-
-    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-    }
-
-    override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
-    }
-
-    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        thread {
-            val imageFile = File(directory, imgName)
-            var fos: FileOutputStream? = null
-            try {
-                fos = FileOutputStream(imageFile)
-                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                fos?.close()
-            }
-        }
+        Glide.with(context)
+            .load(imagePath)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .preload()
     }
 }

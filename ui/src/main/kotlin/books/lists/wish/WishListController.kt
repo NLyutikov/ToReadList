@@ -12,7 +12,7 @@ import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 
 class WishListController : CommonListController() {
 
-    override val listAdapter: CommonListAdapter = CommonListAdapter(true)
+    override val listAdapter: CommonListAdapter = CommonListAdapter(true, true)
 
     override fun createPresenter(): CommonListPresenter {
         return WishListPresenter(
@@ -21,5 +21,13 @@ class WishListController : CommonListController() {
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
             router
         )
+    }
+
+    override fun historyIconClickedIntent(): Observable<Int> {
+        return listAdapter.historyIconClicked
+    }
+
+    override fun deleteIconClickedIntent(): Observable<Int> {
+        return listAdapter.deleteIconClicked
     }
 }
