@@ -1,16 +1,11 @@
 package ru.appkode.base.repository.books
 
 import android.content.Context
-import android.content.ContextWrapper
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.material.circularreveal.CircularRevealHelper
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import io.reactivex.internal.operators.completable.CompletableFromAction
 import ru.appkode.base.data.storage.persistence.books.HistoryPersistence
 import ru.appkode.base.data.storage.persistence.books.WishListPersistence
@@ -18,14 +13,14 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.books.lists.history.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.toHistorySM
 import ru.appkode.base.entities.core.books.lists.toWishListSM
+import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import kotlin.concurrent.thread
+import java.util.*
 
 private const val PAGE_SIZE = 20
+private const val BOTTOM_ORDER_LINE = Long.MIN_VALUE + 1
+private const val TOP_ORDER_LINE = Long.MAX_VALUE - 1
 
 class BooksLocalRepositoryImpl(
     private val appSchedulers: AppSchedulers,
@@ -45,14 +40,31 @@ class BooksLocalRepositoryImpl(
         return del.mergeWith(add)
     }
 
+//    override fun addToWishList(book: BookListItemUM, leftBook: BookListItemUM, rightBook: BookListItemUM): Completable {
+//        var newOrder = 0L
+//        if (rightBook.order!! - leftBook.order!! > 1)
+//            newOrder = (rightBook.order!! - leftBook.order!!)/2
+//        else
+//            newOrder = recalculateOrders()
+//        return Completable.fromAction { wishListPersistence.insert(book.toWishListSM(newOrder)) }
+//    }
+
     override fun addToHistory(book: BookListItemUM): Completable {
         loadImg(book.imagePath)
-        return CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+        return CompletableFromAction {
+            historyPersistence.insert(book.toHistorySM(getDateInMillis()))
+        }.subscribeOn(appSchedulers.io)
     }
 
     override fun addToHistoryFromWishList(book: BookListItemUM): Completable {
-        val del = CompletableFromAction { wishListPersistence.delete(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
-        val add = CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+        val del = CompletableFromAction {
+            wishListPersistence.delete(book.toWishListSM())
+        }.subscribeOn(appSchedulers.io)
+
+        val add = CompletableFromAction {
+            historyPersistence.insert(book.toHistorySM(getDateInMillis()))
+        }.subscribeOn(appSchedulers.io)
+
         return del.mergeWith(add)
     }
 
@@ -130,10 +142,31 @@ class BooksLocalRepositoryImpl(
             .subscribeOn(appSchedulers.io)
     }
 
+//    private fun recalculateOrders(): Completable {
+//        val wishSize = wishListPersistence.getSize()
+//        val books = wishListPersistence.getAllBooks()
+//        val newWishList =  Observable.zip(
+//            wishSize,
+//            books,
+//            BiFunction<Int, List<WishListSM>, List<WishListSM>> { size, books ->
+//                val dif = TOP_ORDER_LINE/size
+//                var currentItemOrder = BOTTOM_ORDER_LINE
+//                books.map { book ->
+//                    currentItemOrder += dif
+//                    book.copy(order = currentItemOrder)
+//                }
+//            })
+//        }
+//        return
+//    }
+
     private fun loadImg(imagePath: String?) {
         Glide.with(context)
             .load(imagePath)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .preload()
     }
+
+    private fun getDateInMillis()  = Calendar.getInstance().time.time
+
 }

@@ -11,6 +11,8 @@ interface BooksLocalRepository {
 
     fun addToWishListFromHistory(book: BookListItemUM): Completable
 
+    //fun addToWishList(book: BookListItemUM, leftOrder: Long, rightOrder: Long): Completable
+
     fun addToHistory(book: BookListItemUM): Completable
 
     fun addToHistoryFromWishList(book: BookListItemUM): Completable

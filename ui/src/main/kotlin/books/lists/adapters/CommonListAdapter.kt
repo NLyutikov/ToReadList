@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.lists
+package ru.appkode.base.ui.books.lists.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableSwipeableItemViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
@@ -14,7 +15,7 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
 
-class CommonListAdapter(
+abstract class CommonListAdapter(
     private val fromLocalDataSource: Boolean = false,
     private val draggable: Boolean = false
 ) : RecyclerView.Adapter<CommonListAdapter.ViewHolder>() {
@@ -25,7 +26,7 @@ class CommonListAdapter(
             notifyDataSetChanged()
         }
 
-    private val eventRelay: PublishRelay< Pair<Int, Int> > = PublishRelay.create()
+    val eventRelay: PublishRelay< Pair<Int, Int> > = PublishRelay.create()
 
     val itemClicked: Observable<Int> = eventRelay.filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED)
 
@@ -45,7 +46,7 @@ class CommonListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder) {
-            Glide.with(view.context)
+            Glide.with(itemView.context)
                 .load(data[position].imagePath)
                 .onlyRetrieveFromCache(fromLocalDataSource)
                 .into(image)
@@ -59,14 +60,17 @@ class CommonListAdapter(
 
     override fun getItemCount(): Int = data.size
 
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val image = view.books_list_item_image
-        val title = view.books_list_item_name
-        val rating = view.books_list_item_rating_text
-        val wishListIcon = view.books_list_item_wish_list
-        val historyIcon = view.books_list_item_history
-        val deleteIcon = view.books_list_item_delete
-        val dragIcon = view.books_list_item_drag_img
+    override fun getItemId(position: Int): Long = data[position].id
+
+    inner class ViewHolder(view: View) : AbstractDraggableSwipeableItemViewHolder(view) {
+        val container = itemView.book_list_item_container
+        val image = itemView.books_list_item_image
+        val title = itemView.books_list_item_name
+        val rating = itemView.books_list_item_rating_text
+        val wishListIcon = itemView.books_list_item_wish_list
+        val historyIcon = itemView.books_list_item_history
+        val deleteIcon = itemView.books_list_item_delete
+        val dragIcon = itemView.books_list_item_drag_img
 
         init {
             view.setOnClickListener { view ->
@@ -89,6 +93,8 @@ class CommonListAdapter(
                 )
             }
         }
+
+        override fun getSwipeableContainerView(): View = container
     }
 }
 

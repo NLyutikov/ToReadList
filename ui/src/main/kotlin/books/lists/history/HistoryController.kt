@@ -2,14 +2,15 @@ package ru.appkode.base.ui.books.lists.history
 
 import io.reactivex.Observable
 import ru.appkode.base.repository.RepositoryHelper
-import ru.appkode.base.ui.books.lists.CommonListAdapter
 import ru.appkode.base.ui.books.lists.CommonListController
 import ru.appkode.base.ui.books.lists.CommonListPresenter
+import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
+import ru.appkode.base.ui.books.lists.adapters.DragAndDrop
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 
 class HistoryController : CommonListController() {
 
-    override val listAdapter: CommonListAdapter = CommonListAdapter(true)
+    override fun getBooksListAdapter(): CommonListAdapter = HistoryAdapter()
 
     override fun createPresenter(): CommonListPresenter {
         return HistoryPresenter(
@@ -27,4 +28,8 @@ class HistoryController : CommonListController() {
     override fun deleteIconClickedIntent(): Observable<Int> {
         return listAdapter.deleteIconClicked
     }
+}
+
+class HistoryAdapter : CommonListAdapter(true), DragAndDrop {
+    override fun adapter(): CommonListAdapter = this
 }

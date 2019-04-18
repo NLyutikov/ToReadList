@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
@@ -90,7 +91,7 @@ internal class DraggableAdapter() : ListActions,
         val bookImg: ImageView = view.books_list_item_image
         val bookName: TextView = view.books_list_item_name
         val bookRating: TextView = view.books_list_item_rating_text
-        val bookCard: ConstraintLayout = view.book_list_item_card
+        val bookCard: CardView = view.book_list_item_container
 
         init {
             bookImg.setOnClickListener {

@@ -60,11 +60,11 @@ fun ShelfNM.toShelfUM(): ShelfUM {
 
 fun BookDetailsUM.toBookListItemUM(): BookListItemUM {
     return BookListItemUM(
-        id,
-        title,
-        averageRating,
-        coverImageUrl,
-        isInWishList,
-        isInWishList
+        id = id,
+        title = title,
+        averageRating = averageRating,
+        imagePath = coverImageUrl,
+        isInHistory = isInWishList,
+        isInWishList = isInWishList
     )
 }

@@ -3,10 +3,14 @@ package ru.appkode.base.ui.books.lists
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
+import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
+import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager
 import com.jakewharton.rxbinding3.recyclerview.scrollEvents
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.ui.R
+import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
@@ -21,13 +25,13 @@ abstract class CommonListController :
         }
     }
 
-    protected abstract val listAdapter: CommonListAdapter
+    protected lateinit var listAdapter: CommonListAdapter
+
+    abstract fun getBooksListAdapter(): CommonListAdapter
 
     override fun initializeView(rootView: View) {
         initSwipeRefresh()
         initRecyclerView()
-        initSwipes()
-        initDragAndDrop()
     }
 
     protected fun initSwipeRefresh() {
@@ -37,24 +41,33 @@ abstract class CommonListController :
     }
 
     protected fun initRecyclerView() = with (books_list_recycler) {
-        layoutManager = LinearLayoutManager(applicationContext!!)
-        adapter = listAdapter
-    }
+        listAdapter = getBooksListAdapter()
+        if (!listAdapter.hasStableIds())
+            listAdapter.setHasStableIds(true)
 
-    protected fun initDragAndDrop() {
-        //TODO написать иницилизацию перетаскиваний
-    }
+        val actionGuardManager = RecyclerViewTouchActionGuardManager()
+        actionGuardManager.setInterceptVerticalScrollingWhileAnimationRunning(true)
+        actionGuardManager.isEnabled = true
 
-    protected fun initSwipes() {
-        //TODO написать иницилизацию свайпов
+        val dragDropManager = RecyclerViewDragDropManager()
+        val dragDropAdapter = dragDropManager.createWrappedAdapter(listAdapter)
+
+        val animator = DraggableItemAnimator()
+        animator.supportsChangeAnimations = false
+
+        books_list_recycler.adapter = dragDropAdapter
+        books_list_recycler.itemAnimator = animator
+        books_list_recycler.layoutManager = LinearLayoutManager(applicationContext)
+
+        actionGuardManager.attachRecyclerView(books_list_recycler)
+        dragDropManager.attachRecyclerView(books_list_recycler)
     }
 
     override fun renderViewState(viewState: CommonListScreen.ViewState) {
         fieldChanged(viewState, {state ->  state.loadNewPageState}) {
             with(viewState) {
                 books_list_loading.isVisible = loadNewPageState.isLoading && list.isEmpty()
-                books_list_empty_list.isVisible =
-                     loadNewPageState.isContent && loadNewPageState.asContent().isEmpty() && list.isEmpty()
+                books_list_empty_list.isVisible = loadNewPageState.isContent && list.isEmpty()
             }
         }
 
