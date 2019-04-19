@@ -1,5 +1,8 @@
 package ru.appkode.base.ui.books.lists.wish
 
+import books.lists.adapters.Swipe
+import books.lists.adapters.SwipeActions
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction
 import io.reactivex.Observable
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.books.lists.CommonListController
@@ -30,6 +33,10 @@ class WishListController : CommonListController() {
     }
 }
 
-class WishListAdapter : CommonListAdapter(true, true), DragAndDrop {
+class WishListAdapter : CommonListAdapter(true, true), DragAndDrop, Swipe {
+    override fun delegateControlsAdapter(): CommonListAdapter = this
+
+    override fun getSwipeAction(action: () -> Unit): SwipeResultAction = SwipeActions.Remove(action)
+
     override fun adapter(): CommonListAdapter = this
 }

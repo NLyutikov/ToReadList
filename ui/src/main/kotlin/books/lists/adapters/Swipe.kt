@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDoNothing
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionRemoveItem
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 
 interface Swipe : SwipeableItemAdapter<CommonListAdapter.ViewHolder> {
@@ -19,14 +21,16 @@ interface Swipe : SwipeableItemAdapter<CommonListAdapter.ViewHolder> {
         position: Int, result: Int
     ): SwipeResultAction? =
         when (result) {
-//            SwipeableItemConstants.RESULT_SWIPED_RIGHT -> getSwipeAction {
-//                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_RIGHT to position)
-//            }
-//            SwipeableItemConstants.RESULT_SWIPED_LEFT -> getSwipeAction {
-//                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_LEFT to position)
-//            }
+            SwipeableItemConstants.RESULT_SWIPED_RIGHT -> getSwipeAction {
+                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_RIGHT to position)
+            }
+            SwipeableItemConstants.RESULT_SWIPED_LEFT -> getSwipeAction {
+                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_LEFT to position)
+            }
             else -> null
         }
+
+    fun getSwipeAction(action: () -> Unit): SwipeResultAction
 
     override fun onGetSwipeReactionType(
         holder: CommonListAdapter.ViewHolder,
@@ -37,6 +41,18 @@ interface Swipe : SwipeableItemAdapter<CommonListAdapter.ViewHolder> {
     @SuppressLint("SwitchIntDef")
     override fun onSetSwipeBackground(holder: CommonListAdapter.ViewHolder, position: Int, type: Int) {
     }
+}
+
+object SwipeActions {
+
+    class Remove(private val action: () -> Unit) : SwipeResultActionRemoveItem() {
+        override fun onPerformAction() = action.invoke()
+    }
+
+    class DoNothing(private val action: () -> Unit) : SwipeResultActionDoNothing() {
+        override fun onPerformAction() = action.invoke()
+    }
+
 }
 
 const val EVENT_ID_ITEM_SWIPED_LEFT = 7

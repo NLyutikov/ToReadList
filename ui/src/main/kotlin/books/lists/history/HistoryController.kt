@@ -1,6 +1,8 @@
 package ru.appkode.base.ui.books.lists.history
 
 import books.lists.adapters.Swipe
+import books.lists.adapters.SwipeActions
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction
 import io.reactivex.Observable
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.books.lists.CommonListController
@@ -32,4 +34,5 @@ class HistoryController : CommonListController() {
 
 class HistoryAdapter : CommonListAdapter(true), Swipe {
     override fun delegateControlsAdapter(): CommonListAdapter = this
+    override fun getSwipeAction(action: () -> Unit): SwipeResultAction = SwipeActions.Remove(action)
 }
