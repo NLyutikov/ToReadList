@@ -6,7 +6,6 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.lists.*
-import ru.appkode.base.ui.books.lists.adapters.DragAndDrop
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
@@ -37,18 +36,12 @@ class WishListPresenter(
         return booksLocalRepository.getFirstWishListPages(numPages)
     }
 
-    override fun processItemSwipedLeft(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeft
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to null //TODO релизовать свайпы
+    override fun bindItemSwipedLeft(): Observable<out ScreenAction> {
+        return intent(CommonListScreen.View::itemSwipedLeftIntent).map { DeleteFromWishList(it) }
     }
 
-    override fun processItemSwipedRight(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRight
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to null //TODO релизовать свайпы
+    override fun bindItemSwipedRight(): Observable<out ScreenAction> {
+        return intent(CommonListScreen.View::itemSwipedRightIntent).map { AddToHistory(it) }
     }
 
     override fun processAddToHistory(

@@ -18,8 +18,6 @@ sealed class ScreenAction
 
 data class LoadNextPage(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 data class ItemClicked(val position: Int) : ScreenAction()
-data class ItemSwipedLeft(val position: Int) : ScreenAction()
-data class ItemSwipedRight(val position: Int) : ScreenAction()
 object UpdateData : ScreenAction()
 data class UpdateDataState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 object Refreshing : ScreenAction()
@@ -43,18 +41,20 @@ abstract class CommonListPresenter(
         return listOf(
             intent(CommonListScreen.View::itemClickedIntent)
                 .map { position -> ItemClicked(position) },
-            intent(CommonListScreen.View::itemSwipedLeftIntent)
-                .map { position -> ItemSwipedLeft(position) },
-            intent(CommonListScreen.View::itemSwipedRightIntent)
-                .map { position -> ItemSwipedRight(position) },
             intent(CommonListScreen.View::loadNextPageOfBooksIntent)
                 .flatMap { page -> loadNextPage(page) }
                 .doLceAction { lceState ->  LoadNextPage(lceState)},
             intent(CommonListScreen.View::refreshIntent)
                 .map { Refreshing },
+            bindItemSwipedLeft(),
+            bindItemSwipedRight(),
             intent { Observable.just(UpdateData) }
         )
     }
+
+    abstract fun bindItemSwipedLeft(): Observable<out ScreenAction>
+
+    abstract fun bindItemSwipedRight(): Observable<out ScreenAction>
 
     override fun reduceViewState(
         previousState: CommonListScreen.ViewState,
@@ -63,8 +63,6 @@ abstract class CommonListPresenter(
         return when(action) {
             is LoadNextPage -> processLoadNextPage(previousState, action)
             is ItemClicked -> processItemClicked(previousState, action)
-            is ItemSwipedLeft -> processItemSwipedLeft(previousState, action)
-            is ItemSwipedRight -> processItemSwipedRight(previousState, action)
             is UpdateData -> processUpdateData(previousState)
             is UpdateDataState -> processUpdateDataState(previousState, action)
             is Refreshing -> processRefreshing(previousState)
@@ -220,16 +218,6 @@ abstract class CommonListPresenter(
     abstract fun processDeleteFromWishList(
         previousState: CommonListScreen.ViewState,
         action: DeleteFromWishList
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
-
-    abstract fun processItemSwipedLeft(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeft
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
-
-    abstract fun processItemSwipedRight(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRight
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?>
 
     protected open fun processChangeList(

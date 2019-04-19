@@ -4,7 +4,6 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
 import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
-import ru.appkode.base.ui.books.lists.ItemSwipedLeft
 import ru.appkode.base.ui.books.utils.UiUtils
 
 interface DragAndDrop : DraggableItemAdapter<CommonListAdapter.ViewHolder> {
