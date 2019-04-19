@@ -3,8 +3,11 @@ package ru.appkode.base.ui.books.lists
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import books.lists.adapters.EVENT_ID_ITEM_SWIPED_LEFT
+import books.lists.adapters.EVENT_ID_ITEM_SWIPED_RIGHT
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager
 import com.jakewharton.rxbinding3.recyclerview.scrollEvents
 import io.reactivex.Observable
@@ -52,16 +55,20 @@ abstract class CommonListController :
 
         val dragDropManager = RecyclerViewDragDropManager()
         val dragDropAdapter = dragDropManager.createWrappedAdapter(listAdapter)
+        val swipeManager = RecyclerViewSwipeManager()
+        val swipeDragAdapter =
+            swipeManager.createWrappedAdapter(dragDropAdapter)
 
         val animator = DraggableItemAnimator()
         animator.supportsChangeAnimations = false
 
-        books_list_recycler.adapter = dragDropAdapter
+        books_list_recycler.adapter = swipeDragAdapter
         books_list_recycler.itemAnimator = animator
         books_list_recycler.layoutManager = LinearLayoutManager(applicationContext)
 
         actionGuardManager.attachRecyclerView(books_list_recycler)
         dragDropManager.attachRecyclerView(books_list_recycler)
+        swipeManager.attachRecyclerView(books_list_recycler)
     }
 
     override fun renderViewState(viewState: CommonListScreen.ViewState) {
@@ -114,11 +121,11 @@ abstract class CommonListController :
     }
 
     override fun itemSwipedLeftIntent(): Observable<Int> {
-        return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
+        return listAdapter.eventRelay.filterEvents(EVENT_ID_ITEM_SWIPED_LEFT)
     }
 
     override fun itemSwipedRightIntent(): Observable<Int> {
-        return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
+        return listAdapter.eventRelay.filterEvents(EVENT_ID_ITEM_SWIPED_RIGHT)
     }
 
     override fun itemDroppedIntent(): Observable<DropItemInfo> {

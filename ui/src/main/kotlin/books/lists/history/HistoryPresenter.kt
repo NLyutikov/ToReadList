@@ -34,18 +34,12 @@ class HistoryPresenter(
         return booksLocalRepository.getFirstHistoryPages(numPages)
     }
 
-    override fun processItemSwipedLeft(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedLeft
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to null //TODO релизовать свайпы
+    override fun bindItemSwipedLeft(): Observable<out ScreenAction> {
+        return intent(CommonListScreen.View::itemSwipedLeftIntent).map { AddToWishList(it) }
     }
 
-    override fun processItemSwipedRight(
-        previousState: CommonListScreen.ViewState,
-        action: ItemSwipedRight
-    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to null //TODO релизовать свайпы
+    override fun bindItemSwipedRight(): Observable<out ScreenAction> {
+        return intent(CommonListScreen.View::itemSwipedRightIntent).map { DeleteFromHistory(it) }
     }
 
     override fun processAddToHistory(

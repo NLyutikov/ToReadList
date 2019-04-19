@@ -1,9 +1,6 @@
 package ru.appkode.base.ui.books.lists.wish
 
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction
-import com.jakewharton.rxbinding3.recyclerview.scrollEvents
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.books.lists.CommonListController
 import ru.appkode.base.ui.books.lists.CommonListPresenter
