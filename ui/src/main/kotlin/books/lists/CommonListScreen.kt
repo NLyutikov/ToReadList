@@ -2,6 +2,7 @@ package ru.appkode.base.ui.books.lists
 
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
+import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.MviView
 
@@ -15,6 +16,7 @@ interface CommonListScreen {
         fun historyIconClickedIntent(): Observable<Int>
         fun wishListIconCickedIntent(): Observable<Int>
         fun deleteIconClickedIntent(): Observable<Int>
+        fun itemDroppedIntent(): Observable<DropItemInfo>
     }
 
     data class ViewState(

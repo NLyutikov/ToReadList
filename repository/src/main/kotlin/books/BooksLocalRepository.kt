@@ -11,6 +11,14 @@ interface BooksLocalRepository {
 
     fun addToWishListFromHistory(book: BookListItemUM): Completable
 
+    fun changeItemOrderInWishList(
+        oldPos: Int,
+        newPos: Int,
+        book: BookListItemUM,
+        left: BookListItemUM?,
+        right: BookListItemUM?
+    ): Observable<List<BookListItemUM>>
+
     fun addToHistory(book: BookListItemUM): Completable
 
     fun addToHistoryFromWishList(book: BookListItemUM): Completable
@@ -34,5 +42,11 @@ interface BooksLocalRepository {
     fun isInHistory(book: BookListItemUM): Observable<Boolean>
 
     fun isInWishList(book: BookListItemUM): Observable<Boolean>
+
+    fun getMaxOrder(): Observable<Long?>
+
+    fun getWishListSize(): Observable<Int>
+
+    fun deleteAllFromWishList(): Completable
 
 }

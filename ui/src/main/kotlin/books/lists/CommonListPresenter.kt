@@ -6,6 +6,7 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.details.BookDetailsController
+import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
@@ -28,6 +29,8 @@ data class AddToWishList(val position: Int) : ScreenAction()
 data class DeleteFromHistory(val position: Int) : ScreenAction()
 data class DeleteFromWishList(val position: Int) : ScreenAction()
 data class ChangeList(val changeAction: (List<BookListItemUM>) -> (List<BookListItemUM>)) : ScreenAction()
+data class ChangeItemPosition(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+data class ItemDropped(val dropInfo: DropItemInfo) : ScreenAction()
 
 abstract class CommonListPresenter(
     schedulers: AppSchedulers,
@@ -71,6 +74,8 @@ abstract class CommonListPresenter(
             is DeleteFromHistory -> processDeleteFromHistory(previousState, action)
             is DeleteFromWishList -> processDeleteFromWishList(previousState, action)
             is ChangeList -> processChangeList(previousState, action)
+            is ItemDropped -> processItemDropped(previousState, action)
+            is ChangeItemPosition -> processChangeItemPosition(previousState, action)
         }
     }
 
@@ -158,6 +163,44 @@ abstract class CommonListPresenter(
             isRefreshing = isRefreshing
         ) to null
     }
+
+    protected fun processItemDropped(
+        previousState: CommonListScreen.ViewState,
+        action: ItemDropped
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        if (action.dropInfo.from != action.dropInfo.newPos) {
+            val newList = ArrayList(list)
+            newList.removeAt(action.dropInfo.from)
+            newList.add(action.dropInfo.newPos, list[action.dropInfo.from])
+            list = newList.toList()
+        }
+        return previousState.copy(
+            list = list
+        ) to command(
+            booksLocalRepository.changeItemOrderInWishList(
+                    oldPos = action.dropInfo.from,
+                    newPos = action.dropInfo.newPos,
+                    book = action.dropInfo.item,
+                    left = action.dropInfo.left,
+                    right = action.dropInfo.right
+                )
+                .doLceAction { ChangeItemPosition(it) }
+        )
+    }
+
+    protected  fun processChangeItemPosition(
+        previousState: CommonListScreen.ViewState,
+        action: ChangeItemPosition
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        if (action.state.isContent) {
+            if (action.state.asContent().isNotEmpty())
+                list = action.state.asContent()
+        }
+        return previousState.copy(list = list) to null
+    }
+
 
     abstract fun processAddToHistory(
         previousState: CommonListScreen.ViewState,

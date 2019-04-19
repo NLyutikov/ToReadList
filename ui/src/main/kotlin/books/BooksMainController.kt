@@ -3,7 +3,6 @@ package ru.appkode.base.ui.books
 import android.view.MenuItem
 import android.view.View
 import com.bluelinelabs.conductor.Router
-import com.bluelinelabs.conductor.RouterTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
@@ -79,4 +78,3 @@ const val EVENT_ID_SHOW_LIST = 200
 
 const val WISH_LIST_CONTROLLER_TAG = "1"
 const val HISTORY_CONTROLLER_TAG = "2"
-

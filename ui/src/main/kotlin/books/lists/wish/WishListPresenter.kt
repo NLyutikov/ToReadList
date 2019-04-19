@@ -6,6 +6,7 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.lists.*
+import ru.appkode.base.ui.books.lists.adapters.DragAndDrop
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
@@ -22,7 +23,9 @@ class WishListPresenter(
             intent(CommonListScreen.View::historyIconClickedIntent)
                 .map { AddToHistory(it) },
             intent(CommonListScreen.View::deleteIconClickedIntent)
-                .map { DeleteFromWishList(it) }
+                .map { DeleteFromWishList(it) },
+            intent(CommonListScreen.View::itemDroppedIntent)
+                .map { ItemDropped(it) }
         ).plus(super.createIntents())
     }
 

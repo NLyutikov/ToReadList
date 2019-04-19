@@ -67,8 +67,8 @@ class BookDetailsPresenter(
     }
 
     private fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
-        val isInHistory = localRepository.isInHistory(book.toBookListItemUM())
-        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM())
+        val isInHistory = localRepository.isInHistory(book.toBookListItemUM()).onErrorReturn { false }
+        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM()).onErrorReturn { false }
         val mBook = Observable.just(book)
         return  Observable.zip(
             mBook,

@@ -9,7 +9,7 @@ import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 
 
 private const val DATABASE_VERSION = 1
-const val DATABASE_NAME = "to_read.db"
+const val DATABASE_NAME = "content.db"
 
 @Database(
   entities = [WishListSM::class, HistorySM::class],

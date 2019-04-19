@@ -16,13 +16,19 @@ interface WishListPersistence : BasePersistence<WishListSM> {
     @Query("SELECT COUNT(id) FROM wish_list WHERE id=:bookId")
     fun countNumById(bookId: Long): Observable<Int>
 
-    @Query("SELECT * FROM wish_list")
+    @Query("SELECT * FROM wish_list ORDER BY priority DESC")
     fun getAllBooks(): Observable<List<WishListSM>>
 
-    @Query("SELECT * FROM wish_list LIMIT :limit OFFSET  :offset")
+    @Query("SELECT * FROM wish_list ORDER BY priority DESC LIMIT :limit OFFSET  :offset")
     fun getBooks(limit: Int, offset: Int): Observable<List<WishListSM>>
 
     @Query("SELECT COUNT(id) FROM wish_list")
     fun getSize(): Observable<Int>
+
+    @Query("SELECT MAX(priority) FROM wish_list")
+    fun getMaxOrder(): Observable<Long?>
+
+    @Query("DELETE FROM wish_list")
+    fun deleteAll()
 
 }

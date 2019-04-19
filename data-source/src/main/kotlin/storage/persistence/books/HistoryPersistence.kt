@@ -17,10 +17,10 @@ interface HistoryPersistence : BasePersistence<HistorySM>{
     @Query("SELECT COUNT(id) FROM history WHERE id=:bookId")
     fun countNumById(bookId: Long): Observable<Int>
 
-    @Query("SELECT * FROM history")
+    @Query("SELECT * FROM history ORDER BY date DESC ")
     fun getAllBooks(): Observable<List<HistorySM>>
 
-    @Query("SELECT * FROM history LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM history ORDER BY date DESC LIMIT :limit OFFSET :offset")
     fun getBooks(limit: Int, offset: Int): Observable<List<HistorySM>>
 
     @Query("SELECT COUNT(id) FROM history")
