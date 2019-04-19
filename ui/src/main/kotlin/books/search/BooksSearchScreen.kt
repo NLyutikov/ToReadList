@@ -1,6 +1,7 @@
 package ru.appkode.base.ui.books.search
 
 import io.reactivex.Observable
+import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.MviView
@@ -15,7 +16,7 @@ interface BooksSearchScreen {
     }
 
     data class ViewState(
-        val booksSearchState: LceState<List<BookUM>>,
+        val booksSearchState: LceState<List<BookListItemUM>>,
         val url: String?,
         val query: String?
     )
