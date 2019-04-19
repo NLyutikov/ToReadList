@@ -89,9 +89,16 @@ class BooksLocalRepositoryImpl(
                 .subscribeOn(appSchedulers.io)
                 .flatMap { getWishList() }
         }
+//
+//        recalculateOrders(oldPos, newPos, book.toWishListSM())
+//            .singleOrError()
+//            .map {
+//                wishListPersistence.deleteAll()
+//                it
+//            }
         return recalculateOrders(oldPos, newPos, book.toWishListSM())
-            .flatMap { books -> Observable.fromCallable { wishListPersistence.insert(*books.toTypedArray()) }.subscribeOn(appSchedulers.io) }
-            .flatMap { getWishList() }
+            .map { books -> wishListPersistence.insert(*books.toTypedArray()) }
+            .concatMap { getWishList() }
     }
 
     override fun addToHistory(book: BookListItemUM): Completable {

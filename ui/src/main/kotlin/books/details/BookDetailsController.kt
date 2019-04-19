@@ -130,7 +130,7 @@ class BookDetailsController :
             .into(book_details_cover_image)
     }
 
-    fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
+    private fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
         book_details_add_to_want_to_read_btn.isVisible = isInWishList || !isInHistory && !isInWishList
         book_details_add_to_history_btn.isVisible = isInHistory || !isInHistory && !isInWishList
 
@@ -146,6 +146,10 @@ class BookDetailsController :
                 book_details_add_to_want_to_read_btn.setImageResource(R.drawable.outline_turned_in_24)
             }
         }
+    }
+
+    override fun reloadBookDetails(): Observable<Unit> {
+        return network_error_screen_reload_btn.clicks()
     }
 
     override fun showSimilarBookIntent(): Observable<Long> {
