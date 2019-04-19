@@ -26,7 +26,7 @@ abstract class CommonListAdapter(
             notifyDataSetChanged()
         }
 
-    val eventRelay: PublishRelay< Pair<Int, Int> > = PublishRelay.create()
+    val eventRelay: PublishRelay< Pair<Int, Any> > = PublishRelay.create()
 
     val itemClicked: Observable<Int> = eventRelay.filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED)
 
@@ -38,6 +38,12 @@ abstract class CommonListAdapter(
 
     val deleteIconClicked: Observable<Int> = eventRelay
         .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED)
+
+    val itemDropped: Observable<DropItemInfo> =
+        eventRelay.filterEvents<Pair<Int, Int>>(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED)
+            .flatMap {
+                Observable.just(getDropItemInfo(it.first, it.second))
+            }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.books_list_item, parent, false)
@@ -61,6 +67,36 @@ abstract class CommonListAdapter(
     override fun getItemCount(): Int = data.size
 
     override fun getItemId(position: Int): Long = data[position].id
+
+    fun getDropItemInfo(
+        from: Int,
+        to: Int
+    ): DropItemInfo {
+        val item = data[from]
+        var top: BookListItemUM? = null
+        var bottom: BookListItemUM? = null
+        when {
+            to > 0 && to < data.size - 1 -> {
+                when {
+                    to - from < 0 -> {
+                        top = data[to - 1]
+                        bottom = data[to]
+                    }
+                    to - from > 0 -> {
+                        top = data[to]
+                        bottom = data[to + 1]
+                    }
+                    to - from == 0 -> {
+                        top = data[to - 1]
+                        bottom = data[to + 1]
+                    }
+                }
+            }
+            to == 0 -> bottom = data[to]
+            to == data.size - 1 -> top = data[to]
+        }
+        return DropItemInfo(from, to, item, bottom, top)
+    }
 
     inner class ViewHolder(view: View) : AbstractDraggableSwipeableItemViewHolder(view) {
         val container = itemView.book_list_item_container
@@ -102,3 +138,4 @@ const val COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED = 12
 const val COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED = 13
 const val COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED = 14
 const val COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED = 15
+const val COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED = 16

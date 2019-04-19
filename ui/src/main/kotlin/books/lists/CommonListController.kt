@@ -11,6 +11,7 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
+import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
@@ -118,6 +119,10 @@ abstract class CommonListController :
 
     override fun itemSwipedRightIntent(): Observable<Int> {
         return Observable.just(1) //TODO должени возвращать Observable< Позиция свайпнутого элемента >
+    }
+
+    override fun itemDroppedIntent(): Observable<DropItemInfo> {
+        return listAdapter.itemDropped
     }
 
     override fun historyIconClickedIntent(): Observable<Int> {

@@ -3,6 +3,8 @@ package ru.appkode.base.ui.books.lists.adapters
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
 import kotlinx.android.synthetic.main.books_list_item.view.*
+import ru.appkode.base.entities.core.books.lists.BookListItemUM
+import ru.appkode.base.ui.books.lists.ItemSwipedLeft
 import ru.appkode.base.ui.books.utils.UiUtils
 
 interface DragAndDrop : DraggableItemAdapter<CommonListAdapter.ViewHolder> {
@@ -20,7 +22,10 @@ interface DragAndDrop : DraggableItemAdapter<CommonListAdapter.ViewHolder> {
 
     override fun onMoveItem(fromPosition: Int, toPosition: Int) {}
 
-    override fun onItemDragFinished(start: Int, end: Int, result: Boolean) = Unit
+    override fun onItemDragFinished(start: Int, end: Int, result: Boolean) {
+        if (result)
+            adapter().eventRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED to Pair<Int, Int>(start, end))
+    }
 
     override fun onCheckCanStartDrag(holder: CommonListAdapter.ViewHolder, position: Int, x: Int, y: Int): Boolean {
         val offsetX = holder.itemView.book_list_item_container.left +
@@ -31,4 +36,13 @@ interface DragAndDrop : DraggableItemAdapter<CommonListAdapter.ViewHolder> {
 
         return UiUtils.hitTest(holder.itemView.books_list_item_drag_img, x - offsetX, y - offsetY)
     }
+
 }
+
+data class DropItemInfo(
+    val from: Int,
+    val newPos: Int,
+    val item: BookListItemUM,
+    val left: BookListItemUM?,
+    val right: BookListItemUM?
+)

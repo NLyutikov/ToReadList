@@ -13,5 +13,6 @@ data class WishListSM (
     val averageRating: Double? = null,
     @ColumnInfo(name = "image_path")
     val imagePath: String? = null,
+    @ColumnInfo(name = "priority")
     val order: Long? = null
 )

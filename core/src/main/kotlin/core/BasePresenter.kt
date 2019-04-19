@@ -5,7 +5,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.internal.operators.observable.ObservableFromCallable
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.skipFirstIf
 import ru.appkode.base.ui.core.core.util.toLceEventObservable

@@ -5,7 +5,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 import io.reactivex.internal.operators.completable.CompletableFromAction
 import ru.appkode.base.data.storage.persistence.books.HistoryPersistence
 import ru.appkode.base.data.storage.persistence.books.WishListPersistence
@@ -17,10 +18,12 @@ import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 private const val PAGE_SIZE = 20
 private const val BOTTOM_ORDER_LINE = Long.MIN_VALUE + 1
 private const val TOP_ORDER_LINE = Long.MAX_VALUE - 1
+private const val FIRST_ITEM_ORDER = 1L
 
 class BooksLocalRepositoryImpl(
     private val appSchedulers: AppSchedulers,
@@ -31,23 +34,65 @@ class BooksLocalRepositoryImpl(
 
     override fun addToWishList(book: BookListItemUM): Completable {
         loadImg(book.imagePath)
-        return CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        val book = Observable.just(book)
+        val wishListSize = getWishListSize()
+//        val add = getWishListSize()
+//            .flatMap { size ->
+//                Timber.e("size $size")
+//                if (size > 0)
+//                    getMaxOrder()
+//                else
+//                    Observable.just(BOTTOM_ORDER_LINE)
+//            }.flatMap { maxOrder ->
+//                Timber.e("max $maxOrder")
+//                Observable.fromCallable { wishListPersistence.insert(book.toWishListSM(TOP_ORDER_LINE / 2 + maxOrder / 2)) }
+//            }.subscribeOn(appSchedulers.io)
+//        return Completable.fromObservable<Unit> { add }
+        val maxOrder = getMaxOrder()
+        return Completable.fromObservable<Unit> (
+            Observable.zip(
+                book,
+                wishListSize,
+                maxOrder,
+                Function3<BookListItemUM, Int, Long?, Unit> { book, size, maxOrder ->
+                    var newOrder = FIRST_ITEM_ORDER
+                    if (size > 0)
+                        newOrder = TOP_ORDER_LINE / 2 + maxOrder / 2
+                    return@Function3 wishListPersistence.insert(book.toWishListSM(newOrder))
+                }).subscribeOn(appSchedulers.io)
+        ).subscribeOn(appSchedulers.io)
     }
 
     override fun addToWishListFromHistory(book: BookListItemUM): Completable {
-        val add = CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        val add = addToWishList(book)
         val del = CompletableFromAction { historyPersistence.delete(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
         return del.mergeWith(add)
     }
 
-//    override fun addToWishList(book: BookListItemUM, leftBook: BookListItemUM, rightBook: BookListItemUM): Completable {
-//        var newOrder = 0L
-//        if (rightBook.order!! - leftBook.order!! > 1)
-//            newOrder = (rightBook.order!! - leftBook.order!!)/2
-//        else
-//            newOrder = recalculateOrders()
-//        return Completable.fromAction { wishListPersistence.insert(book.toWishListSM(newOrder)) }
-//    }
+    override fun changeItemOrderInWishList(
+        oldPos: Int,
+        newPos: Int,
+        book: BookListItemUM,
+        bottom: BookListItemUM?,
+        top: BookListItemUM?
+    ): Observable<List<BookListItemUM>> {
+        var newOrder = 0L
+        when {
+            top == null && bottom == null -> newOrder = FIRST_ITEM_ORDER
+            top != null && bottom != null -> newOrder =  top.order!! / 2 + bottom.order!! / 2
+            bottom != null -> newOrder = TOP_ORDER_LINE / 2 + bottom.order!! / 2
+            top != null -> newOrder = top.order!! / 2 + BOTTOM_ORDER_LINE / 2
+        }
+        if (newOrder != 0L) {
+            val bookWithNewOrder = book.copy(order = newOrder)
+            return Observable.fromCallable { wishListPersistence.update(bookWithNewOrder.toWishListSM()) }
+                .subscribeOn(appSchedulers.io)
+                .flatMap { getWishList() }
+        }
+        return recalculateOrders(oldPos, newPos, book.toWishListSM())
+            .flatMap { books -> Observable.fromCallable { wishListPersistence.insert(*books.toTypedArray()) }.subscribeOn(appSchedulers.io) }
+            .flatMap { getWishList() }
+    }
 
     override fun addToHistory(book: BookListItemUM): Completable {
         loadImg(book.imagePath)
@@ -61,9 +106,7 @@ class BooksLocalRepositoryImpl(
             wishListPersistence.delete(book.toWishListSM())
         }.subscribeOn(appSchedulers.io)
 
-        val add = CompletableFromAction {
-            historyPersistence.insert(book.toHistorySM(getDateInMillis()))
-        }.subscribeOn(appSchedulers.io)
+        val add = addToHistory(book)
 
         return del.mergeWith(add)
     }
@@ -142,23 +185,46 @@ class BooksLocalRepositoryImpl(
             .subscribeOn(appSchedulers.io)
     }
 
-//    private fun recalculateOrders(): Completable {
-//        val wishSize = wishListPersistence.getSize()
-//        val books = wishListPersistence.getAllBooks()
-//        val newWishList =  Observable.zip(
-//            wishSize,
-//            books,
-//            BiFunction<Int, List<WishListSM>, List<WishListSM>> { size, books ->
-//                val dif = TOP_ORDER_LINE/size
-//                var currentItemOrder = BOTTOM_ORDER_LINE
-//                books.map { book ->
-//                    currentItemOrder += dif
-//                    book.copy(order = currentItemOrder)
-//                }
-//            })
-//        }
-//        return
-//    }
+    override fun getMaxOrder(): Observable<Long?> {
+        return wishListPersistence.getMaxOrder()
+            .timeout(1, TimeUnit.SECONDS)
+            .subscribeOn(appSchedulers.io)
+            .onErrorReturn { BOTTOM_ORDER_LINE }
+    }
+
+    override fun getWishListSize(): Observable<Int> {
+        return wishListPersistence.getSize().subscribeOn(appSchedulers.io).onErrorReturn { 0 }
+    }
+
+    override fun deleteAllFromWishList(): Completable {
+        return Completable.fromAction { wishListPersistence.deleteAll() }.subscribeOn(appSchedulers.io)
+    }
+
+    private fun recalculateOrders(oldPos: Int, newPos: Int, item: WishListSM): Observable<List<WishListSM>> {
+        val wishSize = wishListPersistence.getSize().subscribeOn(appSchedulers.io)
+        val books = wishListPersistence.getAllBooks().subscribeOn(appSchedulers.io).timeout(1, TimeUnit.SECONDS)
+        val pos = Observable.just(newPos)
+        val book = Observable.just(item)
+        return Observable.zip(
+            wishSize,
+            books,
+            pos,
+            book,
+            Function4<Int, List<WishListSM>, Int, WishListSM, List<WishListSM>> { size, books, pos, book->
+                val dif = TOP_ORDER_LINE / (size + 1) * 2
+                var currentItemOrder = BOTTOM_ORDER_LINE
+
+                val list = ArrayList(books)
+                list.removeAt(oldPos)
+                list.add(newPos, books[oldPos])
+
+                val recalcBooks  = list.toList()
+                return@Function4 recalcBooks.map { item ->
+                    currentItemOrder += dif
+                    item.copy(order = currentItemOrder)
+                }
+            })
+    }
 
     private fun loadImg(imagePath: String?) {
         Glide.with(context)
