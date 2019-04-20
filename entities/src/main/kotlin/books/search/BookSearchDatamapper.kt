@@ -1,16 +1,19 @@
 package ru.appkode.base.entities.core.books.search
 
-fun BookSearchNM.toUiModel(): List<BookUM> {
+import ru.appkode.base.entities.core.books.lists.BookListItemUM
+
+fun BookSearchNM.toUiModel(): List<BookListItemUM> {
     return this.work.orEmpty().map { it.toUiModel() }
 }
 
-fun SearchResultNM.toUiModel(): BookUM {
-    return BookUM(
+fun SearchResultNM.toUiModel(): BookListItemUM {
+    return BookListItemUM(
         id,
         title,
-        image_url,
         average_rating,
-        isInWish = false,
-        isInHistory = false
+        image_url,
+        isInWishList = false,
+        isInHistory = false,
+        order = null
     )
 }

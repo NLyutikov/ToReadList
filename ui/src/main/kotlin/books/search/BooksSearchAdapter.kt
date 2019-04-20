@@ -10,13 +10,13 @@ import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
-import ru.appkode.base.entities.core.books.search.BookUM
+import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.util.filterEvents
 
 class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>() {
 
-    var data: List<BookUM> = emptyList()
+    var data: List<BookListItemUM> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -35,7 +35,7 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
 
     override fun onBindViewHolder(holder: BooksSearchAdapter.ViewHolder, position: Int) {
         with(holder) {
-            Picasso.get().load(data[position].imgPath).into(bookImg)
+            Picasso.get().load(data[position].imagePath).into(bookImg)
             bookName.text = data[position].title
             bookRating.text = data[position].averageRating.toString()
         }
@@ -48,9 +48,9 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
 
         init {
             bookImg.setOnClickListener {
-                eventsRelay.accept(EVENT_ID_IMAGE_CLICKED to data[adapterPosition].imgPath!!)
+                eventsRelay.accept(EVENT_ID_IMAGE_CLICKED to data[adapterPosition].imagePath!!)
             }
-            view.setOnClickListener {v ->
+            view.setOnClickListener { v ->
                 if (v !is ImageView)
                     eventsRelay.accept(EVENT_ID_ITEM_CLICKED to data[adapterPosition].id!!)
             }
