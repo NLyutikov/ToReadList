@@ -38,6 +38,8 @@ class BooksSearchController :
     override fun initializeView(rootView: View) {
         books_search_toolbar.setNavigationOnClickListener { router.handleBack() }
 
+        books_search_swipe_refresh.setOnRefreshListener { eventsRelay.accept(EVENT_ID_IMAGE_REFRESH to Unit) }
+
         books_search_toolbar_search.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
@@ -55,7 +57,8 @@ class BooksSearchController :
 
     override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
         fieldChanged(viewState, { it.booksSearchState }) {
-            books_search_loading.isVisible = viewState.booksSearchState.isLoading && viewState.list.isEmpty()
+            books_search_loading.isVisible =
+                viewState.booksSearchState.isLoading && viewState.list.isEmpty() && !viewState.isRefreshing
             books_search_recycler.isVisible = !viewState.list.isEmpty()
             network_error_screen_container.isVisible = viewState.booksSearchState.isError && !viewState.list.isEmpty()
         }
@@ -72,6 +75,10 @@ class BooksSearchController :
                 }
                 .withDismissListener { eventsRelay.accept(EVENT_ID_IMAGE_DISMISS to Unit) }
                 .show()
+        }
+
+        fieldChanged(viewState, { it.isRefreshing }) {
+            books_search_swipe_refresh.isRefreshing = viewState.isRefreshing
         }
     }
 
@@ -102,6 +109,10 @@ class BooksSearchController :
 
     override fun repeatSearchIntent(): Observable<Unit> {
         return network_error_screen_reload_btn.clicks()
+    }
+
+    override fun refreshIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(EVENT_ID_IMAGE_REFRESH)
     }
 
     override fun loadPageIntent(): Observable<Pair<String, Int>> {
@@ -137,3 +148,4 @@ class SearchAdapter : CommonListAdapter()
 
 private const val EVENT_ID_SEARCH_CHANGED = 0
 private const val EVENT_ID_IMAGE_DISMISS = 1
+private const val EVENT_ID_IMAGE_REFRESH = 3

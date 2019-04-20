@@ -14,6 +14,7 @@ interface BooksSearchScreen {
         fun repeatSearchIntent(): Observable<Unit>
         fun itemClickedIntent(): Observable<Int>
         fun loadPageIntent(): Observable<Pair<String, Int>>
+        fun refreshIntent(): Observable<Unit>
     }
 
     data class ViewState(
@@ -21,6 +22,7 @@ interface BooksSearchScreen {
         val url: String?,
         val query: String?,
         val page: Int,
-        val list: List<BookListItemUM>
+        val list: List<BookListItemUM>,
+        val isRefreshing: Boolean
     )
 }

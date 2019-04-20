@@ -20,6 +20,7 @@ data class ShowImage(val url: String) : ScreenAction()
 object DismissImage : ScreenAction()
 object RepeatSearch : ScreenAction()
 data class ItemClicked(val position: Int) : ScreenAction()
+object Refresh : ScreenAction()
 
 class BooksSearchPresenter(
     schedulers: AppSchedulers,
@@ -31,7 +32,7 @@ class BooksSearchPresenter(
         return listOf(
             intent(View::searchBookIntent)
                 .map { SearchBook(it) }
-                .debounce(200, TimeUnit.MILLISECONDS)
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged(),
             intent(View::loadPageIntent)
                 .map { LoadPage(it.first, it.second) },
@@ -42,7 +43,9 @@ class BooksSearchPresenter(
             intent(View::repeatSearchIntent)
                 .map { RepeatSearch },
             intent(View::itemClickedIntent)
-                .map { ItemClicked(it) }
+                .map { ItemClicked(it) },
+            intent(View::refreshIntent)
+                .map { Refresh }
         )
     }
 
@@ -58,11 +61,16 @@ class BooksSearchPresenter(
             is LoadPage -> processLoadPage(previousState, action)
             is ItemClicked -> processItemClicked(previousState, action)
             is LoadPageState -> processLoadPageState(previousState, action)
+            is Refresh -> processRefresh(previousState)
         }
     }
 
     private fun loadBooks(text: String, page: Int): Observable<List<BookListItemUM>> {
         return networkRepository.getBookSearch(text, page)
+    }
+
+    private fun isCorrectQuery(query: String): Boolean {
+        return !query.isBlank() && query.length > MIN_QUERY_LENGTH
     }
 
     private fun processShowImage(
@@ -77,12 +85,11 @@ class BooksSearchPresenter(
         previousState: BooksSearchScreen.ViewState,
         action: SearchBook
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        val isCorrectQuery = !action.inputText.isBlank() && action.inputText.length > MIN_QUERY_LENGTH
         return previousState.copy(
             query = action.inputText,
             page = 0,
-            list = if(isCorrectQuery) emptyList() else previousState.list
-        ) to commandOn(isCorrectQuery, {}) {
+            list = if(isCorrectQuery(action.inputText)) emptyList() else previousState.list
+        ) to commandOn(isCorrectQuery(action.inputText), {}) {
              Observable.just(LoadPage(action.inputText, 1) as ScreenAction)
         }
     }
@@ -115,14 +122,17 @@ class BooksSearchPresenter(
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var list = previousState.list
         var page = previousState.page
+        var isRefreshing = previousState.isRefreshing
         if (action.state.isContent) {
             list = list.plus(action.state.asContent())
             page += 1
+            isRefreshing = false
         }
         return previousState.copy(
             booksSearchState = action.state,
             list = list,
-            page = page
+            page = page,
+            isRefreshing = isRefreshing
         ) to null
     }
 
@@ -137,13 +147,24 @@ class BooksSearchPresenter(
         }
     }
 
+    private fun processRefresh(
+        previousState: BooksSearchScreen.ViewState
+    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(
+            isRefreshing = true
+        ) to command(
+            Observable.just(SearchBook(previousState.query ?: "") as ScreenAction)
+        )
+    }
+
     override fun createInitialState(): BooksSearchScreen.ViewState {
         return BooksSearchScreen.ViewState(
             booksSearchState = LceState.Content(emptyList()),
             url = null,
             query = null,
             page = 0,
-            list = emptyList()
+            list = emptyList(),
+            isRefreshing = false
         )
     }
 }
