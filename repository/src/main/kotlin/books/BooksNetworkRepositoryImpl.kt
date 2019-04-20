@@ -25,30 +25,13 @@ class BooksNetworkRepositoryImpl(
     ): Observable<LceState<BookDetailsUM>> {
         return booksApi.getBooksDetails(bookId)
             .map { book -> book.toUiModel() }
-            .flatMap { book -> getInBaseState(book, localRepository) }
+            .flatMap { book -> localRepository.getInBaseState(book) }
             .toLceEventObservable { it }
     }
 
     override fun getBookSearch(text: String, page: Int): Observable<List<BookListItemUM>> {
         return booksApi.getBooksSearch(text, page)
             .map { list -> list.toUiModel() }
-    }
-
-    private fun getInBaseState(book: BookDetailsUM, localRepository: BooksLocalRepository): Observable<BookDetailsUM> {
-        val isInHistory = localRepository.isInHistory(book.toBookListItemUM()).onErrorReturn { false }
-        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM()).onErrorReturn { false }
-        val mBook = Observable.just(book)
-        return  Observable.zip(
-            mBook,
-            isInHistory,
-            isInWishLis,
-            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
-                book.copy(
-                    isInHistory = inHist,
-                    isInWishList = inWish
-                )
-            }
-        )
     }
 
 }

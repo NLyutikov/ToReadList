@@ -3,6 +3,7 @@ package ru.appkode.base.ui.books.details
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
@@ -124,9 +125,9 @@ class BookDetailsController :
         //Genres
         book_details_genres_text.setVisibilityAndText(shelves?.toShelvesLine(0..2))
         //Cover Image
-        Picasso.Builder(applicationContext!!).build()
+        Glide.with(applicationContext!!)
             .load(imageCoverUrl)
-            .error(R.drawable.test_img)
+            .error(R.drawable.without_cover_png)
             .into(book_details_cover_image)
     }
 

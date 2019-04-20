@@ -2,9 +2,7 @@ package ru.appkode.base.ui.books.search
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
-import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.books.search.BooksSearchScreen.View
@@ -15,12 +13,13 @@ import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
 
-data class UpdateList(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+data class LoadPage(val query: String, val page: Int) : ScreenAction()
+data class LoadPageState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 data class SearchBook(val inputText: String) : ScreenAction()
 data class ShowImage(val url: String) : ScreenAction()
 object DismissImage : ScreenAction()
 object RepeatSearch : ScreenAction()
-data class ItemClicked(val position: Long) : ScreenAction()
+data class ItemClicked(val position: Int) : ScreenAction()
 
 class BooksSearchPresenter(
     schedulers: AppSchedulers,
@@ -32,8 +31,10 @@ class BooksSearchPresenter(
         return listOf(
             intent(View::searchBookIntent)
                 .map { SearchBook(it) }
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(200, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged(),
+            intent(View::loadPageIntent)
+                .map { LoadPage(it.first, it.second) },
             intent(View::showImageIntent)
                 .map { ShowImage(it) },
             intent(View::dismissImageIntent)
@@ -50,13 +51,18 @@ class BooksSearchPresenter(
         action: ScreenAction
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when (action) {
-            is RepeatSearch -> processRepeatSearch(previousState, action)
+            is RepeatSearch -> processRepeatSearch(previousState)
             is DismissImage -> previousState.copy(url = null) to null
             is ShowImage -> processShowImage(previousState, action)
             is SearchBook -> processSearchBook(previousState, action)
-            is UpdateList -> processUpdateList(previousState, action)
+            is LoadPage -> processLoadPage(previousState, action)
             is ItemClicked -> processItemClicked(previousState, action)
+            is LoadPageState -> processLoadPageState(previousState, action)
         }
+    }
+
+    private fun loadBooks(text: String, page: Int): Observable<List<BookListItemUM>> {
+        return networkRepository.getBookSearch(text, page)
     }
 
     private fun processShowImage(
@@ -72,29 +78,51 @@ class BooksSearchPresenter(
         action: SearchBook
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         val isCorrectQuery = !action.inputText.isBlank() && action.inputText.length > MIN_QUERY_LENGTH
-        return previousState.copy(query = action.inputText) to commandOn(isCorrectQuery, {}) {
-            networkRepository.getBookSearch(action.inputText)
-                .doLceAction { UpdateList(it) }
+        return previousState.copy(
+            query = action.inputText,
+            page = 0,
+            list = if(isCorrectQuery) emptyList() else previousState.list
+        ) to commandOn(isCorrectQuery, {}) {
+             Observable.just(LoadPage(action.inputText, 1) as ScreenAction)
         }
     }
 
     private fun processRepeatSearch(
+        previousState: BooksSearchScreen.ViewState
+    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(
+            page = 0,
+            list = emptyList()
+        ) to command(
+            Observable.just(LoadPage(previousState.query!!, 1) as ScreenAction)
+        )
+    }
+
+    private fun processLoadPage(
         previousState: BooksSearchScreen.ViewState,
-        action: RepeatSearch
+        action: LoadPage
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command(
-            networkRepository.getBookSearch(previousState.query!!)
-                .doLceAction { UpdateList(it) }
+            loadBooks(action.query, action.page)
+                .doLceAction { LoadPageState(it) }
         )
     }
 
 
-    private fun processUpdateList(
+    private fun processLoadPageState(
         previousState: BooksSearchScreen.ViewState,
-        action: UpdateList
+        action: LoadPageState
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        var page = previousState.page
+        if (action.state.isContent) {
+            list = list.plus(action.state.asContent())
+            page += 1
+        }
         return previousState.copy(
-            booksSearchState = action.state
+            booksSearchState = action.state,
+            list = list,
+            page = page
         ) to null
     }
 
@@ -102,14 +130,20 @@ class BooksSearchPresenter(
         previousState: BooksSearchScreen.ViewState,
         action: ItemClicked
     ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to command { router.pushController(BookDetailsController.createController(action.position).obtainHorizontalTransaction())}
+        return previousState to command {
+            router.pushController(BookDetailsController.createController(
+                previousState.list[action.position].id
+            ).obtainHorizontalTransaction())
+        }
     }
 
     override fun createInitialState(): BooksSearchScreen.ViewState {
         return BooksSearchScreen.ViewState(
             booksSearchState = LceState.Content(emptyList()),
             url = null,
-            query = null
+            query = null,
+            page = 0,
+            list = emptyList()
         )
     }
 }

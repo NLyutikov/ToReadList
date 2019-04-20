@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
+import ru.appkode.base.ui.books.lists.adapters.EVENT_ID_IMAGE_CLICKED
 import ru.appkode.base.ui.core.core.util.filterEvents
 
 class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>() {
@@ -35,7 +37,7 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
 
     override fun onBindViewHolder(holder: BooksSearchAdapter.ViewHolder, position: Int) {
         with(holder) {
-            Picasso.get().load(data[position].imagePath).into(bookImg)
+            Glide.with(itemView.context).load(data[position].imagePath).into(bookImg)
             bookName.text = data[position].title
             bookRating.text = data[position].averageRating.toString()
         }
@@ -58,5 +60,4 @@ class BooksSearchAdapter : RecyclerView.Adapter<BooksSearchAdapter.ViewHolder>()
     }
 }
 
-const val EVENT_ID_IMAGE_CLICKED = 3
 const val EVENT_ID_ITEM_CLICKED = 4

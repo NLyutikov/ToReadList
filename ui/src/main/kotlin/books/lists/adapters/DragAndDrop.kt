@@ -23,7 +23,7 @@ interface DragAndDrop : DraggableItemAdapter<CommonListAdapter.ViewHolder> {
 
     override fun onItemDragFinished(start: Int, end: Int, result: Boolean) {
         if (result)
-            adapter().eventRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED to Pair<Int, Int>(start, end))
+            adapter().eventsRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED to Pair<Int, Int>(start, end))
     }
 
     override fun onCheckCanStartDrag(holder: CommonListAdapter.ViewHolder, position: Int, x: Int, y: Int): Boolean {
