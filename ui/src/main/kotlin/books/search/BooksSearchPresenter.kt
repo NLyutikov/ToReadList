@@ -3,6 +3,7 @@ package ru.appkode.base.ui.books.search
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
+import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.books.search.BooksSearchScreen.View
@@ -25,6 +26,7 @@ object Refresh : ScreenAction()
 class BooksSearchPresenter(
     schedulers: AppSchedulers,
     private val networkRepository: BooksNetworkRepository,
+    private val localRepository: BooksLocalRepository,
     private val router: Router
 ) : BasePresenter<View, BooksSearchScreen.ViewState, ScreenAction>(schedulers) {
 
@@ -66,7 +68,7 @@ class BooksSearchPresenter(
     }
 
     private fun loadBooks(text: String, page: Int): Observable<List<BookListItemUM>> {
-        return networkRepository.getBookSearch(text, page)
+        return networkRepository.getBookSearch(text, localRepository, page)
     }
 
     private fun isCorrectQuery(query: String): Boolean {
@@ -115,7 +117,6 @@ class BooksSearchPresenter(
         )
     }
 
-
     private fun processLoadPageState(
         previousState: BooksSearchScreen.ViewState,
         action: LoadPageState
@@ -128,6 +129,8 @@ class BooksSearchPresenter(
             page += 1
             isRefreshing = false
         }
+        if (action.state.isError)
+            isRefreshing = false
         return previousState.copy(
             booksSearchState = action.state,
             list = list,

@@ -139,6 +139,7 @@ class BooksSearchController :
         return BooksSearchPresenter(
             DefaultAppSchedulers,
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
+            RepositoryHelper.getBooksLocalRepository(applicationContext!!, DefaultAppSchedulers),
             router
         )
     }

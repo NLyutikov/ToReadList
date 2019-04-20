@@ -29,9 +29,16 @@ class BooksNetworkRepositoryImpl(
             .toLceEventObservable { it }
     }
 
-    override fun getBookSearch(text: String, page: Int): Observable<List<BookListItemUM>> {
+    override fun getBookSearch(
+        text: String,
+        localRepository: BooksLocalRepository,
+        page: Int
+    ): Observable<List<BookListItemUM>> {
         return booksApi.getBooksSearch(text, page)
             .map { list -> list.toUiModel() }
+            .flatMapIterable { it }
+            .flatMap { localRepository.getInBaseState(it) }
+            .map { listOf(it) }
     }
 
 }

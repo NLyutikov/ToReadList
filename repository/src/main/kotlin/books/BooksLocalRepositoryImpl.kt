@@ -226,6 +226,23 @@ class BooksLocalRepositoryImpl(
         )
     }
 
+    override fun getInBaseState(book: BookListItemUM): Observable<BookListItemUM> {
+        val isInHistory = isInHistory(book).onErrorReturn { false }
+        val isInWishLis = isInWishList(book).onErrorReturn { false }
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookListItemUM, Boolean, Boolean, BookListItemUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
     private fun recalculateOrders(oldPos: Int, newPos: Int, item: WishListSM): Observable<List<WishListSM>> {
         val wishSize = wishListPersistence.getSize().subscribeOn(appSchedulers.io)
         val books = wishListPersistence.getAllBooks().subscribeOn(appSchedulers.io).timeout(1, TimeUnit.SECONDS)
