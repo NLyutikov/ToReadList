@@ -2,7 +2,6 @@ package ru.appkode.base.ui.books.details
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
-import io.reactivex.functions.Function3
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
@@ -42,12 +41,11 @@ class BookDetailsPresenter(
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent {
-                    networkRepository.getBookDetails(bookId)
-                        .flatMap { book -> getInBaseState(book) }
-                        .onErrorReturn { null }
-                }
-                .doLceAction { LoadBookDetails(it) }
+            intent(BookDetailsScreen.View::reloadBookDetails)
+                .flatMap {  networkRepository.getBookDetails(bookId, localRepository) }
+                .map { LoadBookDetails(it) },
+            intent { networkRepository.getBookDetails(bookId, localRepository) }
+                .map { LoadBookDetails(it) }
         )
     }
 
@@ -66,23 +64,6 @@ class BookDetailsPresenter(
         }
     }
 
-    private fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
-        val isInHistory = localRepository.isInHistory(book.toBookListItemUM()).onErrorReturn { false }
-        val isInWishLis = localRepository.isInWishList(book.toBookListItemUM()).onErrorReturn { false }
-        val mBook = Observable.just(book)
-        return  Observable.zip(
-            mBook,
-            isInHistory,
-            isInWishLis,
-            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
-                book.copy(
-                    isInHistory = inHist,
-                    isInWishList = inWish
-                )
-            }
-        )
-    }
-
     private fun processLoadBookDetails(
         previousState: BookDetailsScreen.ViewState,
         action: LoadBookDetails
@@ -91,6 +72,7 @@ class BookDetailsPresenter(
         if (action.state.isContent) {
             bookDetails = action.state.asContent()
         }
+        action.state.isError
         return previousState.copy(
             bookDetails = bookDetails,
             bookDetailsState = action.state
