@@ -4,7 +4,7 @@ import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.ui.books.lists.history.HistoryController
 import ru.appkode.base.ui.books.lists.wish.WishListController
-import ru.appkode.base.ui.books.search.BooksSearchController
+import ru.appkode.base.ui.books.lists.search.BooksSearchController
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command

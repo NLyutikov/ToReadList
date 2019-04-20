@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.search
+package ru.appkode.base.ui.books.lists.search
 
 import android.view.View
 import androidx.core.view.isVisible

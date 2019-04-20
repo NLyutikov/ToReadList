@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.search
+package ru.appkode.base.ui.books.lists.search
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
@@ -6,7 +6,7 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.details.BookDetailsController
-import ru.appkode.base.ui.books.search.BooksSearchScreen.View
+import ru.appkode.base.ui.books.lists.search.BooksSearchScreen.View
 import ru.appkode.base.ui.core.core.*
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction

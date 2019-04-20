@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.search
+package ru.appkode.base.ui.books.lists.search
 
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
