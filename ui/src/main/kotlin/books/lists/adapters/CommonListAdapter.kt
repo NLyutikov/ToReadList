@@ -67,23 +67,13 @@ abstract class CommonListAdapter(
 
             dragIcon.isVisible = draggable
 
-            wishListIcon.isVisible = item.isInWishList || !item.isInHistory && !item.isInWishList
-            historyIcon.isVisible = item.isInHistory || !item.isInHistory && !item.isInWishList
-
+            wishListIcon.isVisible = item.isInWishList
+            historyIcon.isVisible = item.isInHistory
             deleteIcon.isVisible = false
 
-            when {
-                !item.isInHistory && !item.isInWishList -> {
-                    wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_not_24)
-                    historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_24dp)
-                }
-                item.isInHistory -> {
-                    historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_blue_24dp)
-                }
-                item.isInWishList -> {
-                    wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_24)
-                }
-            }
+            historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_blue_24dp)
+            wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_24)
+
         }
     }
 
