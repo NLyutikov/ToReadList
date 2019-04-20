@@ -6,6 +6,10 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.core.core.LceState
 
 interface BooksNetworkRepository {
-    fun getBookDetails(bookId: Long, localRepository: BooksLocalRepository):Observable<LceState<BookDetailsUM>>
-    fun getBookSearch(text: String, page: Int = 1): Observable<List<BookListItemUM>>
+    fun getBookDetails(bookId: Long, localRepository: BooksLocalRepository): Observable<LceState<BookDetailsUM>>
+    fun getBookSearch(
+        text: String,
+        localRepository: BooksLocalRepository,
+        page: Int = 1
+    ): Observable<List<BookListItemUM>>
 }

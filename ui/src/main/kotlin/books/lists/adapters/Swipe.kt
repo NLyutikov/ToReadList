@@ -22,10 +22,10 @@ interface Swipe : SwipeableItemAdapter<CommonListAdapter.ViewHolder> {
     ): SwipeResultAction? =
         when (result) {
             SwipeableItemConstants.RESULT_SWIPED_RIGHT -> getSwipeAction {
-                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_RIGHT to position)
+                delegateControlsAdapter().eventsRelay.accept(EVENT_ID_ITEM_SWIPED_RIGHT to position)
             }
             SwipeableItemConstants.RESULT_SWIPED_LEFT -> getSwipeAction {
-                delegateControlsAdapter().eventRelay.accept(EVENT_ID_ITEM_SWIPED_LEFT to position)
+                delegateControlsAdapter().eventsRelay.accept(EVENT_ID_ITEM_SWIPED_LEFT to position)
             }
             else -> null
         }

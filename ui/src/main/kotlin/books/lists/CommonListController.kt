@@ -121,11 +121,11 @@ abstract class CommonListController :
     }
 
     override fun itemSwipedLeftIntent(): Observable<Int> {
-        return listAdapter.eventRelay.filterEvents(EVENT_ID_ITEM_SWIPED_LEFT)
+        return listAdapter.eventsRelay.filterEvents(EVENT_ID_ITEM_SWIPED_LEFT)
     }
 
     override fun itemSwipedRightIntent(): Observable<Int> {
-        return listAdapter.eventRelay.filterEvents(EVENT_ID_ITEM_SWIPED_RIGHT)
+        return listAdapter.eventsRelay.filterEvents(EVENT_ID_ITEM_SWIPED_RIGHT)
     }
 
     override fun itemDroppedIntent(): Observable<DropItemInfo> {

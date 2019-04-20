@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableSwipeableItemViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
+import kotlinx.android.synthetic.main.book_details_controller.*
 import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
@@ -26,21 +27,23 @@ abstract class CommonListAdapter(
             notifyDataSetChanged()
         }
 
-    val eventRelay: PublishRelay< Pair<Int, Any> > = PublishRelay.create()
+    val eventsRelay: PublishRelay< Pair<Int, Any> > = PublishRelay.create()
 
-    val itemClicked: Observable<Int> = eventRelay.filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED)
+    val itemClicked: Observable<Int> = eventsRelay.filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED)
 
-    val wishListIconClicked: Observable<Int> = eventRelay
+    val wishListIconClicked: Observable<Int> = eventsRelay
         .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED)
 
-    val historyIconClicked: Observable<Int> = eventRelay
+    val historyIconClicked: Observable<Int> = eventsRelay
         .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED)
 
-    val deleteIconClicked: Observable<Int> = eventRelay
+    val deleteIconClicked: Observable<Int> = eventsRelay
         .filterEvents(COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED)
 
+    val imageClicked: Observable<String> = eventsRelay.filterEvents(EVENT_ID_IMAGE_CLICKED)
+
     val itemDropped: Observable<DropItemInfo> =
-        eventRelay.filterEvents<Pair<Int, Int>>(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED)
+        eventsRelay.filterEvents<Pair<Int, Int>>(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED)
             .flatMap {
                 Observable.just(getDropItemInfo(it.first, it.second))
             }
@@ -52,15 +55,25 @@ abstract class CommonListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder) {
+            val item = data[position]
+
             Glide.with(itemView.context)
-                .load(data[position].imagePath)
+                .load(item.imagePath)
                 .onlyRetrieveFromCache(fromLocalDataSource)
                 .into(image)
-            title.text = data[position].title
-            rating.text = data[position].averageRating.toString()
-            wishListIcon.isVisible = !data[position].isInWishList
-            historyIcon.isVisible = !data[position].isInHistory
+
+            title.text = item.title
+            rating.text = item.averageRating.toString()
+
             dragIcon.isVisible = draggable
+
+            wishListIcon.isVisible = item.isInWishList
+            historyIcon.isVisible = item.isInHistory
+            deleteIcon.isVisible = false
+
+            historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_blue_24dp)
+            wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_24)
+
         }
     }
 
@@ -111,22 +124,25 @@ abstract class CommonListAdapter(
         init {
             view.setOnClickListener { view ->
                     if (view !is ImageView)
-                        eventRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED to adapterPosition)
+                        eventsRelay.accept(COMMON_LIST_ADAPTER_EVENT_ID_ITEM_CLICKED to adapterPosition)
             }
             wishListIcon.setOnClickListener {
-                eventRelay.accept(
+                eventsRelay.accept(
                     COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED to adapterPosition
                 )
             }
             historyIcon.setOnClickListener {
-                eventRelay.accept(
+                eventsRelay.accept(
                     COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED to adapterPosition
                 )
             }
             deleteIcon.setOnClickListener {
-                eventRelay.accept(
+                eventsRelay.accept(
                     COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED to adapterPosition
                 )
+            }
+            image.setOnClickListener {
+                eventsRelay.accept(EVENT_ID_IMAGE_CLICKED to data[adapterPosition].imagePath!!)
             }
         }
 
@@ -139,3 +155,4 @@ const val COMMON_LIST_ADAPTER_EVENT_ID_WISH_LIST_ICON_CLICKED = 13
 const val COMMON_LIST_ADAPTER_EVENT_ID_HISTORY_ICON_CLICKED = 14
 const val COMMON_LIST_ADAPTER_EVENT_ID_DELETE_ICON_CLICKED = 15
 const val COMMON_LIST_ADAPTER_EVENT_ID_ITEM_DROPPED = 16
+const val EVENT_ID_IMAGE_CLICKED = 3

@@ -10,6 +10,8 @@ import io.reactivex.functions.Function4
 import io.reactivex.internal.operators.completable.CompletableFromAction
 import ru.appkode.base.data.storage.persistence.books.HistoryPersistence
 import ru.appkode.base.data.storage.persistence.books.WishListPersistence
+import ru.appkode.base.entities.core.books.details.BookDetailsUM
+import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.books.lists.history.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.toHistorySM
@@ -205,6 +207,40 @@ class BooksLocalRepositoryImpl(
 
     override fun deleteAllFromWishList(): Completable {
         return Completable.fromAction { wishListPersistence.deleteAll() }.subscribeOn(appSchedulers.io)
+    }
+
+    override fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
+        val isInHistory = isInHistory(book.toBookListItemUM()).onErrorReturn { false }
+        val isInWishLis = isInWishList(book.toBookListItemUM()).onErrorReturn { false }
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
+    override fun getInBaseState(book: BookListItemUM): Observable<BookListItemUM> {
+        val isInHistory = isInHistory(book).onErrorReturn { false }
+        val isInWishLis = isInWishList(book).onErrorReturn { false }
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookListItemUM, Boolean, Boolean, BookListItemUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
     }
 
     private fun recalculateOrders(oldPos: Int, newPos: Int, item: WishListSM): Observable<List<WishListSM>> {

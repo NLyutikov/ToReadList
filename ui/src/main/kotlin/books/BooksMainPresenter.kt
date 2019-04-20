@@ -4,7 +4,7 @@ import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.ui.books.lists.history.HistoryController
 import ru.appkode.base.ui.books.lists.wish.WishListController
-import ru.appkode.base.ui.books.search.BooksSearchController
+import ru.appkode.base.ui.books.lists.search.BooksSearchController
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
@@ -13,7 +13,7 @@ import ru.appkode.base.ui.core.core.util.*
 sealed class ScreenAction
 
 data class ShowList(val controllerTag: String) : ScreenAction()
-object ShowSerchList: ScreenAction()
+object ShowSearchList: ScreenAction()
 
 class BooksMainPresenter(
     schedulers: AppSchedulers,
@@ -26,7 +26,7 @@ class BooksMainPresenter(
             intent(BooksMainScreen.View::showListIntent)
                 .map { itemId -> ShowList(itemId) },
             intent(BooksMainScreen.View::showSearchList)
-                .map { ShowSerchList },
+                .map { ShowSearchList },
             intent { Observable.just(WISH_LIST_CONTROLLER_TAG) }
                 .map { itemId -> ShowList(itemId) }
         )
@@ -38,13 +38,12 @@ class BooksMainPresenter(
     ): Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when(action) {
             is ShowList -> processShowList(previousState, action)
-            is ShowSerchList -> processShowSearchList(previousState, action)
+            is ShowSearchList -> processShowSearchList(previousState)
         }
     }
 
-    protected fun processShowSearchList(
-        previousState: BooksMainScreen.ViewState,
-        action: ShowSerchList
+    private fun processShowSearchList(
+        previousState: BooksMainScreen.ViewState
     ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {
             parentRouter.pushController(BooksSearchController().obtainVerticalTransaction())
