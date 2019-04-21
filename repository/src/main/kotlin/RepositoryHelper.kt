@@ -12,7 +12,7 @@ import ru.appkode.base.ui.core.core.util.AppSchedulers
 object RepositoryHelper {
 
   fun getBooksNetworkRepository(schedulers: AppSchedulers): BooksNetworkRepository {
-    return BooksNetworkRepositoryImpl(schedulers, NetworkHelper.getBooksApi())
+    return BooksNetworkRepositoryImpl(schedulers, NetworkHelper.getBooksApi(), NetworkHelper.getMovieApi())
   }
 
   fun getBooksLocalRepository(context: Context, schedulers: AppSchedulers): BooksLocalRepository {
