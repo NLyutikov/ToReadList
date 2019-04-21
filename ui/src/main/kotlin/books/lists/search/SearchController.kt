@@ -20,12 +20,12 @@ import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
 
-class BooksSearchController :
+abstract class SearchController :
     BaseMviController<
-            BooksSearchScreen.ViewState,
-            BooksSearchScreen.View,
-            BooksSearchPresenter>(),
-    BooksSearchScreen.View {
+            SearchScreen.ViewState,
+            SearchScreen.View,
+            SearchPresenter>(),
+    SearchScreen.View {
     override fun createConfig(): Config {
         return object : Config {
             override val viewLayoutResource: Int
@@ -55,7 +55,7 @@ class BooksSearchController :
         books_search_recycler.adapter = adapter
     }
 
-    override fun renderViewState(viewState: BooksSearchScreen.ViewState) {
+    override fun renderViewState(viewState: SearchScreen.ViewState) {
         fieldChanged(viewState, { it.booksSearchState }) {
             books_search_loading.isVisible =
                 viewState.booksSearchState.isLoading && viewState.list.isEmpty() && !viewState.isRefreshing
@@ -133,15 +133,6 @@ class BooksSearchController :
                         firstVisibleItem + visibleItemCount >= limit
             }.throttleFirst( 500, TimeUnit.MILLISECONDS)
             .map { (previousViewState?.query ?: "")  to previousViewState!!.page + 1 }
-    }
-
-    override fun createPresenter(): BooksSearchPresenter {
-        return BooksSearchPresenter(
-            DefaultAppSchedulers,
-            RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
-            RepositoryHelper.getBooksLocalRepository(applicationContext!!, DefaultAppSchedulers),
-            router
-        )
     }
 }
 

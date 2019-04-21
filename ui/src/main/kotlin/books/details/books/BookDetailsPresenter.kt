@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
@@ -34,9 +34,9 @@ class BookDetailsPresenter(
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
             intent(BookDetailsScreen.View::showMoreInfoIntent)
-                .map{ShowMoreInformation},
+                .map{ ShowMoreInformation },
             intent(BookDetailsScreen.View::showSimilarBookIntent)
-                .map{ShowSimilarBook(it)},
+                .map{ ShowSimilarBook(it) },
             intent(BookDetailsScreen.View::wishListBtnPressed)
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)

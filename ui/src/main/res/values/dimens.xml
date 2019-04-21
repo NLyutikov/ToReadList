@@ -21,4 +21,29 @@
   <dimen name="similar_books_list_item_cover_image_width">80dp</dimen>
   <dimen name="similar_books_list_item_width">80dp</dimen>
 
+  <!-- Movies -->
+  <dimen name="left">117dp</dimen>
+  <dimen name="secondary_text_size">13sp</dimen>
+  <dimen name="details_title_text_size">22sp</dimen>
+  <dimen name="description_text_size">12sp</dimen>
+  <dimen name="sub_title_details_text_size">16sp</dimen>
+  <dimen name="facts_item_height">20dp</dimen>
+  <dimen name="facts_item_text_size">14sp</dimen>
+  <dimen name="backdrop_height">274dp</dimen>
+
+  <dimen name="list_item_padding">10dp</dimen>
+  <dimen name="list_item_layout_margin">10dp</dimen>
+  <dimen name="list_poster_view_width">87dp</dimen>
+  <dimen name="list_poster_view_height">130dp</dimen>
+  <dimen name="title_text_size">16sp</dimen>
+  <dimen name="year_text_size">14sp</dimen>
+  <dimen name="score_logo_view_width">30dp</dimen>
+  <dimen name="score_logo_view_height">30dp</dimen>
+  <dimen name="score_text_height">30dp</dimen>
+  <dimen name="score_text_size">14sp</dimen>
+  <dimen name="score_text_margin">5dp</dimen>
+  <dimen name="genres_text_size">14sp</dimen>
+
+  <dimen name="trailer_name_text_size">12sp</dimen>
+
 </resources>
