@@ -3,8 +3,9 @@ package ru.appkode.base.ui.books
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.ui.books.lists.history.HistoryController
+import ru.appkode.base.ui.books.lists.search.books.BooksSearchController
+import ru.appkode.base.ui.books.lists.search.movies.MoviesSearchController
 import ru.appkode.base.ui.books.lists.wish.WishListController
-import ru.appkode.base.ui.books.lists.search.BooksSearchController
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.command
@@ -13,7 +14,10 @@ import ru.appkode.base.ui.core.core.util.*
 sealed class ScreenAction
 
 data class ShowList(val controllerTag: String) : ScreenAction()
-object ShowSearchList: ScreenAction()
+object ShowSearchList : ScreenAction()
+object ShowMovieSearchList : ScreenAction()
+object ShowBookSearchList : ScreenAction()
+object DialogCanceled : ScreenAction()
 
 class BooksMainPresenter(
     schedulers: AppSchedulers,
@@ -28,7 +32,13 @@ class BooksMainPresenter(
             intent(BooksMainScreen.View::showSearchList)
                 .map { ShowSearchList },
             intent { Observable.just(WISH_LIST_CONTROLLER_TAG) }
-                .map { itemId -> ShowList(itemId) }
+                .map { itemId -> ShowList(itemId) },
+            intent(BooksMainScreen.View::showBookSearchList)
+                .map { ShowBookSearchList },
+            intent(BooksMainScreen.View::showMovieSearchList)
+                .map { ShowMovieSearchList },
+            intent(BooksMainScreen.View::dialogCanceled)
+                .map { DialogCanceled }
         )
     }
 
@@ -39,15 +49,40 @@ class BooksMainPresenter(
         return when(action) {
             is ShowList -> processShowList(previousState, action)
             is ShowSearchList -> processShowSearchList(previousState)
+            is ShowBookSearchList -> processShowBookSearchList(previousState)
+            is ShowMovieSearchList -> processShowMovieSearchList(previousState)
+            is DialogCanceled -> processDialogCanceled(previousState)
         }
     }
 
     private fun processShowSearchList(
         previousState: BooksMainScreen.ViewState
     ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to command {
+        return previousState.copy(showDialog = true) to command {
+            //parentRouter.pushController(MoviesSearchController().obtainVerticalTransaction())
+        }
+    }
+
+    private fun processShowBookSearchList(
+        previousState: BooksMainScreen.ViewState
+    ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(showDialog = false) to command {
             parentRouter.pushController(BooksSearchController().obtainVerticalTransaction())
         }
+    }
+
+    private fun processShowMovieSearchList(
+        previousState: BooksMainScreen.ViewState
+    ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(showDialog = false) to command {
+            parentRouter.pushController(MoviesSearchController().obtainVerticalTransaction())
+        }
+    }
+
+    private fun processDialogCanceled(
+        previousState: BooksMainScreen.ViewState
+    ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(showDialog = false) to null
     }
 
     /**
@@ -81,6 +116,6 @@ class BooksMainPresenter(
     }
 
     override fun createInitialState(): BooksMainScreen.ViewState {
-        return BooksMainScreen.ViewState(WISH_LIST_CONTROLLER_TAG)
+        return BooksMainScreen.ViewState(WISH_LIST_CONTROLLER_TAG, false)
     }
 }

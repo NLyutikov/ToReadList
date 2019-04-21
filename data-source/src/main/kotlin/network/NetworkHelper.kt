@@ -21,6 +21,7 @@ import ru.appkode.ui.core.BuildConfig
 object NetworkHelper {
   private const val MOVIES_BASE_URL = "https://api.themoviedb.org/"
   private const val BOOKS_BASE_URL = "https://www.goodreads.com/"
+
   const val API_KEY_BOOKS = "lEJVSEkHbRKXduThStEg9w"
   const val MOVIES_API_KEY = "1774b3433274ef2d5a7baff526aa7f23"
 

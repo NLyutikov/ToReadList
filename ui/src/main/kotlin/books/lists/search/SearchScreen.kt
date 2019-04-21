@@ -6,7 +6,7 @@ import ru.appkode.base.entities.core.books.search.BookUM
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.MviView
 
-interface BooksSearchScreen {
+interface SearchScreen {
     interface View : MviView<ViewState> {
         fun searchBookIntent(): Observable<String>
         fun showImageIntent(): Observable<String>

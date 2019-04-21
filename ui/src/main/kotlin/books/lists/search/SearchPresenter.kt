@@ -6,7 +6,7 @@ import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
 import ru.appkode.base.ui.books.details.BookDetailsController
-import ru.appkode.base.ui.books.lists.search.BooksSearchScreen.View
+import ru.appkode.base.ui.books.lists.search.SearchScreen.View
 import ru.appkode.base.ui.core.core.*
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
@@ -23,12 +23,12 @@ object RepeatSearch : ScreenAction()
 data class ItemClicked(val position: Int) : ScreenAction()
 object Refresh : ScreenAction()
 
-class BooksSearchPresenter(
+abstract class SearchPresenter(
     schedulers: AppSchedulers,
     private val networkRepository: BooksNetworkRepository,
     private val localRepository: BooksLocalRepository,
     private val router: Router
-) : BasePresenter<View, BooksSearchScreen.ViewState, ScreenAction>(schedulers) {
+) : BasePresenter<View, SearchScreen.ViewState, ScreenAction>(schedulers) {
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
@@ -52,9 +52,9 @@ class BooksSearchPresenter(
     }
 
     override fun reduceViewState(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: ScreenAction
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return when (action) {
             is RepeatSearch -> processRepeatSearch(previousState)
             is DismissImage -> previousState.copy(url = null) to null
@@ -67,26 +67,24 @@ class BooksSearchPresenter(
         }
     }
 
-    private fun loadBooks(text: String, page: Int): Observable<List<BookListItemUM>> {
-        return networkRepository.getBookSearch(text, localRepository, page)
-    }
+    protected abstract fun loadContent(text: String, page: Int): Observable<List<BookListItemUM>>
 
     private fun isCorrectQuery(query: String): Boolean {
         return !query.isBlank() && query.length > MIN_QUERY_LENGTH
     }
 
     private fun processShowImage(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: ShowImage
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
 
         return previousState.copy(url = action.url) to null
     }
 
     private fun processSearchBook(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: SearchBook
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState.copy(
             query = action.inputText,
             page = 0,
@@ -97,8 +95,8 @@ class BooksSearchPresenter(
     }
 
     private fun processRepeatSearch(
-        previousState: BooksSearchScreen.ViewState
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        previousState: SearchScreen.ViewState
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState.copy(
             page = 0,
             list = emptyList()
@@ -108,19 +106,19 @@ class BooksSearchPresenter(
     }
 
     private fun processLoadPage(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: LoadPage
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command(
-            loadBooks(action.query, action.page)
+            loadContent(action.query, action.page)
                 .doLceAction { LoadPageState(it) }
         )
     }
 
     private fun processLoadPageState(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: LoadPageState
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var list = previousState.list
         var page = previousState.page
         var isRefreshing = previousState.isRefreshing
@@ -140,9 +138,9 @@ class BooksSearchPresenter(
     }
 
     private fun processItemClicked(
-        previousState: BooksSearchScreen.ViewState,
+        previousState: SearchScreen.ViewState,
         action: ItemClicked
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {
             router.pushController(BookDetailsController.createController(
                 previousState.list[action.position].id
@@ -151,8 +149,8 @@ class BooksSearchPresenter(
     }
 
     private fun processRefresh(
-        previousState: BooksSearchScreen.ViewState
-    ): Pair<BooksSearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        previousState: SearchScreen.ViewState
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState.copy(
             isRefreshing = true
         ) to command(
@@ -160,8 +158,8 @@ class BooksSearchPresenter(
         )
     }
 
-    override fun createInitialState(): BooksSearchScreen.ViewState {
-        return BooksSearchScreen.ViewState(
+    override fun createInitialState(): SearchScreen.ViewState {
+        return SearchScreen.ViewState(
             booksSearchState = LceState.Content(emptyList()),
             url = null,
             query = null,
