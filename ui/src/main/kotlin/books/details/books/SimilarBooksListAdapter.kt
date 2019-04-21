@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import android.view.LayoutInflater
 import android.view.View

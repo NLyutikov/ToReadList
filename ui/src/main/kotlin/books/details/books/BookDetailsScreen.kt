@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.details.BookDetailsUM

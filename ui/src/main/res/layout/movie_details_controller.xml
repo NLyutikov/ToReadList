@@ -207,8 +207,6 @@
 
             </LinearLayout>
 
-
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
@@ -217,7 +215,7 @@
     <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/book_details_load_progress_bar"
+            android:id="@+id/movie_details_loading"
             android:layout_gravity="center"
     />
 

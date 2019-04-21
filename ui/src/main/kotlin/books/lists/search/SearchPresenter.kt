@@ -5,11 +5,9 @@ import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
-import ru.appkode.base.ui.books.details.BookDetailsController
 import ru.appkode.base.ui.books.lists.search.SearchScreen.View
 import ru.appkode.base.ui.core.core.*
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
 import java.util.concurrent.TimeUnit
 
 sealed class ScreenAction
@@ -137,16 +135,10 @@ abstract class SearchPresenter(
         ) to null
     }
 
-    private fun processItemClicked(
+    protected abstract fun processItemClicked(
         previousState: SearchScreen.ViewState,
         action: ItemClicked
-    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState to command {
-            router.pushController(BookDetailsController.createController(
-                previousState.list[action.position].id
-            ).obtainHorizontalTransaction())
-        }
-    }
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?>
 
     private fun processRefresh(
         previousState: SearchScreen.ViewState

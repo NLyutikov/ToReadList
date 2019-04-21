@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
-import ru.appkode.base.ui.books.details.BookDetailsController
+import books.details.books.BookDetailsController
 import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
