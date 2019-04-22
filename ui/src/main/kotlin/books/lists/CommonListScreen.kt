@@ -17,12 +17,15 @@ interface CommonListScreen {
         fun wishListIconCickedIntent(): Observable<Int>
         fun deleteIconClickedIntent(): Observable<Int>
         fun itemDroppedIntent(): Observable<DropItemInfo>
+        fun showImageIntent(): Observable<String>
+        fun dismissImageIntent(): Observable<Unit>
     }
 
     data class ViewState(
         val curPage: Int,
         val list: List<BookListItemUM>,
         val loadNewPageState: LceState<List<BookListItemUM>>,
-        val isRefreshing: Boolean
+        val isRefreshing: Boolean,
+        val url: String?
     )
 }

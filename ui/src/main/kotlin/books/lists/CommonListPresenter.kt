@@ -1,11 +1,11 @@
 package ru.appkode.base.ui.books.lists
 
+import books.details.books.BookDetailsController
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
-import books.details.books.BookDetailsController
 import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
@@ -29,6 +29,8 @@ data class DeleteFromWishList(val position: Int) : ScreenAction()
 data class ChangeList(val changeAction: (List<BookListItemUM>) -> (List<BookListItemUM>)) : ScreenAction()
 data class ChangeItemPosition(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 data class ItemDropped(val dropInfo: DropItemInfo) : ScreenAction()
+data class ShowImage(val url: String) : ScreenAction()
+object DismissImage : ScreenAction()
 
 abstract class CommonListPresenter(
     schedulers: AppSchedulers,
@@ -48,7 +50,11 @@ abstract class CommonListPresenter(
                 .map { Refreshing },
             bindItemSwipedLeft(),
             bindItemSwipedRight(),
-            intent { Observable.just(UpdateData) }
+            intent { Observable.just(UpdateData) },
+            intent(CommonListScreen.View::showImageIntent)
+                .map { ShowImage(it) },
+            intent(CommonListScreen.View::dismissImageIntent)
+                .map { DismissImage }
         )
     }
 
@@ -74,6 +80,8 @@ abstract class CommonListPresenter(
             is ChangeList -> processChangeList(previousState, action)
             is ItemDropped -> processItemDropped(previousState, action)
             is ChangeItemPosition -> processChangeItemPosition(previousState, action)
+            is ShowImage -> processShowImage(previousState, action)
+            is DismissImage -> previousState.copy(url = null) to null
         }
     }
 
@@ -99,6 +107,14 @@ abstract class CommonListPresenter(
             curPage = page,
             loadNewPageState = action.state
         ) to null
+    }
+
+    protected open fun processShowImage(
+        previousState: CommonListScreen.ViewState,
+        action: ShowImage
+    ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+
+        return previousState.copy(url = action.url) to null
     }
 
     protected open fun processItemClicked(
@@ -228,6 +244,6 @@ abstract class CommonListPresenter(
     }
 
     override fun createInitialState(): CommonListScreen.ViewState {
-        return CommonListScreen.ViewState(1, emptyList(), LceState.Loading(), false)
+        return CommonListScreen.ViewState(1, emptyList(), LceState.Loading(), false, null)
     }
 }
