@@ -18,6 +18,8 @@ import ru.appkode.base.entities.core.books.lists.toHistorySM
 import ru.appkode.base.entities.core.books.lists.toWishListSM
 import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
+import ru.appkode.base.entities.core.movies.details.MovieDetailsUM
+import ru.appkode.base.entities.core.movies.details.toBookListUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -218,6 +220,23 @@ class BooksLocalRepositoryImpl(
             isInHistory,
             isInWishLis,
             Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
+    override fun getInBaseState(book: MovieDetailsUM): Observable<MovieDetailsUM> {
+        val isInHistory = isInHistory(book.toBookListUM()).onErrorReturn { false }
+        val isInWishLis = isInWishList(book.toBookListUM()).onErrorReturn { false }
+        val mBook = Observable.just(book)
+        return  Observable.zip(
+            mBook,
+            isInHistory,
+            isInWishLis,
+            Function3 <MovieDetailsUM, Boolean, Boolean, MovieDetailsUM> { book, inHist, inWish ->
                 book.copy(
                     isInHistory = inHist,
                     isInWishList = inWish
