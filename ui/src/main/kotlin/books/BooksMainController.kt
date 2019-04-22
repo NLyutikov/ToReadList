@@ -26,7 +26,7 @@ class BooksMainController :
 
     private lateinit var childRouter: Router
 
-    private val searchItems = listOf("Фильмы", "Книги")
+    private val searchItems = listOf("Фильмы", "Книги") //FIXME перенести в string.xml
 
     override fun createConfig(): Config {
         return object : Config {

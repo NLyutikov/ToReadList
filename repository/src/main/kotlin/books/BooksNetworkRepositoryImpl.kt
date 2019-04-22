@@ -50,8 +50,9 @@ class BooksNetworkRepositoryImpl(
         id: Long,
         localRepository: BooksLocalRepository
     ): Observable<MovieDetailsUM> {
-        return movieAPI.getMovieById(-id)
+        return movieAPI.getMovieById(Math.abs(id))
             .map { it.toUiModel() }
+            .flatMap { localRepository.getInBaseState(it) }
     }
 
     override fun getMovieSearch(

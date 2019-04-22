@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
+import ru.appkode.base.entities.core.movies.details.MovieDetailsUM
 
 interface BooksLocalRepository {
 
@@ -53,5 +54,7 @@ interface BooksLocalRepository {
     fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM>
 
     fun getInBaseState(book: BookListItemUM): Observable<BookListItemUM>
+
+    fun getInBaseState(book: MovieDetailsUM): Observable<MovieDetailsUM>
 
 }

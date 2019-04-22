@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+        android:id="@+id/movie_details_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -96,18 +96,37 @@
 
                 </LinearLayout>
 
-
             </RelativeLayout>
 
-
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/details_toolbar"
+                android:id="@+id/movie_details_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:navigationIcon="@drawable/ic_arrow_back_24dp"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_history_24dp"
+                        android:background="@android:color/transparent"
+                        android:id="@+id/movie_details_add_to_history"
+                        android:layout_gravity="end"
+                        android:layout_marginRight="15dp"
                 />
 
+                <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/outline_turned_in_not_24"
+                        android:background="@android:color/transparent"
+                        android:id="@+id/movie_details_add_to_wish_list"
+                        android:layout_gravity="end"
+                        android:layout_marginRight="10dp"
+                />
+
+            </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -117,10 +136,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:id="@+id/details_scrollview"
+        android:id="@+id/movie_details_scrollview"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -203,7 +220,6 @@
                     android:id="@+id/details_trailers_list"
                     android:orientation="horizontal"
                     tools:listitem="@layout/trailers_list_item"/>
-
 
             </LinearLayout>
 
