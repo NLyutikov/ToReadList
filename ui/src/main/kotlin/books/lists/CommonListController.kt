@@ -84,6 +84,7 @@ abstract class CommonListController :
         fieldChanged(viewState, {state ->  state.list}) {
             with(viewState) {
                 books_list_recycler.isVisible = list.isNotEmpty()
+                books_list_empty_list.isVisible = loadNewPageState.isContent && list.isEmpty()
                 listAdapter.data = list
             }
         }

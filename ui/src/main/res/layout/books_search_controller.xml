@@ -53,6 +53,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"/>
 
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/books_search_empty_search_result"
+                    android:layout_margin="20dp"
+            />
+
         </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
