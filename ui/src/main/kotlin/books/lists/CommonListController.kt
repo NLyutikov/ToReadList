@@ -5,11 +5,13 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import books.lists.adapters.EVENT_ID_ITEM_SWIPED_LEFT
 import books.lists.adapters.EVENT_ID_ITEM_SWIPED_RIGHT
+import com.bumptech.glide.Glide
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager
 import com.jakewharton.rxbinding3.recyclerview.scrollEvents
+import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.ui.R
@@ -86,6 +88,15 @@ abstract class CommonListController :
             }
         }
 
+        fieldChanged(viewState, { it.url.orEmpty() }) {
+            if (viewState.url.isNullOrBlank()) return@fieldChanged
+            StfalconImageViewer.Builder<String>(activity, listOf(viewState.url)) { view, url ->
+                Glide.with(applicationContext!!).load(url).into(view)
+            }
+                .withDismissListener { eventsRelay.accept(EVENT_ID_IMAGE_DISMISS to Unit) }
+                .show()
+        }
+
         fieldChanged(viewState, {state -> state.isRefreshing}) {
             books_list_swipe_refresh.isRefreshing = viewState.isRefreshing
         }
@@ -132,6 +143,14 @@ abstract class CommonListController :
         return listAdapter.itemDropped
     }
 
+    override fun showImageIntent(): Observable<String> {
+        return listAdapter.imageClicked
+    }
+
+    override fun dismissImageIntent(): Observable<Unit> {
+        return eventsRelay.filterEvents(EVENT_ID_IMAGE_DISMISS)
+    }
+
     override fun historyIconClickedIntent(): Observable<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -146,3 +165,4 @@ abstract class CommonListController :
 }
 
 const val COMMON_LIST_REFRESH_EVENT_ID = 31
+const val EVENT_ID_IMAGE_DISMISS = 1

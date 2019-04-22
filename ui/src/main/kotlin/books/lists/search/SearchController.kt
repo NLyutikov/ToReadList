@@ -11,12 +11,11 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_search_controller.*
 import kotlinx.android.synthetic.main.network_error.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
-import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
+import ru.appkode.base.ui.books.lists.EVENT_ID_IMAGE_DISMISS
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
-import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
 
@@ -139,5 +138,4 @@ abstract class SearchController :
 class SearchAdapter : CommonListAdapter()
 
 private const val EVENT_ID_SEARCH_CHANGED = 0
-private const val EVENT_ID_IMAGE_DISMISS = 1
 private const val EVENT_ID_IMAGE_REFRESH = 3
