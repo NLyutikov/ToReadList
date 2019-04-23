@@ -61,19 +61,14 @@ abstract class SearchController :
                 viewState.booksSearchState.isLoading && viewState.list.isEmpty() && !viewState.isRefreshing
             books_search_recycler.isVisible = !viewState.list.isEmpty()
             network_error_screen_container.isVisible = viewState.booksSearchState.isError && !viewState.list.isEmpty()
-            books_search_empty_search_result.isVisible = viewState.list.isEmpty() && !viewState.booksSearchState.isLoading
+            renderEmptyResult(viewState)
         }
 
         fieldChanged(viewState, { it.list }) {
-            books_search_empty_search_result.isVisible = viewState.list.isEmpty() && !viewState.booksSearchState.isLoading
+            renderEmptyResult(viewState)
             if (viewState.list.isNotEmpty())
                 adapter.data = viewState.list
-            else
-                if (viewState.query.isNullOrBlank())
-                    books_search_empty_search_result.text = resources!!.getString(R.string.search_is_not_started)
-                else
-                    books_search_empty_search_result.text =
-                        "${resources!!.getString(R.string.search_nothing_found_by_query)} ${viewState.query}"
+
         }
 
         fieldChanged(viewState, { it.url.orEmpty() }) {
@@ -90,13 +85,14 @@ abstract class SearchController :
         }
     }
 
-    private fun renderSearchState(searchState: LceState<List<BookListItemUM>>) {
-        books_search_loading.isVisible = searchState.isLoading
-        books_search_recycler.isVisible = searchState.isContent
-        network_error_screen_container.isVisible = searchState.isError
-        if (searchState.isContent) {
-            adapter.data = searchState.asContent()
-        }
+    private fun renderEmptyResult(viewState: SearchScreen.ViewState) {
+        books_search_empty_search_result.isVisible = viewState.list.isEmpty() && !viewState.booksSearchState.isLoading
+        if (viewState.list.isEmpty())
+            if (viewState.query.isNullOrBlank())
+                books_search_empty_search_result.text = resources!!.getString(R.string.search_is_not_started)
+            else
+                books_search_empty_search_result.text =
+                    "${resources!!.getString(R.string.search_nothing_found_by_query)} ${viewState.query}"
     }
 
     override fun itemClickedIntent(): Observable<Int> {
