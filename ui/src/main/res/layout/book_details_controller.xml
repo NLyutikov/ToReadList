@@ -255,7 +255,7 @@
                   android:layout_height="wrap_content"
                   android:id="@+id/book_details_description_text"
                   android:text="@string/common_description"
-                  android:maxLines="4"
+                  android:maxLines="6"
                   android:ellipsize="end"
                   android:textSize="@dimen/book_details_description_text_size"
                   android:layout_marginBottom="@dimen/book_details_container_padding"

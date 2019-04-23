@@ -1,6 +1,7 @@
 package ru.appkode.base.ui.books.lists.search
 
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -10,15 +11,12 @@ import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_search_controller.*
 import kotlinx.android.synthetic.main.network_error.*
-import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.books.lists.EVENT_ID_IMAGE_DISMISS
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
-import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
-import java.util.concurrent.TimeUnit
 
 abstract class SearchController :
     BaseMviController<
@@ -45,7 +43,7 @@ abstract class SearchController :
                 books_search_swipe_refresh.isRefreshing = false
         }
 
-        books_search_toolbar_search.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+        books_search_toolbar_search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -54,8 +52,6 @@ abstract class SearchController :
             }
 
         })
-
-        books_search_toolbar_search.onActionViewExpanded()
         books_search_recycler.layoutManager = LinearLayoutManager(applicationContext)
         books_search_recycler.adapter = adapter
     }
@@ -87,6 +83,11 @@ abstract class SearchController :
 
         fieldChanged(viewState, { it.isRefreshing }) {
             books_search_swipe_refresh.isRefreshing = viewState.isRefreshing
+        }
+
+        fieldChanged(viewState, { it.query ?: 1 }) {
+            if (viewState.query == null)
+                books_search_toolbar_search.onActionViewExpanded()
         }
     }
 
