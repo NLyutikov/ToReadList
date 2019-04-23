@@ -38,7 +38,12 @@ abstract class SearchController :
     override fun initializeView(rootView: View) {
         books_search_toolbar.setNavigationOnClickListener { router.handleBack() }
 
-        books_search_swipe_refresh.setOnRefreshListener { eventsRelay.accept(EVENT_ID_IMAGE_REFRESH to Unit) }
+        books_search_swipe_refresh.setOnRefreshListener {
+            if (!previousViewState?.query.isNullOrBlank() && previousViewState?.query!!.length > 1)
+                eventsRelay.accept(EVENT_ID_IMAGE_REFRESH to Unit)
+            else
+                books_search_swipe_refresh.isRefreshing = false
+        }
 
         books_search_toolbar_search.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
