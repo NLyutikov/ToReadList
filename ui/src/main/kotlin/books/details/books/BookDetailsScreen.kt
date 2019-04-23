@@ -11,8 +11,8 @@ interface BookDetailsScreen {
         fun showSimilarBookIntent(): Observable<Long>
         fun showMoreInfoIntent(): Observable<Unit>
         fun historyBtnPressed(): Observable<Unit>
-        fun wishListBtnPressed(): Observable<Unit>
-        fun reloadBookDetails(): Observable<Unit>
+        fun wishListBtnPressedIntent(): Observable<Unit>
+        fun reloadBookDetailsIntent(): Observable<Unit>
     }
 
     data class ViewState(

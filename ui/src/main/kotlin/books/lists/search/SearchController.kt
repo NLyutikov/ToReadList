@@ -16,6 +16,7 @@ import ru.appkode.base.ui.books.lists.EVENT_ID_IMAGE_DISMISS
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.LceState
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
 
@@ -99,7 +100,7 @@ abstract class SearchController :
     }
 
     override fun itemClickedIntent(): Observable<Int> {
-        return adapter.itemClicked
+        return adapter.itemClicked.eventThrottleFirst()
     }
 
     override fun searchBookIntent(): Observable<String> {
@@ -107,7 +108,7 @@ abstract class SearchController :
     }
 
     override fun showImageIntent(): Observable<String> {
-        return adapter.imageClicked
+        return adapter.imageClicked.eventThrottleFirst()
     }
 
     override fun dismissImageIntent(): Observable<Unit> {
@@ -138,7 +139,7 @@ abstract class SearchController :
                         isLoading != null &&
                         !isLoading  &&
                         firstVisibleItem + visibleItemCount >= limit
-            }.throttleFirst( 500, TimeUnit.MILLISECONDS)
+            }.eventThrottleFirst()
             .map { (previousViewState?.query ?: "")  to previousViewState!!.page + 1 }
     }
 }

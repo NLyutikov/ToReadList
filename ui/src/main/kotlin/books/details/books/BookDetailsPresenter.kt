@@ -37,11 +37,11 @@ class BookDetailsPresenter(
                 .map{ ShowMoreInformation },
             intent(BookDetailsScreen.View::showSimilarBookIntent)
                 .map{ ShowSimilarBook(it) },
-            intent(BookDetailsScreen.View::wishListBtnPressed)
+            intent(BookDetailsScreen.View::wishListBtnPressedIntent)
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent(BookDetailsScreen.View::reloadBookDetails)
+            intent(BookDetailsScreen.View::reloadBookDetailsIntent)
                 .flatMap {  networkRepository.getBookDetails(bookId, localRepository) }
                 .map { LoadBookDetails(it) },
             intent { networkRepository.getBookDetails(bookId, localRepository) }

@@ -16,7 +16,7 @@ fun MovieDetailsNM.toUiModel(): MovieDetailsUM {
         cast = credits?.cast,
         genres = genres,
         overview = overview,
-        release_date = release_date,
+        releaseDate = release_date,
         runtime = runtime,
         videos = videos?.results
     )

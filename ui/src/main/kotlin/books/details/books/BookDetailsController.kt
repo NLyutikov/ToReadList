@@ -148,7 +148,7 @@ class BookDetailsController :
         }
     }
 
-    override fun reloadBookDetails(): Observable<Unit> {
+    override fun reloadBookDetailsIntent(): Observable<Unit> {
         return network_error_screen_reload_btn.clicks()
     }
 
@@ -164,7 +164,7 @@ class BookDetailsController :
         return book_details_add_to_history_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
     }
 
-    override fun wishListBtnPressed(): Observable<Unit> {
+    override fun wishListBtnPressedIntent(): Observable<Unit> {
         return book_details_add_to_want_to_read_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
     }
 

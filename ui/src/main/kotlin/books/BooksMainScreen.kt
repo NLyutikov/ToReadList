@@ -8,9 +8,9 @@ interface BooksMainScreen {
     interface View : MviView<ViewState> {
         fun showListIntent(): Observable<String>
         fun showSearchList(): Observable<Unit>
-        fun showBookSearchList(): Observable<Unit>
-        fun showMovieSearchList(): Observable<Unit>
-        fun dialogCanceled(): Observable<Unit>
+        fun showBookSearchListIntent(): Observable<Unit>
+        fun showMovieSearchListIntent(): Observable<Unit>
+        fun dialogCanceledIntent(): Observable<Unit>
     }
 
     data class ViewState(

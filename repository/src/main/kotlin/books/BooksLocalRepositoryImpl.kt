@@ -40,18 +40,6 @@ class BooksLocalRepositoryImpl(
         loadImg(book.imagePath)
         val book = Observable.just(book)
         val wishListSize = getWishListSize()
-//        val add = getWishListSize()
-//            .flatMap { size ->
-//                Timber.e("size $size")
-//                if (size > 0)
-//                    getMaxOrder()
-//                else
-//                    Observable.just(BOTTOM_ORDER_LINE)
-//            }.flatMap { maxOrder ->
-//                Timber.e("max $maxOrder")
-//                Observable.fromCallable { wishListPersistence.insert(book.toWishListSM(TOP_ORDER_LINE / 2 + maxOrder / 2)) }
-//            }.subscribeOn(appSchedulers.io)
-//        return Completable.fromObservable<Unit> { add }
         val maxOrder = getMaxOrder()
         return Completable.fromObservable<Unit> (
             Observable.zip(
@@ -93,13 +81,7 @@ class BooksLocalRepositoryImpl(
                 .subscribeOn(appSchedulers.io)
                 .flatMap { getWishList() }
         }
-//
-//        recalculateOrders(oldPos, newPos, book.toWishListSM())
-//            .singleOrError()
-//            .map {
-//                wishListPersistence.deleteAll()
-//                it
-//            }
+
         return recalculateOrders(oldPos, newPos, book.toWishListSM())
             .map { books -> wishListPersistence.insert(*books.toTypedArray()) }
             .concatMap { getWishList() }
@@ -214,9 +196,9 @@ class BooksLocalRepositoryImpl(
     override fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
         val isInHistory = isInHistory(book.toBookListItemUM()).onErrorReturn { false }
         val isInWishLis = isInWishList(book.toBookListItemUM()).onErrorReturn { false }
-        val mBook = Observable.just(book)
+        val book = Observable.just(book)
         return  Observable.zip(
-            mBook,
+            book,
             isInHistory,
             isInWishLis,
             Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
@@ -228,16 +210,16 @@ class BooksLocalRepositoryImpl(
         )
     }
 
-    override fun getInBaseState(book: MovieDetailsUM): Observable<MovieDetailsUM> {
-        val isInHistory = isInHistory(book.toBookListUM()).onErrorReturn { false }
-        val isInWishLis = isInWishList(book.toBookListUM()).onErrorReturn { false }
-        val mBook = Observable.just(book)
+    override fun getInBaseState(movie: MovieDetailsUM): Observable<MovieDetailsUM> {
+        val isInHistory = isInHistory(movie.toBookListUM()).onErrorReturn { false }
+        val isInWishLis = isInWishList(movie.toBookListUM()).onErrorReturn { false }
+        val movie = Observable.just(movie)
         return  Observable.zip(
-            mBook,
+            movie,
             isInHistory,
             isInWishLis,
-            Function3 <MovieDetailsUM, Boolean, Boolean, MovieDetailsUM> { book, inHist, inWish ->
-                book.copy(
+            Function3 <MovieDetailsUM, Boolean, Boolean, MovieDetailsUM> { movie, inHist, inWish ->
+                movie.copy(
                     isInHistory = inHist,
                     isInWishList = inWish
                 )
@@ -248,9 +230,9 @@ class BooksLocalRepositoryImpl(
     override fun getInBaseState(book: BookListItemUM): Observable<BookListItemUM> {
         val isInHistory = isInHistory(book).onErrorReturn { false }
         val isInWishLis = isInWishList(book).onErrorReturn { false }
-        val mBook = Observable.just(book)
+        val book = Observable.just(book)
         return  Observable.zip(
-            mBook,
+            book,
             isInHistory,
             isInWishLis,
             Function3 <BookListItemUM, Boolean, Boolean, BookListItemUM> { book, inHist, inWish ->
