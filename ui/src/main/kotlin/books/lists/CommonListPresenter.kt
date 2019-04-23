@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
+import ru.appkode.base.ui.books.details.movies.MovieDetailsController
 import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
@@ -121,8 +122,12 @@ abstract class CommonListPresenter(
         previousState: CommonListScreen.ViewState,
         action: ItemClicked
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        val itemId = previousState.list[action.position].id
         return previousState to command { router.pushController(
-            BookDetailsController.createController(previousState.list[action.position].id).obtainVerticalTransaction()
+            if (itemId > 0)
+                BookDetailsController.createController(itemId).obtainVerticalTransaction()
+            else
+                MovieDetailsController.createController(-itemId).obtainVerticalTransaction()
         ) }
     }
 

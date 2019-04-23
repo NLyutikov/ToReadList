@@ -14,6 +14,7 @@ import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.isOnlyControllersWithTagsInBackstack
 import timber.log.Timber
@@ -26,7 +27,10 @@ class BooksMainController :
 
     private lateinit var childRouter: Router
 
-    private val searchItems = listOf("Фильмы", "Книги") //FIXME перенести в string.xml
+    private val searchItems: List<String> by lazy { listOf(
+        resources!!.getString(R.string.search_dialog_movie_item),
+        resources!!.getString(R.string.search_dialog_book_item)
+    ) }
 
     override fun createConfig(): Config {
         return object : Config {
@@ -43,7 +47,7 @@ class BooksMainController :
         fieldChanged(viewState, {it.showDialog}) {
             if(viewState.showDialog)
                 MaterialDialog(activity!!).show {
-                    title(text = SEARCH_DIALOG_TITLE)
+                    title(res = R.string.search_dialog_title)
                     listItems(items = searchItems) { dialog, index, text ->
                         when(index) {
                             0 -> eventsRelay.accept(SHOW_SEARCH_MOVIE_LIST to Unit)
@@ -60,22 +64,23 @@ class BooksMainController :
     }
 
     override fun showSearchList(): Observable<Unit> {
-        return books_main_fab.clicks().throttleFirst(700, TimeUnit.MILLISECONDS)
+        return books_main_fab.clicks()
+            .eventThrottleFirst()
     }
 
-    override fun showBookSearchList(): Observable<Unit> {
+    override fun showBookSearchListIntent(): Observable<Unit> {
         return eventsRelay.filterEvents<Unit>(SHOW_SEARCH_BOOKS_LIST)
-            .throttleFirst(500, TimeUnit.MILLISECONDS)
+            .eventThrottleFirst()
     }
 
-    override fun showMovieSearchList(): Observable<Unit> {
+    override fun showMovieSearchListIntent(): Observable<Unit> {
         return eventsRelay.filterEvents<Unit>(SHOW_SEARCH_MOVIE_LIST)
-            .throttleFirst(500, TimeUnit.MILLISECONDS)
+            .eventThrottleFirst()
     }
 
-    override fun dialogCanceled(): Observable<Unit> {
+    override fun dialogCanceledIntent(): Observable<Unit> {
         return eventsRelay.filterEvents<Unit>(DIALOG_CANCELED)
-            .throttleFirst(500, TimeUnit.MILLISECONDS)
+            .eventThrottleFirst()
     }
 
     override fun onNavigationItemSelected(item: MenuItem) = when(item.itemId) {
@@ -117,4 +122,3 @@ const val HISTORY_CONTROLLER_TAG = "2"
 const val SHOW_SEARCH_BOOKS_LIST = 76
 const val SHOW_SEARCH_MOVIE_LIST = 34
 const val DIALOG_CANCELED = 23
-const val SEARCH_DIALOG_TITLE = "Искать"

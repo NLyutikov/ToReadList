@@ -41,4 +41,13 @@
   <string name="change_task_save">Save</string>
   <string name="description">Description</string>
 
+  <!-- Search -->
+  <string name="search_is_not_started">Start typing the query text</string>
+  <string name="search_nothing_found_by_query">Nothing found by query:</string>
+
+  <!-- MainController search dialog -->
+  <string name="search_dialog_movie_item">Movies</string>
+  <string name="search_dialog_book_item">Books</string>
+  <string name="search_dialog_title">Search</string>
+
 </resources>

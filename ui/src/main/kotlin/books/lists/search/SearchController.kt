@@ -1,6 +1,7 @@
 package ru.appkode.base.ui.books.lists.search
 
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -10,14 +11,12 @@ import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.books_search_controller.*
 import kotlinx.android.synthetic.main.network_error.*
-import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.books.lists.EVENT_ID_IMAGE_DISMISS
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.BaseMviController
-import ru.appkode.base.ui.core.core.LceState
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
-import java.util.concurrent.TimeUnit
 
 abstract class SearchController :
     BaseMviController<
@@ -37,9 +36,14 @@ abstract class SearchController :
     override fun initializeView(rootView: View) {
         books_search_toolbar.setNavigationOnClickListener { router.handleBack() }
 
-        books_search_swipe_refresh.setOnRefreshListener { eventsRelay.accept(EVENT_ID_IMAGE_REFRESH to Unit) }
+        books_search_swipe_refresh.setOnRefreshListener {
+            if (!previousViewState?.query.isNullOrBlank() && previousViewState?.query!!.length > 1)
+                eventsRelay.accept(EVENT_ID_IMAGE_REFRESH to Unit)
+            else
+                books_search_swipe_refresh.isRefreshing = false
+        }
 
-        books_search_toolbar_search.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+        books_search_toolbar_search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
 
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -48,8 +52,6 @@ abstract class SearchController :
             }
 
         })
-
-        books_search_toolbar_search.onActionViewExpanded()
         books_search_recycler.layoutManager = LinearLayoutManager(applicationContext)
         books_search_recycler.adapter = adapter
     }
@@ -60,11 +62,14 @@ abstract class SearchController :
                 viewState.booksSearchState.isLoading && viewState.list.isEmpty() && !viewState.isRefreshing
             books_search_recycler.isVisible = !viewState.list.isEmpty()
             network_error_screen_container.isVisible = viewState.booksSearchState.isError && !viewState.list.isEmpty()
+            renderEmptyResult(viewState)
         }
 
         fieldChanged(viewState, { it.list }) {
+            renderEmptyResult(viewState)
             if (viewState.list.isNotEmpty())
                 adapter.data = viewState.list
+
         }
 
         fieldChanged(viewState, { it.url.orEmpty() }) {
@@ -79,19 +84,25 @@ abstract class SearchController :
         fieldChanged(viewState, { it.isRefreshing }) {
             books_search_swipe_refresh.isRefreshing = viewState.isRefreshing
         }
-    }
 
-    private fun renderSearchState(searchState: LceState<List<BookListItemUM>>) {
-        books_search_loading.isVisible = searchState.isLoading
-        books_search_recycler.isVisible = searchState.isContent
-        network_error_screen_container.isVisible = searchState.isError
-        if (searchState.isContent) {
-            adapter.data = searchState.asContent()
+        fieldChanged(viewState, { it.query ?: 1 }) {
+            if (viewState.query == null)
+                books_search_toolbar_search.onActionViewExpanded()
         }
     }
 
+    private fun renderEmptyResult(viewState: SearchScreen.ViewState) {
+        books_search_empty_search_result.isVisible = viewState.list.isEmpty() && !viewState.booksSearchState.isLoading
+        if (viewState.list.isEmpty())
+            if (viewState.query.isNullOrBlank())
+                books_search_empty_search_result.text = resources!!.getString(R.string.search_is_not_started)
+            else
+                books_search_empty_search_result.text =
+                    "${resources!!.getString(R.string.search_nothing_found_by_query)} ${viewState.query}"
+    }
+
     override fun itemClickedIntent(): Observable<Int> {
-        return adapter.itemClicked
+        return adapter.itemClicked.eventThrottleFirst()
     }
 
     override fun searchBookIntent(): Observable<String> {
@@ -99,7 +110,7 @@ abstract class SearchController :
     }
 
     override fun showImageIntent(): Observable<String> {
-        return adapter.imageClicked
+        return adapter.imageClicked.eventThrottleFirst()
     }
 
     override fun dismissImageIntent(): Observable<Unit> {
@@ -130,7 +141,7 @@ abstract class SearchController :
                         isLoading != null &&
                         !isLoading  &&
                         firstVisibleItem + visibleItemCount >= limit
-            }.throttleFirst( 500, TimeUnit.MILLISECONDS)
+            }.eventThrottleFirst()
             .map { (previousViewState?.query ?: "")  to previousViewState!!.page + 1 }
     }
 }

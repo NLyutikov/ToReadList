@@ -23,7 +23,7 @@ class HistoryController : CommonListController() {
         )
     }
 
-    override fun wishListIconCickedIntent(): Observable<Int> {
+    override fun wishListIconClickedIntent(): Observable<Int> {
         return listAdapter.wishListIconClicked
     }
 

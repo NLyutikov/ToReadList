@@ -67,8 +67,8 @@ abstract class SearchPresenter(
 
     protected abstract fun loadContent(text: String, page: Int): Observable<List<BookListItemUM>>
 
-    private fun isCorrectQuery(query: String): Boolean {
-        return !query.isBlank() && query.length > MIN_QUERY_LENGTH
+    private fun isCorrectQuery(query: String?): Boolean {
+        return !query.isNullOrBlank() && query.length > MIN_QUERY_LENGTH
     }
 
     private fun processShowImage(

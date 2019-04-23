@@ -9,7 +9,7 @@ data class MovieDetailsUM (
     val id: Long,
     val title: String?,
     val averageRating: Double?,
-    val release_date: String?,
+    val releaseDate: String?,
     val runtime: Int?,
     val genres: List<Genre>?,
     val poster: String?,

@@ -18,6 +18,7 @@ import ru.appkode.base.ui.R
 import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.books.lists.adapters.DropItemInfo
 import ru.appkode.base.ui.core.core.BaseMviController
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
 import java.util.concurrent.TimeUnit
 
@@ -84,6 +85,7 @@ abstract class CommonListController :
         fieldChanged(viewState, {state ->  state.list}) {
             with(viewState) {
                 books_list_recycler.isVisible = list.isNotEmpty()
+                books_list_empty_list.isVisible = loadNewPageState.isContent && list.isEmpty()
                 listAdapter.data = list
             }
         }
@@ -118,25 +120,26 @@ abstract class CommonListController :
                         isLoading != null &&
                         !isLoading  &&
                         firstVisibleItem + visibleItemCount >= limit
-            }.throttleFirst( 500, TimeUnit.MILLISECONDS)
+            }.eventThrottleFirst()
             .map { previousViewState!!.curPage + 1 }
     }
 
     override fun itemClickedIntent(): Observable<Int> {
         return listAdapter.itemClicked
-            .throttleFirst(500, TimeUnit.MILLISECONDS)
+            .eventThrottleFirst()
     }
 
     override fun refreshIntent(): Observable<Unit> {
-        return eventsRelay.filterEvents(COMMON_LIST_REFRESH_EVENT_ID)
+        return eventsRelay.filterEvents<Unit>(COMMON_LIST_REFRESH_EVENT_ID)
+            .eventThrottleFirst()
     }
 
     override fun itemSwipedLeftIntent(): Observable<Int> {
-        return listAdapter.eventsRelay.filterEvents(EVENT_ID_ITEM_SWIPED_LEFT)
+        return listAdapter.eventsRelay.filterEvents<Int>(EVENT_ID_ITEM_SWIPED_LEFT)
     }
 
     override fun itemSwipedRightIntent(): Observable<Int> {
-        return listAdapter.eventsRelay.filterEvents(EVENT_ID_ITEM_SWIPED_RIGHT)
+        return listAdapter.eventsRelay.filterEvents<Int>(EVENT_ID_ITEM_SWIPED_RIGHT)
     }
 
     override fun itemDroppedIntent(): Observable<DropItemInfo> {
@@ -155,7 +158,7 @@ abstract class CommonListController :
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun wishListIconCickedIntent(): Observable<Int> {
+    override fun wishListIconClickedIntent(): Observable<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

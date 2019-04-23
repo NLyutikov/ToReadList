@@ -8,10 +8,10 @@ fun BookSearchNM.toUiModel(): List<BookListItemUM> {
 
 fun SearchResultNM.toUiModel(): BookListItemUM {
     return BookListItemUM(
-        id,
-        title,
-        average_rating,
-        image_url,
+        id = id,
+        title = title,
+        averageRating = average_rating,
+        imagePath = image_url,
         isInWishList = false,
         isInHistory = false,
         order = null

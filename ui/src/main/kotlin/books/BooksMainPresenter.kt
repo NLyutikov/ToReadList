@@ -33,11 +33,11 @@ class BooksMainPresenter(
                 .map { ShowSearchList },
             intent { Observable.just(WISH_LIST_CONTROLLER_TAG) }
                 .map { itemId -> ShowList(itemId) },
-            intent(BooksMainScreen.View::showBookSearchList)
+            intent(BooksMainScreen.View::showBookSearchListIntent)
                 .map { ShowBookSearchList },
-            intent(BooksMainScreen.View::showMovieSearchList)
+            intent(BooksMainScreen.View::showMovieSearchListIntent)
                 .map { ShowMovieSearchList },
-            intent(BooksMainScreen.View::dialogCanceled)
+            intent(BooksMainScreen.View::dialogCanceledIntent)
                 .map { DialogCanceled }
         )
     }
@@ -58,9 +58,7 @@ class BooksMainPresenter(
     private fun processShowSearchList(
         previousState: BooksMainScreen.ViewState
     ) :  Pair<BooksMainScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        return previousState.copy(showDialog = true) to command {
-            //parentRouter.pushController(MoviesSearchController().obtainVerticalTransaction())
-        }
+        return previousState.copy(showDialog = true) to null
     }
 
     private fun processShowBookSearchList(

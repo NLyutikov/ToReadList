@@ -16,4 +16,9 @@
   <string name="common_description">Эта книга об истории двух друзей...</string>
   <string name="description">Описание</string>
   <string name="book_details_reload_btn_text">Перезагрузить</string>
+  <string name="search_is_not_started">начните вводить текст запроса</string>
+  <string name="search_nothing_found_by_query">по запросу ничего не найденно:</string>
+  <string name="search_dialog_movie_item">Фильмы</string>
+  <string name="search_dialog_book_item">"Книги "</string>
+  <string name="search_dialog_title">Искать</string>
 </resources>

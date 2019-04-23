@@ -31,7 +31,7 @@ object NetworkHelper {
     .build()
 
   private val movieHttpClient = OkHttpClient.Builder()
-    .addInterceptor(HttpLoggingInterceptor().setLevel(if (ru.appkode.base.data.BuildConfig.DEBUG) BODY else NONE))
+    .addInterceptor(HttpLoggingInterceptor().setLevel(if (BuildConfig.DEBUG) BODY else NONE))
     .addInterceptor(MovieApiKeyInterceptor)
     .build()
 

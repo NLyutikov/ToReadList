@@ -14,7 +14,7 @@ interface CommonListScreen {
         fun itemSwipedRightIntent(): Observable<Int>
         fun refreshIntent(): Observable<Unit>
         fun historyIconClickedIntent(): Observable<Int>
-        fun wishListIconCickedIntent(): Observable<Int>
+        fun wishListIconClickedIntent(): Observable<Int>
         fun deleteIconClickedIntent(): Observable<Int>
         fun itemDroppedIntent(): Observable<DropItemInfo>
         fun showImageIntent(): Observable<String>

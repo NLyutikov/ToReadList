@@ -19,7 +19,7 @@ class HistoryPresenter(
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
-            intent(CommonListScreen.View::wishListIconCickedIntent)
+            intent(CommonListScreen.View::wishListIconClickedIntent)
                 .map { AddToWishList(it) },
             intent(CommonListScreen.View::deleteIconClickedIntent)
                 .map { DeleteFromHistory(it) }
