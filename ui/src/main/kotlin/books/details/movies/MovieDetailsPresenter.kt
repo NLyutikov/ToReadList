@@ -1,7 +1,10 @@
 package ru.appkode.base.ui.books.details.movies
 
+import android.content.Intent
+import android.net.Uri
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import ru.appkode.base.entities.core.movies.YOUTUBE_VIDEO_BASE_URL
 import ru.appkode.base.entities.core.movies.details.MovieDetailsUM
 import ru.appkode.base.entities.core.movies.details.toBookListUM
 import ru.appkode.base.repository.books.BooksLocalRepository
@@ -17,6 +20,7 @@ sealed class ScreenAction
 data class LoadMovieState(val state: LceState<MovieDetailsUM>) : ScreenAction()
 object WishListBtnPressed : ScreenAction()
 object HistoryBtnPressed : ScreenAction()
+data class ShowMovieTrailer(val key: String) : ScreenAction()
 data class WishListBtnPressedState(val state: LceState<Unit>) : ScreenAction()
 data class HistoryBtnPressedState(val state: LceState<Unit>) : ScreenAction()
 
@@ -38,7 +42,9 @@ class MovieDetailsPresenter(
             intent(MovieDetailsScreen.View::historyBtnPressedIntent)
                 .map { HistoryBtnPressed },
             intent(MovieDetailsScreen.View::wishListBtnPressedIntent)
-                .map { WishListBtnPressed }
+                .map { WishListBtnPressed },
+            intent(MovieDetailsScreen.View::showMovieTrailerIntent)
+                .map { ShowMovieTrailer(it) }
         )
     }
 
@@ -53,6 +59,18 @@ class MovieDetailsPresenter(
             is HistoryBtnPressed -> processHistoryBtnPressed(previousState)
             is WishListBtnPressedState -> processWishListBtnPressedState(previousState, action)
             is HistoryBtnPressedState -> processHistoryBtnPressedState(previousState, action)
+            is ShowMovieTrailer -> processMovieTrailerPressed(previousState, action)
+        }
+    }
+
+    private fun processMovieTrailerPressed(
+        previousState: MovieDetailsScreen.ViewState,
+        action: ShowMovieTrailer
+    ): Pair<MovieDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to command {
+            router.activity?.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_VIDEO_BASE_URL + action.key))
+            )
         }
     }
 
