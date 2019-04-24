@@ -122,13 +122,17 @@ abstract class CommonListPresenter(
         previousState: CommonListScreen.ViewState,
         action: ItemClicked
     ): Pair<CommonListScreen.ViewState, Command<Observable<ScreenAction>>?> {
-        val itemId = previousState.list[action.position].id
-        return previousState to command { router.pushController(
-            if (itemId > 0)
-                BookDetailsController.createController(itemId).obtainVerticalTransaction()
-            else
-                MovieDetailsController.createController(-itemId).obtainVerticalTransaction()
-        ) }
+        var com: Command<Observable<ScreenAction>>? = null
+        if (action.position in 0 until previousState.list.size) {
+            val itemId = previousState.list[action.position].id
+            com = command { router.pushController(
+                if (itemId > 0)
+                    BookDetailsController.createController(itemId).obtainVerticalTransaction()
+                else
+                    MovieDetailsController.createController(-itemId).obtainVerticalTransaction()
+            ) }
+        }
+        return previousState to com
     }
 
     protected open fun processUpdateData(
