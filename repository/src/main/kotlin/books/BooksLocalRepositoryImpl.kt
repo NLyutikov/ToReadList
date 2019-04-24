@@ -270,6 +270,25 @@ class BooksLocalRepositoryImpl(
             })
     }
 
+    override fun getInBaseState(books: List<BookListItemUM>): Observable<List<BookListItemUM>> {
+        val books = Observable.just(books)
+        val wishList = getWishList()
+        val history = getHistory()
+        return Observable.zip(
+            books,
+            wishList,
+            history,
+            Function3<List<BookListItemUM>,  List<BookListItemUM>, List<BookListItemUM>, List<BookListItemUM>> { books, wish, hist ->
+                books.map {
+                    it.copy(
+                        isInHistory = hist.map { it.id }.contains(it.id),
+                        isInWishList = wish.map { it.id }.contains(it.id)
+                    )
+                }
+            }
+        )
+    }
+
     private fun loadImg(imagePath: String?) {
         Glide.with(context)
             .load(imagePath)

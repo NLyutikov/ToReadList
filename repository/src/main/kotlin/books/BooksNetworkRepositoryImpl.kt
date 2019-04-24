@@ -41,9 +41,7 @@ class BooksNetworkRepositoryImpl(
     ): Observable<List<BookListItemUM>> {
         return booksApi.getBooksSearch(text, page)
             .map { list -> list.toUiModel() }
-            .flatMapIterable { it }
             .flatMap { localRepository.getInBaseState(it) }
-            .map { listOf(it) }
     }
 
     override fun getMovieDetails(
@@ -62,5 +60,6 @@ class BooksNetworkRepositoryImpl(
     ): Observable<List<BookListItemUM>> {
         return movieAPI.searchMoviesPaged(text, page)
             .map { it.toListOfBookListUM() }
+            .flatMap { localRepository.getInBaseState(it) }
     }
 }

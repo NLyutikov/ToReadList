@@ -45,5 +45,7 @@ dependencies {
   //Advanced recycler view
   api 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
 
+  kapt 'nz.bradcampbell:paperparcel-compiler:2.0.6'
+
 
 }

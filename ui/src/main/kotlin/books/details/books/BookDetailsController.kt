@@ -14,6 +14,7 @@ import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setVisibilityAndText
 import java.util.concurrent.TimeUnit
@@ -43,13 +44,11 @@ class BookDetailsController :
     override fun initializeView(rootView: View) {
         book_details_back_btn.setOnClickListener { router.handleBack() }
 
-        //TODO
-        book_details_add_to_want_to_read_btn.setOnClickListener {
-            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
+        book_details_more_info_btn.setOnClickListener {
+            eventsRelay.accept(EVENT_ID_MORE_INFO to Unit)
         }
 
         book_details_about_book_container.setOnClickListener {
-            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
             eventsRelay.accept(EVENT_ID_MORE_INFO to Unit)
         }
 
@@ -161,11 +160,11 @@ class BookDetailsController :
     }
 
     override fun historyBtnPressed(): Observable<Unit> {
-        return book_details_add_to_history_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+        return book_details_add_to_history_btn.clicks().eventThrottleFirst(100)
     }
 
     override fun wishListBtnPressedIntent(): Observable<Unit> {
-        return book_details_add_to_want_to_read_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+        return book_details_add_to_want_to_read_btn.clicks().eventThrottleFirst(100)
     }
 
     override fun createPresenter(): BookDetailsPresenter {

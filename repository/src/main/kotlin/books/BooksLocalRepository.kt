@@ -57,4 +57,6 @@ interface BooksLocalRepository {
 
     fun getInBaseState(book: MovieDetailsUM): Observable<MovieDetailsUM>
 
+    fun getInBaseState(books: List<BookListItemUM>): Observable<List<BookListItemUM>>
+
 }

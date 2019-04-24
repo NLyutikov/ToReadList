@@ -6,12 +6,14 @@ import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
+import ru.appkode.base.ui.books.details.books.about_book.AboutBookController
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
+import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
 
 sealed class ScreenAction
 
@@ -95,7 +97,7 @@ class BookDetailsPresenter(
         action: ShowMoreInformation
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {
-            //TODO показать доп. информацию о книге
+            router.pushController(AboutBookController.createController(previousState.bookDetails).obtainVerticalTransaction())
         }
     }
 

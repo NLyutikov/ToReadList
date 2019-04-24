@@ -21,4 +21,9 @@
   <string name="search_dialog_movie_item">Фильмы</string>
   <string name="search_dialog_book_item">"Книги "</string>
   <string name="search_dialog_title">Искать</string>
+    <string name="about_book_isbn">isbn</string>
+  <string name="about_book_language">Язык</string>
+  <string name="about_book_pages_number">Количество страниц</string>
+  <string name="about_book_authors">Авторы</string>
+    <string name="about_book">" О книге"</string>
 </resources>
