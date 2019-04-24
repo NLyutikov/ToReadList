@@ -10,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableSwipeableItemViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.book_details_controller.*
 import kotlinx.android.synthetic.main.books_list_item.view.*
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.ui.R
