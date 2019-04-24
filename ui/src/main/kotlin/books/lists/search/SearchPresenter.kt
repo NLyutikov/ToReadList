@@ -20,6 +20,8 @@ object DismissImage : ScreenAction()
 object RepeatSearch : ScreenAction()
 data class ItemClicked(val position: Int) : ScreenAction()
 object Refresh : ScreenAction()
+object InBaseStateChanged : ScreenAction()
+data class InBaseStateChangedState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
 
 abstract class SearchPresenter(
     schedulers: AppSchedulers,
@@ -45,7 +47,9 @@ abstract class SearchPresenter(
             intent(View::itemClickedIntent)
                 .map { ItemClicked(it) },
             intent(View::refreshIntent)
-                .map { Refresh }
+                .map { Refresh },
+            intent{ viewStateObservable.map { it.list } }
+                .map { InBaseStateChanged }
         )
     }
 
@@ -62,6 +66,8 @@ abstract class SearchPresenter(
             is ItemClicked -> processItemClicked(previousState, action)
             is LoadPageState -> processLoadPageState(previousState, action)
             is Refresh -> processRefresh(previousState)
+            is InBaseStateChanged -> processInBaseStateChanged(previousState)
+            is InBaseStateChangedState -> processInBaseStateChangedState(previousState, action)
         }
     }
 
@@ -148,6 +154,25 @@ abstract class SearchPresenter(
         ) to command(
             Observable.just(SearchBook(previousState.query ?: "") as ScreenAction)
         )
+    }
+
+    private fun processInBaseStateChanged(
+        previousState: SearchScreen.ViewState
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState to command(
+            localRepository.getInBaseState(previousState.list)
+                .doLceAction { InBaseStateChangedState(it) }
+        )
+    }
+
+    private fun processInBaseStateChangedState(
+        previousState: SearchScreen.ViewState,
+        action: InBaseStateChangedState
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        var list = previousState.list
+        if (action.state.isContent)
+            list = action.state.asContent()
+        return previousState.copy(list = list) to null
     }
 
     override fun createInitialState(): SearchScreen.ViewState {
