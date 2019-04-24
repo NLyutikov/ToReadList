@@ -125,6 +125,14 @@ abstract class SearchController :
         return eventsRelay.filterEvents(EVENT_ID_IMAGE_REFRESH)
     }
 
+    override fun historyIconPressedIntent(): Observable<Int> {
+        return adapter.historyIconClicked.eventThrottleFirst()
+    }
+
+    override fun wishIconPressedIntent(): Observable<Int> {
+        return adapter.wishListIconClicked.eventThrottleFirst()
+    }
+
     override fun loadPageIntent(): Observable<Pair<String, Int>> {
         return books_search_recycler.scrollEvents()
             .filter {
@@ -146,7 +154,7 @@ abstract class SearchController :
     }
 }
 
-class SearchAdapter : CommonListAdapter()
+class SearchAdapter : CommonListAdapter(enableControlIcons = true)
 
 private const val EVENT_ID_SEARCH_CHANGED = 0
 private const val EVENT_ID_IMAGE_REFRESH = 3

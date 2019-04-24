@@ -84,7 +84,7 @@ class MovieDetailsController() :
         }
     }
 
-    fun showContent(viewState: MovieDetailsScreen.ViewState) {
+    private fun showContent(viewState: MovieDetailsScreen.ViewState) {
         val movie = viewState.details
         check(movie != null)
 
@@ -126,13 +126,16 @@ class MovieDetailsController() :
 
         Glide.with(applicationContext!!)
             .load(backdrop)
+            .centerCrop()
             .into(details_backdrop)
         Glide.with(applicationContext!!)
             .load(poster)
+            .centerCrop()
             .into(details_poster)
         details_subtitle_time.setVisibilityAndText(getDetailsTimeSubtitle(releaseDate, runtime, "hrs", "min"))
         details_subtitle.setVisibilityAndText(title)
         details_subtitle_genres.setVisibilityAndText(genres?.toGenreLine(0..2))
+        movie_details_toolbar.setNavigationOnClickListener { router.handleBack() }
     }
 
     private fun getDetailsTimeSubtitle(date: String?, runtime: Int?, hrs: String, min: String): String {

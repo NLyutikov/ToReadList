@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.book_details_similar_books_list_item.view.*
@@ -32,8 +33,9 @@ class SimilarBooksListAdapter : RecyclerView.Adapter<SimilarBooksListAdapter.Vie
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder) {
             title.text = data[position].title
-            Picasso.get()
+            Glide.with(view.context)
                 .load(data[position].coverImageUrl)
+                .centerCrop()
                 .into(image)
         }
     }
