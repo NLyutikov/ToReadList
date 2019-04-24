@@ -15,6 +15,8 @@ interface SearchScreen {
         fun itemClickedIntent(): Observable<Int>
         fun loadPageIntent(): Observable<Pair<String, Int>>
         fun refreshIntent(): Observable<Unit>
+        fun historyIconPressedIntent(): Observable<Int>
+        fun wishIconPressedIntent(): Observable<Int>
     }
 
     data class ViewState(

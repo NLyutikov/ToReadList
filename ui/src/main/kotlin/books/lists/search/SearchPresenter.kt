@@ -1,10 +1,15 @@
 package ru.appkode.base.ui.books.lists.search
 
+import books.details.books.BookDetailsScreen
+import books.details.books.HistoryState
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
+import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
+import ru.appkode.base.ui.books.lists.ChangeItemPosition
+import ru.appkode.base.ui.books.lists.CommonListScreen
 import ru.appkode.base.ui.books.lists.search.SearchScreen.View
 import ru.appkode.base.ui.core.core.*
 import ru.appkode.base.ui.core.core.util.AppSchedulers
@@ -22,6 +27,9 @@ data class ItemClicked(val position: Int) : ScreenAction()
 object Refresh : ScreenAction()
 object InBaseStateChanged : ScreenAction()
 data class InBaseStateChangedState(val state: LceState<List<BookListItemUM>>) : ScreenAction()
+data class WishListIconPressed(val position: Int) : ScreenAction()
+data class HistoryIconPressed(val position: Int) : ScreenAction()
+data class ChangeList(val changeAction: (List<BookListItemUM>) -> (List<BookListItemUM>)) : ScreenAction()
 
 abstract class SearchPresenter(
     schedulers: AppSchedulers,
@@ -48,6 +56,10 @@ abstract class SearchPresenter(
                 .map { ItemClicked(it) },
             intent(View::refreshIntent)
                 .map { Refresh },
+            intent(View::historyIconPressedIntent)
+                .map { HistoryIconPressed(it) },
+            intent(View::wishIconPressedIntent)
+                .map{ WishListIconPressed(it) },
             intent{ viewStateObservable.map { it.list } }
                 .map { InBaseStateChanged }
         )
@@ -68,6 +80,9 @@ abstract class SearchPresenter(
             is Refresh -> processRefresh(previousState)
             is InBaseStateChanged -> processInBaseStateChanged(previousState)
             is InBaseStateChangedState -> processInBaseStateChangedState(previousState, action)
+            is HistoryIconPressed -> processHistoryIconPressed(previousState, action)
+            is WishListIconPressed -> processWishListIconPressed(previousState, action)
+            is ChangeList -> processChangeList(previousState, action)
         }
     }
 
@@ -173,6 +188,69 @@ abstract class SearchPresenter(
         if (action.state.isContent)
             list = action.state.asContent()
         return previousState.copy(list = list) to null
+    }
+
+    private fun processHistoryIconPressed(
+        previousState: SearchScreen.ViewState,
+        action: HistoryIconPressed
+    ) : Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        val item = previousState.list[action.position]
+        var com: Command<Observable<ScreenAction>>? = null
+        val act =  ChangeList { list ->
+            val list = ArrayList(list)
+            list[action.position] = list[action.position].copy(
+                isInWishList = false,
+                isInHistory = !list[action.position].isInHistory
+            )
+            list.toList()
+        }
+        if (item.isInHistory)
+            com = command(
+                localRepository.deleteFromHistory(item)
+                    .doAction { act }
+            )
+        else
+            com = command(
+            localRepository.addToHistory(item)
+                    .doAction { act }
+            )
+
+        return previousState to com
+    }
+
+    private fun processWishListIconPressed(
+        previousState: SearchScreen.ViewState,
+        action: WishListIconPressed
+    ) : Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        val item = previousState.list[action.position]
+        var com: Command<Observable<ScreenAction>>? = null
+        val act =  ChangeList { list ->
+            val list = ArrayList(list)
+            list[action.position] = list[action.position].copy(
+                isInHistory = false,
+                isInWishList = !list[action.position].isInWishList
+            )
+            list.toList()
+        }
+        if (item.isInWishList)
+            com = command(
+                localRepository.deleteFromWishList(item)
+                    .doAction { act }
+            )
+        else
+            com = command(
+                localRepository.addToWishList(item)
+                    .doAction { act }
+            )
+
+        return previousState to com
+    }
+
+    private fun processChangeList(
+        previousState: SearchScreen.ViewState,
+        action: ChangeList
+    ): Pair<SearchScreen.ViewState, Command<Observable<ScreenAction>>?> {
+        return previousState.copy(list = action.changeAction(previousState.list)) to null
     }
 
     override fun createInitialState(): SearchScreen.ViewState {

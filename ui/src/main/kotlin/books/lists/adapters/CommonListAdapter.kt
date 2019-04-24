@@ -18,7 +18,8 @@ import ru.appkode.base.ui.core.core.util.filterEvents
 
 abstract class CommonListAdapter(
     private val fromLocalDataSource: Boolean = false,
-    private val draggable: Boolean = false
+    private val draggable: Boolean = false,
+    private val enableControlIcons: Boolean = false
 ) : RecyclerView.Adapter<CommonListAdapter.ViewHolder>() {
 
     var data = emptyList<BookListItemUM>()
@@ -59,6 +60,7 @@ abstract class CommonListAdapter(
 
             Glide.with(itemView.context)
                 .load(item.imagePath)
+                .centerCrop()
                 .onlyRetrieveFromCache(fromLocalDataSource)
                 .into(image)
 
@@ -67,12 +69,31 @@ abstract class CommonListAdapter(
 
             dragIcon.isVisible = draggable
 
-            wishListIcon.isVisible = item.isInWishList
-            historyIcon.isVisible = item.isInHistory
             deleteIcon.isVisible = false
+            if (!enableControlIcons) {
+                wishListIcon.isVisible = item.isInWishList
+                historyIcon.isVisible = item.isInHistory
 
-            historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_blue_24dp)
-            wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_24)
+
+                historyIcon.setImageResource(ru.appkode.base.ui.R.drawable.ic_history_blue_24dp)
+                wishListIcon.setImageResource(ru.appkode.base.ui.R.drawable.outline_turned_in_24)
+            } else {
+                wishListIcon.isVisible = item.isInWishList || !item.isInHistory && !item.isInWishList
+                historyIcon.isVisible = item.isInHistory || !item.isInHistory && !item.isInWishList
+
+                when {
+                    !item.isInHistory && !item.isInWishList -> {
+                        wishListIcon.setImageResource(R.drawable.outline_turned_in_not_24)
+                        historyIcon.setImageResource(R.drawable.ic_history_24dp)
+                    }
+                    item.isInHistory -> {
+                        historyIcon.setImageResource(R.drawable.ic_history_blue_24dp)
+                    }
+                    item.isInWishList -> {
+                        wishListIcon.setImageResource(R.drawable.outline_turned_in_24)
+                    }
+                }
+            }
 
         }
     }
