@@ -84,7 +84,7 @@ class MovieDetailsController() :
         }
     }
 
-    fun showContent(viewState: MovieDetailsScreen.ViewState) {
+    private fun showContent(viewState: MovieDetailsScreen.ViewState) {
         val movie = viewState.details
         check(movie != null)
 
@@ -126,9 +126,11 @@ class MovieDetailsController() :
 
         Glide.with(applicationContext!!)
             .load(backdrop)
+            .centerCrop()
             .into(details_backdrop)
         Glide.with(applicationContext!!)
             .load(poster)
+            .centerCrop()
             .into(details_poster)
         details_subtitle_time.setVisibilityAndText(getDetailsTimeSubtitle(releaseDate, runtime, "hrs", "min"))
         details_subtitle.setVisibilityAndText(title)
