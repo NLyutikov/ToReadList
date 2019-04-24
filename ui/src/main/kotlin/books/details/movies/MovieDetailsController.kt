@@ -135,6 +135,7 @@ class MovieDetailsController() :
         details_subtitle_time.setVisibilityAndText(getDetailsTimeSubtitle(releaseDate, runtime, "hrs", "min"))
         details_subtitle.setVisibilityAndText(title)
         details_subtitle_genres.setVisibilityAndText(genres?.toGenreLine(0..2))
+        movie_details_toolbar.setNavigationOnClickListener { router.handleBack() }
     }
 
     private fun getDetailsTimeSubtitle(date: String?, runtime: Int?, hrs: String, min: String): String {
