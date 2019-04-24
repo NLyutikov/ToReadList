@@ -1,11 +1,11 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
-import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.book_details_controller.*
 import kotlinx.android.synthetic.main.network_error.*
@@ -14,14 +14,14 @@ import ru.appkode.base.repository.RepositoryHelper
 import ru.appkode.base.ui.R
 import ru.appkode.base.ui.core.core.BaseMviController
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
+import ru.appkode.base.ui.core.core.util.eventThrottleFirst
 import ru.appkode.base.ui.core.core.util.filterEvents
 import ru.appkode.base.ui.core.core.util.setVisibilityAndText
 import java.util.concurrent.TimeUnit
 
 class BookDetailsController :
     BaseMviController<BookDetailsScreen.ViewState, BookDetailsScreen.View, BookDetailsPresenter>(),
-    BookDetailsScreen.View,
-    BookDetailsScreen.ViewControl {
+    BookDetailsScreen.View {
 
     companion object {
         fun createController(bookId: Long): BookDetailsController {
@@ -44,13 +44,11 @@ class BookDetailsController :
     override fun initializeView(rootView: View) {
         book_details_back_btn.setOnClickListener { router.handleBack() }
 
-        //TODO
-        book_details_add_to_want_to_read_btn.setOnClickListener {
-            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
+        book_details_more_info_btn.setOnClickListener {
+            eventsRelay.accept(EVENT_ID_MORE_INFO to Unit)
         }
 
         book_details_about_book_container.setOnClickListener {
-            Snackbar.make(rootView, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
             eventsRelay.accept(EVENT_ID_MORE_INFO to Unit)
         }
 
@@ -125,13 +123,13 @@ class BookDetailsController :
         //Genres
         book_details_genres_text.setVisibilityAndText(shelves?.toShelvesLine(0..2))
         //Cover Image
-        Picasso.Builder(applicationContext!!).build()
+        Glide.with(applicationContext!!)
             .load(imageCoverUrl)
-            .error(R.drawable.test_img)
+            .error(R.drawable.without_cover_png)
             .into(book_details_cover_image)
     }
 
-    override fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
+    private fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean) {
         book_details_add_to_want_to_read_btn.isVisible = isInWishList || !isInHistory && !isInWishList
         book_details_add_to_history_btn.isVisible = isInHistory || !isInHistory && !isInWishList
 
@@ -149,6 +147,10 @@ class BookDetailsController :
         }
     }
 
+    override fun reloadBookDetailsIntent(): Observable<Unit> {
+        return network_error_screen_reload_btn.clicks()
+    }
+
     override fun showSimilarBookIntent(): Observable<Long> {
         return similarBooksAdapter.itemClicked
     }
@@ -158,11 +160,11 @@ class BookDetailsController :
     }
 
     override fun historyBtnPressed(): Observable<Unit> {
-        return book_details_add_to_history_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+        return book_details_add_to_history_btn.clicks().eventThrottleFirst(100)
     }
 
-    override fun wishListBtnPressed(): Observable<Unit> {
-        return book_details_add_to_want_to_read_btn.clicks().throttleFirst(100, TimeUnit.MILLISECONDS)
+    override fun wishListBtnPressedIntent(): Observable<Unit> {
+        return book_details_add_to_want_to_read_btn.clicks().eventThrottleFirst(100)
     }
 
     override fun createPresenter(): BookDetailsPresenter {
@@ -171,8 +173,7 @@ class BookDetailsController :
             RepositoryHelper.getBooksNetworkRepository(DefaultAppSchedulers),
             RepositoryHelper.getBooksLocalRepository(applicationContext!!, DefaultAppSchedulers),
             this.router!!,
-            bookId,
-            this
+            bookId
         )
     }
 }

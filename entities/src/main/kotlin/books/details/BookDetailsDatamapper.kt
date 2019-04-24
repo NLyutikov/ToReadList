@@ -1,25 +1,26 @@
 package ru.appkode.base.entities.core.books.details
 
+import android.text.Html
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.util.requireField
 import java.util.*
 
 fun BookDetailsNM.toUiModel(): BookDetailsUM {
     return BookDetailsUM (
-        goodReadsBookId.requireField("BookDetails.goodReadsId").toLong(),
-        title,
-        isbn,
-        isbn13,
-        if (!languageCode.isNullOrBlank()) Locale(languageCode).language else null,
-        coverImageUrl,
-        smallCoverImageUrl,
-        pagesNumber?.toInt(),
-        description,
-        ratingsCount?.toInt(),
-        averageRating?.toDouble(),
-        shelves?.toShelfUM()?.sortedByDescending { shelf -> shelf.count },
-        authors?.toAuthorUM(),
-        similarBooks?.toBookDetailsUM()
+        id = goodReadsBookId.requireField("BookDetails.goodReadsId").toLong(),
+        title = title,
+        isbn = isbn,
+        isbn13 = isbn13,
+        language = if (!languageCode.isNullOrBlank()) Locale(languageCode).language else null,
+        coverImageUrl = coverImageUrl,
+        smallCoverImageUrl = smallCoverImageUrl,
+        pagesNumber = pagesNumber?.toInt(),
+        description = Html.fromHtml(description).toString(),
+        ratingsCount = ratingsCount?.toInt(),
+        averageRating = averageRating?.toDouble(),
+        shelves = shelves?.toShelfUM()?.sortedByDescending { shelf -> shelf.count },
+        authors = authors?.toAuthorUM(),
+        similarBooks = similarBooks?.toBookDetailsUM()
     )
 }
 
@@ -60,11 +61,11 @@ fun ShelfNM.toShelfUM(): ShelfUM {
 
 fun BookDetailsUM.toBookListItemUM(): BookListItemUM {
     return BookListItemUM(
-        id,
-        title,
-        averageRating,
-        coverImageUrl,
-        isInWishList,
-        isInWishList
+        id = id,
+        title = title,
+        averageRating = averageRating,
+        imagePath = coverImageUrl,
+        isInHistory = isInWishList,
+        isInWishList = isInWishList
     )
 }

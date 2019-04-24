@@ -43,4 +43,6 @@ dependencies {
   api 'com.tickaroo.tikxml:annotation:0.8.13'
   api 'com.tickaroo.tikxml:core:0.8.13'
   kapt 'com.tickaroo.tikxml:processor:0.8.13'
+
+  kapt 'nz.bradcampbell:paperparcel-compiler:2.0.6'
 }

@@ -97,8 +97,8 @@ abstract class BasePresenter<V : MviView<VS>, VS, A : Any>(
 
   protected fun Completable.doAction(
     actionCreator: () -> A
-  ): Completable {
-    return this
+  ): Observable<A> {
+    return this.andThen(Observable.fromCallable { actionCreator() })
       .observeOn(schedulers.ui)
   }
 

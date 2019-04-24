@@ -1,30 +1,33 @@
 package ru.appkode.base.repository.books
 
 import android.content.Context
-import android.content.ContextWrapper
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 import io.reactivex.internal.operators.completable.CompletableFromAction
 import ru.appkode.base.data.storage.persistence.books.HistoryPersistence
 import ru.appkode.base.data.storage.persistence.books.WishListPersistence
+import ru.appkode.base.entities.core.books.details.BookDetailsUM
+import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.BookListItemUM
 import ru.appkode.base.entities.core.books.lists.history.toBookListItemUM
 import ru.appkode.base.entities.core.books.lists.toHistorySM
 import ru.appkode.base.entities.core.books.lists.toWishListSM
+import ru.appkode.base.entities.core.books.lists.wish.WishListSM
 import ru.appkode.base.entities.core.books.lists.wish.toBookListItemUM
+import ru.appkode.base.entities.core.movies.details.MovieDetailsUM
+import ru.appkode.base.entities.core.movies.details.toBookListUM
 import ru.appkode.base.ui.core.core.util.AppSchedulers
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import kotlin.concurrent.thread
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-const val BASE_IMAGE_NAME = "to_read_list_book_"
-const val IMAGE_DIR = "image_dir"
 private const val PAGE_SIZE = 20
+private const val BOTTOM_ORDER_LINE = Long.MIN_VALUE + 1
+private const val TOP_ORDER_LINE = Long.MAX_VALUE - 1
+private const val FIRST_ITEM_ORDER = 1L
 
 class BooksLocalRepositoryImpl(
     private val appSchedulers: AppSchedulers,
@@ -33,37 +36,75 @@ class BooksLocalRepositoryImpl(
     private val context: Context
 ) : BooksLocalRepository {
 
-    companion object {
-        fun getImageNameById(id: Long) = BASE_IMAGE_NAME + id.toString() + "png"
-    }
-
     override fun addToWishList(book: BookListItemUM): Completable {
-        loadImg(getImageNameById(book.id))
-        return CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        loadImg(book.imagePath)
+        val book = Observable.just(book)
+        val wishListSize = getWishListSize()
+        val maxOrder = getMaxOrder()
+        return Completable.fromObservable<Unit> (
+            Observable.zip(
+                book,
+                wishListSize,
+                maxOrder,
+                Function3<BookListItemUM, Int, Long?, Unit> { book, size, maxOrder ->
+                    var newOrder = FIRST_ITEM_ORDER
+                    if (size > 0)
+                        newOrder = TOP_ORDER_LINE / 2 + maxOrder / 2
+                    return@Function3 wishListPersistence.insert(book.toWishListSM(newOrder))
+                }).subscribeOn(appSchedulers.io)
+        ).subscribeOn(appSchedulers.io)
     }
 
     override fun addToWishListFromHistory(book: BookListItemUM): Completable {
-        val add = CompletableFromAction { wishListPersistence.insert(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
+        val add = addToWishList(book)
         val del = CompletableFromAction { historyPersistence.delete(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
         return del.mergeWith(add)
     }
 
+    override fun changeItemOrderInWishList(
+        oldPos: Int,
+        newPos: Int,
+        book: BookListItemUM,
+        bottom: BookListItemUM?,
+        top: BookListItemUM?
+    ): Observable<List<BookListItemUM>> {
+        var newOrder = 0L
+        when {
+            top == null && bottom == null -> newOrder = FIRST_ITEM_ORDER
+            top != null && bottom != null -> newOrder =  top.order!! / 2 + bottom.order!! / 2
+            bottom != null -> newOrder = TOP_ORDER_LINE / 2 + bottom.order!! / 2
+            top != null -> newOrder = top.order!! / 2 + BOTTOM_ORDER_LINE / 2
+        }
+        if (newOrder != 0L) {
+            val bookWithNewOrder = book.copy(order = newOrder)
+            return Observable.fromCallable { wishListPersistence.update(bookWithNewOrder.toWishListSM()) }
+                .subscribeOn(appSchedulers.io)
+                .flatMap { getWishList() }
+        }
+
+        return recalculateOrders(oldPos, newPos, book.toWishListSM())
+            .map { books -> wishListPersistence.insert(*books.toTypedArray()) }
+            .concatMap { getWishList() }
+    }
+
     override fun addToHistory(book: BookListItemUM): Completable {
-        loadImg(getImageNameById(book.id))
-        return CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
+        loadImg(book.imagePath)
+        return CompletableFromAction {
+            historyPersistence.insert(book.toHistorySM(getDateInMillis()))
+        }.subscribeOn(appSchedulers.io)
     }
 
     override fun addToHistoryFromWishList(book: BookListItemUM): Completable {
-        val del = CompletableFromAction { wishListPersistence.delete(book.toWishListSM()) }.subscribeOn(appSchedulers.io)
-        val add = CompletableFromAction { historyPersistence.insert(book.toHistorySM()) }.subscribeOn(appSchedulers.io)
-        loadImg(book.imagePath)
+        val del = CompletableFromAction {
+            wishListPersistence.delete(book.toWishListSM())
+        }.subscribeOn(appSchedulers.io)
+
+        val add = addToHistory(book)
+
         return del.mergeWith(add)
     }
 
     override fun deleteFromWishList(book: BookListItemUM): Completable {
-        val directory = context.getDir(IMAGE_DIR, Context.MODE_PRIVATE)
-        val imageFile = File(directory, book.imagePath)
-        imageFile.delete()
         return Completable.fromAction {
             wishListPersistence.delete(book.toWishListSM())
         }.subscribeOn(appSchedulers.io)
@@ -90,34 +131,38 @@ class BooksLocalRepositoryImpl(
     override fun getWishListPage(page: Int): Observable<List<BookListItemUM>> {
         return wishListPersistence
             .getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
+                limit = PAGE_SIZE,
+                offset = if (page != 0) (page - 1) * PAGE_SIZE else 0
             )
             .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getHistoryPage(page: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = PAGE_SIZE,
-            offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = PAGE_SIZE,
+                offset = if (page != 0)(page - 1) * PAGE_SIZE else 0
+            )
+            .map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstWishListPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return wishListPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return wishListPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
     override fun getFirstHistoryPages(numPages: Int): Observable<List<BookListItemUM>> {
-        return historyPersistence.getBooks(
-            limit = numPages * PAGE_SIZE,
-            offset = 0
-        ).map { bookSM -> bookSM.toBookListItemUM() }
+        return historyPersistence
+            .getBooks(
+                limit = numPages * PAGE_SIZE,
+                offset = 0
+            ).map { bookSM -> bookSM.toBookListItemUM() }
             .subscribeOn(appSchedulers.io)
     }
 
@@ -133,39 +178,124 @@ class BooksLocalRepositoryImpl(
             .subscribeOn(appSchedulers.io)
     }
 
-    private fun loadImg(imagePath: String?) {
-        Picasso.get().load(imagePath).into(ImageTarget(context, IMAGE_DIR, imagePath))
-    }
-}
-
-class ImageTarget(
-    context: Context,
-    imageDir: String?,
-    imageName: String?
-) : Target {
-
-    private val contextWrapper = ContextWrapper(context)
-    private val directory = contextWrapper.getDir(imageDir, Context.MODE_PRIVATE)
-    private val imgName = imageName
-
-    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+    override fun getMaxOrder(): Observable<Long?> {
+        return wishListPersistence.getMaxOrder()
+            .timeout(1, TimeUnit.SECONDS)
+            .subscribeOn(appSchedulers.io)
+            .onErrorReturn { BOTTOM_ORDER_LINE }
     }
 
-    override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
+    override fun getWishListSize(): Observable<Int> {
+        return wishListPersistence.getSize().subscribeOn(appSchedulers.io).onErrorReturn { 0 }
     }
 
-    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        thread {
-            val imageFile = File(directory, imgName)
-            var fos: FileOutputStream? = null
-            try {
-                fos = FileOutputStream(imageFile)
-                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                fos?.close()
+    override fun deleteAllFromWishList(): Completable {
+        return Completable.fromAction { wishListPersistence.deleteAll() }.subscribeOn(appSchedulers.io)
+    }
+
+    override fun getInBaseState(book: BookDetailsUM): Observable<BookDetailsUM> {
+        val isInHistory = isInHistory(book.toBookListItemUM()).onErrorReturn { false }
+        val isInWishLis = isInWishList(book.toBookListItemUM()).onErrorReturn { false }
+        val book = Observable.just(book)
+        return  Observable.zip(
+            book,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookDetailsUM, Boolean, Boolean, BookDetailsUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
             }
-        }
+        )
     }
+
+    override fun getInBaseState(movie: MovieDetailsUM): Observable<MovieDetailsUM> {
+        val isInHistory = isInHistory(movie.toBookListUM()).onErrorReturn { false }
+        val isInWishLis = isInWishList(movie.toBookListUM()).onErrorReturn { false }
+        val movie = Observable.just(movie)
+        return  Observable.zip(
+            movie,
+            isInHistory,
+            isInWishLis,
+            Function3 <MovieDetailsUM, Boolean, Boolean, MovieDetailsUM> { movie, inHist, inWish ->
+                movie.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
+    override fun getInBaseState(book: BookListItemUM): Observable<BookListItemUM> {
+        val isInHistory = isInHistory(book).onErrorReturn { false }
+        val isInWishLis = isInWishList(book).onErrorReturn { false }
+        val book = Observable.just(book)
+        return  Observable.zip(
+            book,
+            isInHistory,
+            isInWishLis,
+            Function3 <BookListItemUM, Boolean, Boolean, BookListItemUM> { book, inHist, inWish ->
+                book.copy(
+                    isInHistory = inHist,
+                    isInWishList = inWish
+                )
+            }
+        )
+    }
+
+    private fun recalculateOrders(oldPos: Int, newPos: Int, item: WishListSM): Observable<List<WishListSM>> {
+        val wishSize = wishListPersistence.getSize().subscribeOn(appSchedulers.io)
+        val books = wishListPersistence.getAllBooks().subscribeOn(appSchedulers.io).timeout(1, TimeUnit.SECONDS)
+        val pos = Observable.just(newPos)
+        val book = Observable.just(item)
+        return Observable.zip(
+            wishSize,
+            books,
+            pos,
+            book,
+            Function4<Int, List<WishListSM>, Int, WishListSM, List<WishListSM>> { size, books, pos, book->
+                val dif = TOP_ORDER_LINE / (size + 1) * 2
+                var currentItemOrder = BOTTOM_ORDER_LINE
+
+                val list = ArrayList(books)
+                list.removeAt(oldPos)
+                list.add(newPos, books[oldPos])
+
+                val recalcBooks  = list.toList()
+                return@Function4 recalcBooks.map { item ->
+                    currentItemOrder += dif
+                    item.copy(order = currentItemOrder)
+                }
+            })
+    }
+
+    override fun getInBaseState(books: List<BookListItemUM>): Observable<List<BookListItemUM>> {
+        val books = Observable.just(books)
+        val wishList = getWishList()
+        val history = getHistory()
+        return Observable.zip(
+            books,
+            wishList,
+            history,
+            Function3<List<BookListItemUM>,  List<BookListItemUM>, List<BookListItemUM>, List<BookListItemUM>> { books, wish, hist ->
+                books.map {
+                    it.copy(
+                        isInHistory = hist.map { it.id }.contains(it.id),
+                        isInWishList = wish.map { it.id }.contains(it.id)
+                    )
+                }
+            }
+        )
+    }
+
+    private fun loadImg(imagePath: String?) {
+        Glide.with(context)
+            .load(imagePath)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .preload()
+    }
+
+    private fun getDateInMillis()  = Calendar.getInstance().time.time
+
 }

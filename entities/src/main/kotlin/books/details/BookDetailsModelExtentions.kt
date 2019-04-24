@@ -2,7 +2,7 @@ package ru.appkode.base.entities.core.books.details
 
 import ru.appkode.base.entities.core.books.Format
 
-fun List<AuthorUM>.toAuthorsLine(range: IntRange): String {
+fun List<AuthorUM>.toAuthorsLine(range: IntRange = 0 until size): String {
     return Format.toLine(this, range) { author -> author.name ?: "" }
 }
 

@@ -1,17 +1,18 @@
 package ru.appkode.base.ui.books.lists.history
 
-import com.jakewharton.rxbinding3.recyclerview.scrollEvents
+import books.lists.adapters.Swipe
+import books.lists.adapters.SwipeActions
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.books_list_controller.*
 import ru.appkode.base.repository.RepositoryHelper
-import ru.appkode.base.ui.books.lists.CommonListAdapter
 import ru.appkode.base.ui.books.lists.CommonListController
 import ru.appkode.base.ui.books.lists.CommonListPresenter
+import ru.appkode.base.ui.books.lists.adapters.CommonListAdapter
 import ru.appkode.base.ui.core.core.util.DefaultAppSchedulers
 
 class HistoryController : CommonListController() {
 
-    override val listAdapter: CommonListAdapter = CommonListAdapter(true)
+    override fun getBooksListAdapter(): CommonListAdapter = HistoryAdapter()
 
     override fun createPresenter(): CommonListPresenter {
         return HistoryPresenter(
@@ -22,4 +23,16 @@ class HistoryController : CommonListController() {
         )
     }
 
+    override fun wishListIconClickedIntent(): Observable<Int> {
+        return listAdapter.wishListIconClicked
+    }
+
+    override fun deleteIconClickedIntent(): Observable<Int> {
+        return listAdapter.deleteIconClicked
+    }
+}
+
+class HistoryAdapter : CommonListAdapter(true), Swipe {
+    override fun delegateControlsAdapter(): CommonListAdapter = this
+    override fun getSwipeAction(action: () -> Unit): SwipeResultAction = SwipeActions.Remove(action)
 }

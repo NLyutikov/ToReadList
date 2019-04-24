@@ -1,99 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="3dp"
+        >
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/book_card">
+            android:layout_height="wrap_content"
+            app:cardElevation="8dp"
+            android:id="@+id/book_list_item_container">
 
-        <ImageView
-                android:id="@+id/books_list_item_image"
-                android:layout_width="56dp"
-                android:layout_height="100dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-        />
-
-        <TextView
-                android:id="@+id/books_list_item_name"
-                android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000"
-                android:textSize="24sp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/books_list_item_swipe_img"/>
+                android:padding="10dp">
 
-        <ImageView
-                android:id="@+id/books_list_item_favorites"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/outline_turned_in_not_24"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/books_list_item_visible"
-        />
+            <ImageView
+                    android:id="@+id/books_list_item_image"
+                    android:layout_width="90dp"
+                    android:layout_height="130dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+            />
 
-        <ImageView
-                android:id="@+id/books_list_item_visible"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/outline_visibility_off_24"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/books_list_item_swipe_img"
-        />
+            <TextView
+                    android:id="@+id/books_list_item_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_black_color"
+                    android:textSize="18sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/books_list_item_drag_img"/>
 
-        <TextView
-                android:id="@+id/books_list_item_rating_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:layout_marginBottom="10dp"
-                app:layout_constraintStart_toEndOf="@+id/books_list_item_rating_img"
-                app:layout_constraintBottom_toBottomOf="parent"
-        />
+            <ImageView
+                    android:id="@+id/books_list_item_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_delete_black_24dp"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/books_list_item_wish_list"
+            />
 
-        <ImageView
-                android:id="@+id/books_list_item_rating_img"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/round_star_rate_18"
-                android:layout_marginStart="14dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
-                app:layout_constraintBottom_toBottomOf="parent"
-        />
+            <ImageView
+                    android:id="@+id/books_list_item_wish_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/outline_turned_in_not_24"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/books_list_item_history"
+            />
 
-        <ImageView
-                android:id="@+id/books_list_item_swipe_img"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/round_drag_handle_24"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-        />
+            <ImageView
+                    android:id="@+id/books_list_item_history"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_history_24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/books_list_item_drag_img"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                    android:id="@+id/books_list_item_rating_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16dp"
+                    android:text="text"
+                    android:layout_margin="2dp"
+                    app:layout_constraintStart_toEndOf="@+id/books_list_item_rating_img"
+                    app:layout_constraintBottom_toBottomOf="parent"
+            />
 
-</androidx.cardview.widget.CardView>
+            <ImageView
+                    android:id="@+id/books_list_item_rating_img"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/round_star_rate_18"
+                    android:layout_marginStart="14dp"
+                    app:layout_constraintStart_toEndOf="@+id/books_list_item_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+            <ImageView
+                    android:id="@+id/books_list_item_drag_img"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:clickable="true"
+                    android:background="@drawable/round_drag_handle_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+            />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

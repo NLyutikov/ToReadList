@@ -19,7 +19,7 @@ data class SearchResultNM(
 
     @Path("best_book")
     @PropertyElement
-    val id: Long?,
+    val id: Long,
 
     @Path("best_book")
     @PropertyElement

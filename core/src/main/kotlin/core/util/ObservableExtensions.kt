@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.appkode.base.ui.core.core.LceState
+import java.util.concurrent.TimeUnit
 
 /**
  * Swaps out an original source with a new one which will complete after a small delay.
@@ -84,4 +85,12 @@ fun <T, Event> Observable<T>.toLceEventObservable(
     .startWith(onLoading)
 }
 
+fun <T> Observable<T>.eventThrottleFirst(
+    time: Long = THROTTLE_TIME,
+    units: TimeUnit = TimeUnit.MILLISECONDS
+): Observable<T> {
+    return this.throttleFirst(THROTTLE_TIME, TimeUnit.MILLISECONDS)
+}
+
 private const val MOCK_NOTIFICATION_DEFAULT_DELAY_MS = 1500L
+private const val THROTTLE_TIME = 500L

@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import com.bluelinelabs.conductor.Router
 import io.reactivex.Observable
@@ -6,13 +6,14 @@ import ru.appkode.base.entities.core.books.details.BookDetailsUM
 import ru.appkode.base.entities.core.books.details.toBookListItemUM
 import ru.appkode.base.repository.books.BooksLocalRepository
 import ru.appkode.base.repository.books.BooksNetworkRepository
+import ru.appkode.base.ui.books.details.books.about_book.AboutBookController
 import ru.appkode.base.ui.core.core.BasePresenter
 import ru.appkode.base.ui.core.core.Command
 import ru.appkode.base.ui.core.core.LceState
 import ru.appkode.base.ui.core.core.command
 import ru.appkode.base.ui.core.core.util.AppSchedulers
 import ru.appkode.base.ui.core.core.util.obtainHorizontalTransaction
-import timber.log.Timber
+import ru.appkode.base.ui.core.core.util.obtainVerticalTransaction
 
 sealed class ScreenAction
 
@@ -29,29 +30,24 @@ class BookDetailsPresenter(
     private val networkRepository: BooksNetworkRepository,
     private val localRepository: BooksLocalRepository,
     private val router: Router,
-    private val bookId: Long,
-    private val view: BookDetailsScreen.ViewControl
+    private val bookId: Long
 ) : BasePresenter<BookDetailsScreen.View, BookDetailsScreen.ViewState, ScreenAction>(schedulers){
 
     override fun createIntents(): List<Observable<out ScreenAction>> {
         return listOf(
             intent(BookDetailsScreen.View::showMoreInfoIntent)
-                .map{ShowMoreInformation},
+                .map{ ShowMoreInformation },
             intent(BookDetailsScreen.View::showSimilarBookIntent)
-                .map{ShowSimilarBook(it)},
-            intent(BookDetailsScreen.View::wishListBtnPressed)
+                .map{ ShowSimilarBook(it) },
+            intent(BookDetailsScreen.View::wishListBtnPressedIntent)
                 .map { WishListBtnPressed },
             intent(BookDetailsScreen.View::historyBtnPressed)
                 .map { HistoryBtnPressed },
-            intent { networkRepository.getBookDetails(bookId).onErrorReturn { BookDetailsUM(-1) }}
-                .doLceAction { LoadBookDetails(it) }
-                .doOnError { e -> Timber.e(e.message) }
-                .onErrorReturn { e ->
-                    LoadBookDetails(LceState.Error(
-                        e.message ?: "unknown error",
-                        BookDetailsUM(-1)
-                    ))
-                }
+            intent(BookDetailsScreen.View::reloadBookDetailsIntent)
+                .flatMap {  networkRepository.getBookDetails(bookId, localRepository) }
+                .map { LoadBookDetails(it) },
+            intent { networkRepository.getBookDetails(bookId, localRepository) }
+                .map { LoadBookDetails(it) }
         )
     }
 
@@ -75,8 +71,10 @@ class BookDetailsPresenter(
         action: LoadBookDetails
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         var bookDetails: BookDetailsUM? = previousState.bookDetails
-        if (action.state.isContent)
+        if (action.state.isContent) {
             bookDetails = action.state.asContent()
+        }
+        action.state.isError
         return previousState.copy(
             bookDetails = bookDetails,
             bookDetailsState = action.state
@@ -99,7 +97,7 @@ class BookDetailsPresenter(
         action: ShowMoreInformation
     ) : Pair<BookDetailsScreen.ViewState, Command<Observable<ScreenAction>>?> {
         return previousState to command {
-            //TODO показать доп. информацию о книге
+            router.pushController(AboutBookController.createController(previousState.bookDetails).obtainVerticalTransaction())
         }
     }
 

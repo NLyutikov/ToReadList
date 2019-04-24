@@ -1,4 +1,4 @@
-package ru.appkode.base.ui.books.details
+package books.details.books
 
 import io.reactivex.Observable
 import ru.appkode.base.entities.core.books.details.BookDetailsUM
@@ -11,11 +11,8 @@ interface BookDetailsScreen {
         fun showSimilarBookIntent(): Observable<Long>
         fun showMoreInfoIntent(): Observable<Unit>
         fun historyBtnPressed(): Observable<Unit>
-        fun wishListBtnPressed(): Observable<Unit>
-    }
-
-    interface ViewControl {
-        fun showHistoryAndWishListIcons(isInHistory: Boolean, isInWishList: Boolean)
+        fun wishListBtnPressedIntent(): Observable<Unit>
+        fun reloadBookDetailsIntent(): Observable<Unit>
     }
 
     data class ViewState(

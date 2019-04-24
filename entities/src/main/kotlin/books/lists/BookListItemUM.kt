@@ -5,6 +5,7 @@ data class BookListItemUM (
     val title: String? = null,
     val averageRating: Double? = null,
     val imagePath: String? = null,
-    val isInWishList: Boolean? = false,
-    val isInHistory: Boolean? = false
+    val order: Long? = null,
+    val isInWishList: Boolean = false,
+    val isInHistory: Boolean = false
 )

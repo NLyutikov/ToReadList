@@ -34,11 +34,27 @@
   <string name="book_details_more_info_btn_text">More information</string>
   <string name="book_details_similar_books_text">Similar books</string>
 
+  <!-- About Book -->
+  <string name="about_book_isbn">isbn</string>
+  <string name="about_book_language">language</string>
+  <string name="about_book_pages_number">Pages number</string>
+  <string name="about_book_authors">Authors</string>
+  <string name="about_book">About book</string>
+
   <!-- Empty favorites/history -->
   <string name="no_favorite_items">There is nothing in the favorites list yet.</string>
   <string name="no_books_read">There are no books in the list.</string>
   <string name="create_task_create">Create</string>
   <string name="change_task_save">Save</string>
   <string name="description">Description</string>
+
+  <!-- Search -->
+  <string name="search_is_not_started">Start typing the query text</string>
+  <string name="search_nothing_found_by_query">Nothing found by query:</string>
+
+  <!-- MainController search dialog -->
+  <string name="search_dialog_movie_item">Movies</string>
+  <string name="search_dialog_book_item">Books</string>
+  <string name="search_dialog_title">Search</string>
 
 </resources>
